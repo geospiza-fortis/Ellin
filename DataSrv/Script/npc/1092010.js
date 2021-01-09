@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -31,21 +31,19 @@ No specific function, useless text.
 var status = 0;
 
 function start() {
-	status = -1;
-	action(1, 0, 0);
+    status = -1;
+    action(1, 0, 0);
 }
 
 function action(mode, type, selection) {
-	if (mode == -1) {
-		cm.dispose();
-	} else {
-	if (mode == 1)
-		status++;
-	else
-		status--;
-	if (status == 0) {
-		cm.sendOk("(Scratch scratch...)");
-		cm.dispose();
-		}
-	}
+    if (mode == -1) {
+        cm.dispose();
+    } else {
+        if (mode == 1) status++;
+        else status--;
+        if (status == 0) {
+            cm.sendOk("(Scratch scratch...)");
+            cm.dispose();
+        }
+    }
 }

@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -35,34 +35,48 @@ var status = 0;
 var returnmap;
 
 function start() {
-	status = -1;
-	action(1, 0, 0);
+    status = -1;
+    action(1, 0, 0);
 }
 
 function action(mode, type, selection) {
-	if (mode == -1) {
-		cm.dispose();
-	} else {
-		if (mode == 0) {
-			cm.sendNext("You must have some business to take care of here. It's not a bad idea to take some rest at #m"+returnmap+"# Look at me; I love it here so much that I wound up living here. Hahaha anyway, talk to me when you feel like going back.");
-			cm.dispose();
-			return;
-		}
-		if (mode == 1)
-			status++;
-		else
-			status--;
-		if (status == 0) {
-			returnmap = cm.getPlayer().getSavedLocation(SavedLocationType.FLORINA);
-			if (returnmap == -1) {
-				returnmap = 104000000;
-			}
-			cm.sendNext("So you want to leave #b#m110000000##k? If you want, I can take you back to #b#m"+returnmap+"##k.");
-		} else if (status == 1) {
-			cm.sendYesNo("Are you sure you want to return to #b#m"+returnmap+"##k? Alright, we'll have to get going fast. Do you want to head back to #m"+returnmap+"# now?")
-		} else if (status == 2) {
-			cm.warp(returnmap, 0);
-			cm.dispose();
-		}
-	}
+    if (mode == -1) {
+        cm.dispose();
+    } else {
+        if (mode == 0) {
+            cm.sendNext(
+                "You must have some business to take care of here. It's not a bad idea to take some rest at #m" +
+                    returnmap +
+                    "# Look at me; I love it here so much that I wound up living here. Hahaha anyway, talk to me when you feel like going back."
+            );
+            cm.dispose();
+            return;
+        }
+        if (mode == 1) status++;
+        else status--;
+        if (status == 0) {
+            returnmap = cm
+                .getPlayer()
+                .getSavedLocation(SavedLocationType.FLORINA);
+            if (returnmap == -1) {
+                returnmap = 104000000;
+            }
+            cm.sendNext(
+                "So you want to leave #b#m110000000##k? If you want, I can take you back to #b#m" +
+                    returnmap +
+                    "##k."
+            );
+        } else if (status == 1) {
+            cm.sendYesNo(
+                "Are you sure you want to return to #b#m" +
+                    returnmap +
+                    "##k? Alright, we'll have to get going fast. Do you want to head back to #m" +
+                    returnmap +
+                    "# now?"
+            );
+        } else if (status == 2) {
+            cm.warp(returnmap, 0);
+            cm.dispose();
+        }
+    }
 }

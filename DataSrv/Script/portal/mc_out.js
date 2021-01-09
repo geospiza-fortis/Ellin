@@ -24,11 +24,18 @@ Return from MCPQ map.
 */
 
 function enter(pi) {
-    var returnMap = pi.getPlayer().getSavedLocation(SavedLocationType.MONSTER_CARNIVAL);
+    var returnMap = pi
+        .getPlayer()
+        .getSavedLocation(SavedLocationType.MONSTER_CARNIVAL);
     if (returnMap < 0) {
-        returnMap = 100000000;  
+        returnMap = 100000000;
     }
-    var target = pi.getPlayer().getClient().getChannelServer().getMapFactory().getMap(returnMap);
+    var target = pi
+        .getPlayer()
+        .getClient()
+        .getChannelServer()
+        .getMapFactory()
+        .getMap(returnMap);
     var targetPortal;
 
     if (returnMap == 230000000) {
@@ -37,8 +44,7 @@ function enter(pi) {
         targetPortal = target.getPortal("market00");
     }
 
-    if (targetPortal == null)
-        targetPortal = target.getPortal(0);
+    if (targetPortal == null) targetPortal = target.getPortal(0);
 
     if (pi.getPlayer().getMapId() != target) {
         pi.getPlayer().clearSavedLocation(SavedLocationType.MONSTER_CARNIVAL);
@@ -46,4 +52,4 @@ function enter(pi) {
         return true;
     }
     return false;
-}  
+}

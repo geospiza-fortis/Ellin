@@ -1,6 +1,6 @@
-/* 
+/*
  * This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -19,15 +19,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* 
+/*
  * @Author Lerk
- * 
+ *
  * spawn for Sharen III's Soul, Sharenian: Sharen III's Grave (990000700)
- * 
+ *
  * Guild Quest - end of stage 4
  */
 
-function act(){
-    rm.mapMessage(5, "A bright flash of light, then someone familiar appears in front of the blocked gate.");
+function act() {
+    rm.mapMessage(
+        5,
+        "A bright flash of light, then someone familiar appears in front of the blocked gate."
+    );
     rm.spawnNpc(9040003);
 }

@@ -2,6 +2,11 @@ package client.player.commands;
 
 import client.Client;
 import client.ClientLoginState;
+import client.player.Player;
+import client.player.PlayerNote;
+import client.player.commands.object.CommandExecute;
+import client.player.inventory.Equip;
+import client.player.inventory.Item;
 import constants.CommandConstants.CoomandRank;
 import database.DatabaseConnection;
 import handling.channel.ChannelServer;
@@ -18,17 +23,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import packet.creators.PacketCreator;
 import packet.transfer.write.OutPacket;
-import client.player.Player;
-import client.player.PlayerNote;
-import client.player.commands.object.CommandExecute;
-import client.player.inventory.Equip;
-import client.player.inventory.Item;
-import java.util.Map;
 import provider.MapleData;
 import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
@@ -56,11 +56,11 @@ import tools.TimerTools.MiscTimer;
  */
 
 public class AdminCommand {
-    
+
     public static CoomandRank getPlayerLevelRequired() {
         return CoomandRank.ADMIN;
     }
-    
+
     public static class ShutdownTime extends AdminCommand.Shutdown {
 
         private static ScheduledFuture<?> ts = null;
@@ -69,63 +69,127 @@ public class AdminCommand {
         @Override
         public boolean execute(Client c, String[] splitted) {
             this.minutesLeft = Integer.parseInt(splitted[1]);
-            
-            c.getPlayer().dropMessage(6, "Desligando o servidor em... " + this.minutesLeft + " minutos");
-            
+
+            c
+                .getPlayer()
+                .dropMessage(
+                    6,
+                    "Desligando o servidor em... " +
+                    this.minutesLeft +
+                    " minutos"
+                );
+
             if (ts == null && (t == null || !t.isAlive())) {
                 t = new Thread(ShutdownServer.getInstance());
-                ts = MiscTimer.getInstance().register(() -> {
-                    if (AdminCommand.ShutdownTime.this.minutesLeft == 0) {
-                        ShutdownServer.getInstance().shutdown();
-                        AdminCommand.Shutdown.t.start();
-                        AdminCommand.ShutdownTime.ts.cancel(false);
-                        return;
-                    }
-                    BroadcastService.broadcastMessage(PacketCreator.ServerNotice(0, "The server will be shut down in " + AdminCommand.ShutdownTime.this.minutesLeft + " minutos. Por favor, fa�a logoff com seguran�a."));
-                    AdminCommand.ShutdownTime.this.minutesLeft--;
-                }, 60000L);
+                ts =
+                    MiscTimer
+                        .getInstance()
+                        .register(
+                            () -> {
+                                if (
+                                    AdminCommand.ShutdownTime.this.minutesLeft ==
+                                    0
+                                ) {
+                                    ShutdownServer.getInstance().shutdown();
+                                    AdminCommand.Shutdown.t.start();
+                                    AdminCommand.ShutdownTime.ts.cancel(false);
+                                    return;
+                                }
+                                BroadcastService.broadcastMessage(
+                                    PacketCreator.ServerNotice(
+                                        0,
+                                        "The server will be shut down in " +
+                                        AdminCommand.ShutdownTime.this.minutesLeft +
+                                        " minutos. Por favor, fa�a logoff com seguran�a."
+                                    )
+                                );
+                                AdminCommand.ShutdownTime.this.minutesLeft--;
+                            },
+                            60000L
+                        );
             } else {
-                c.getPlayer().dropMessage(6, "There is already a shutdown in progress or the shutdown has not been completed. Please wait.");
+                c
+                    .getPlayer()
+                    .dropMessage(
+                        6,
+                        "There is already a shutdown in progress or the shutdown has not been completed. Please wait."
+                    );
             }
             return true;
         }
     }
-    
+
     public static class Position extends CommandExecute {
+
         @Override
         public boolean execute(Client c, String[] splitted) {
             float xpos = c.getPlayer().getPosition().x;
             float ypos = c.getPlayer().getPosition().y;
-            float fh = c.getPlayer().getMap().getFootholds().findBelow(c.getPlayer().getPosition()).getId();
-            c.getPlayer().dropMessage(6, "Position: (" + xpos + ", " + ypos + ")");
+            float fh = c
+                .getPlayer()
+                .getMap()
+                .getFootholds()
+                .findBelow(c.getPlayer().getPosition())
+                .getId();
+            c
+                .getPlayer()
+                .dropMessage(6, "Position: (" + xpos + ", " + ypos + ")");
             c.getPlayer().dropMessage(6, "Foothold ID: " + fh);
             return true;
         }
     }
-    
+
     public static class Expeds extends CommandExecute {
+
         @Override
         public boolean execute(Client c, String[] splitted) {
             for (ChannelServer ch : ChannelServer.getAllInstances()) {
                 if (ch.getExpeditions().isEmpty()) {
-                    c.getPlayer().yellowMessage("No Expeditions in Channel " + ch.getChannelId());
+                    c
+                        .getPlayer()
+                        .yellowMessage(
+                            "No Expeditions in Channel " + ch.getChannelId()
+                        );
                     continue;
                 }
-                c.getPlayer().yellowMessage("Expeditions in Channel " + ch.getChannelId());
+                c
+                    .getPlayer()
+                    .yellowMessage(
+                        "Expeditions in Channel " + ch.getChannelId()
+                    );
                 int id = 0;
                 for (MapleExpedition exped : ch.getExpeditions()) {
                     id++;
                     c.getPlayer().yellowMessage("> Expedition " + id);
-                    c.getPlayer().yellowMessage(">> Type: " + exped.getType().toString());
-                    c.getPlayer().yellowMessage(">> Status: " + (exped.isRegistering() ? "REGISTERING" : "UNDERWAY"));
-                    c.getPlayer().yellowMessage(">> Size: " + exped.getMembers().size());
-                    c.getPlayer().yellowMessage(">> Leader: " + exped.getLeader().getName());
+                    c
+                        .getPlayer()
+                        .yellowMessage(
+                            ">> Type: " + exped.getType().toString()
+                        );
+                    c
+                        .getPlayer()
+                        .yellowMessage(
+                            ">> Status: " +
+                            (exped.isRegistering() ? "REGISTERING" : "UNDERWAY")
+                        );
+                    c
+                        .getPlayer()
+                        .yellowMessage(">> Size: " + exped.getMembers().size());
+                    c
+                        .getPlayer()
+                        .yellowMessage(
+                            ">> Leader: " + exped.getLeader().getName()
+                        );
                     int memId = 2;
                     for (Player member : exped.getMembers()) {
                         if (exped.isLeader(member)) {
-                                continue;
+                            continue;
                         }
-                        c.getPlayer().yellowMessage(">>> Member " + memId + ": " + member.getName());
+                        c
+                            .getPlayer()
+                            .yellowMessage(
+                                ">>> Member " + memId + ": " + member.getName()
+                            );
                         memId++;
                     }
                 }
@@ -133,23 +197,50 @@ public class AdminCommand {
             return true;
         }
     }
-    
+
     public static class Seeds extends CommandExecute {
+
         @Override
         public boolean execute(Client c, String[] splitted) {
             if (c.getPlayer().getMapId() != 910010000) {
-                c.getPlayer().yellowMessage("This command can only be used in HPQ.");
+                c
+                    .getPlayer()
+                    .yellowMessage("This command can only be used in HPQ.");
                 return false;
             }
-            Point pos[] = {new Point(7, -207), new Point(179, -447), new Point(-3, -687), new Point(-357, -687), new Point(-538, -447), new Point(-359, -207)};
-            int seed[] = {4001097, 4001096, 4001095, 4001100, 4001099, 4001098};
+            Point pos[] = {
+                new Point(7, -207),
+                new Point(179, -447),
+                new Point(-3, -687),
+                new Point(-357, -687),
+                new Point(-538, -447),
+                new Point(-359, -207),
+            };
+            int seed[] = {
+                4001097,
+                4001096,
+                4001095,
+                4001100,
+                4001099,
+                4001098,
+            };
             for (int i = 0; i < pos.length; i++) {
                 Item item = new Item(seed[i], (byte) 0, (short) 1);
-                c.getPlayer().getMap().spawnItemDrop(c.getPlayer(), c.getPlayer(), item, pos[i], false, true);
+                c
+                    .getPlayer()
+                    .getMap()
+                    .spawnItemDrop(
+                        c.getPlayer(),
+                        c.getPlayer(),
+                        item,
+                        pos[i],
+                        false,
+                        true
+                    );
                 try {
-                        Thread.sleep(100);
+                    Thread.sleep(100);
                 } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    e.printStackTrace();
                 }
             }
             return true;
@@ -157,6 +248,7 @@ public class AdminCommand {
     }
 
     public static class ReloadEvents extends CommandExecute {
+
         @Override
         public boolean execute(Client c, String[] splitted) {
             for (ChannelServer ch : ChannelServer.getAllInstances()) {
@@ -166,8 +258,9 @@ public class AdminCommand {
             return true;
         }
     }
-    
+
     public static class ReloadDrops extends CommandExecute {
+
         @Override
         public boolean execute(Client c, String[] splitted) {
             MapleMonsterInformationProvider.getInstance().clearDrops();
@@ -175,8 +268,9 @@ public class AdminCommand {
             return true;
         }
     }
-    
+
     public static class ReloadPortals extends CommandExecute {
+
         @Override
         public boolean execute(Client c, String[] splitted) {
             PortalScriptManager.getInstance().clearScripts();
@@ -184,25 +278,30 @@ public class AdminCommand {
             return true;
         }
     }
-    
+
     public static class ReloadMaps extends CommandExecute {
+
         @Override
         public boolean execute(Client c, String[] splitted) {
-            
             Field oldMap = c.getPlayer().getMap();
-            Field newMap = c.getChannelServer().getMapFactory().resetMap(c.getPlayer().getMapId());
+            Field newMap = c
+                .getChannelServer()
+                .getMapFactory()
+                .resetMap(c.getPlayer().getMapId());
             int callerid = c.getPlayer().getId();
 
             for (Player p : oldMap.getCharacters()) {
                 p.changeMap(newMap);
                 if (p.getId() != callerid) {
-                    p.dropMessage("You have been relocated due to map reloading. Sorry for the inconvenience.");
+                    p.dropMessage(
+                        "You have been relocated due to map reloading. Sorry for the inconvenience."
+                    );
                 }
             }
             newMap.Respawn(false);
             return true;
         }
-     }
+    }
 
     public static class Shutdown extends CommandExecute {
 
@@ -216,12 +315,17 @@ public class AdminCommand {
                 ShutdownServer.getInstance().shutdown();
                 t.start();
             } else {
-                c.getPlayer().dropMessage(6, "There is already a shutdown in progress. Please wait.");
+                c
+                    .getPlayer()
+                    .dropMessage(
+                        6,
+                        "There is already a shutdown in progress. Please wait."
+                    );
             }
             return true;
         }
     }
-    
+
     public static class ServerMessage extends CommandExecute {
 
         @Override
@@ -234,13 +338,16 @@ public class AdminCommand {
             return true;
         }
     }
-    
+
     public static class SaveAll extends CommandExecute {
+
         @Override
         public boolean execute(Client c, String[] splitted) {
             try {
                 for (ChannelServer ch : ChannelServer.getAllInstances()) {
-                    for (Player chr : ch.getPlayerStorage().getAllCharacters()) {
+                    for (Player chr : ch
+                        .getPlayerStorage()
+                        .getAllCharacters()) {
                         chr.saveDatabase();
                     }
                 }
@@ -252,40 +359,65 @@ public class AdminCommand {
             return true;
         }
     }
-    
+
     public static class WarpAllHere extends CommandExecute {
+
         @Override
         public boolean execute(Client c, String[] splitted) {
             List<Player> people = new LinkedList<>();
             for (ChannelServer cs : ChannelServer.getAllInstances()) {
                 for (Player mch : cs.getPlayerStorage().getAllCharacters()) {
-                    if (mch.getMapId() != c.getPlayer().getMapId() || mch.getClient().getChannel() != c.getChannel()) {
+                    if (
+                        mch.getMapId() != c.getPlayer().getMapId() ||
+                        mch.getClient().getChannel() != c.getChannel()
+                    ) {
                         people.add(mch);
                     }
                 }
             }
             String ip = c.getChannelServer().getIP();
             String[] socket = ip.split(":");
-            
+
             for (Player p : people) {
                 if (p.getClient().getChannel() != c.getChannel()) {
                     try {
                         p.getMap().removePlayer(p);
-                        ChannelServer.getInstance(p.getClient().getChannel()).removePlayer(p);
-                        p.getClient().updateLoginState(ClientLoginState.LOGIN_SERVER_TRANSITION, c.getSessionIPAddress());
-                        p.getClient().getSession().write(PacketCreator.GetChannelChange(InetAddress.getByName(socket[0]), Integer.parseInt(socket[1])));
+                        ChannelServer
+                            .getInstance(p.getClient().getChannel())
+                            .removePlayer(p);
+                        p
+                            .getClient()
+                            .updateLoginState(
+                                ClientLoginState.LOGIN_SERVER_TRANSITION,
+                                c.getSessionIPAddress()
+                            );
+                        p
+                            .getClient()
+                            .getSession()
+                            .write(
+                                PacketCreator.GetChannelChange(
+                                    InetAddress.getByName(socket[0]),
+                                    Integer.parseInt(socket[1])
+                                )
+                            );
                     } catch (UnknownHostException ex) {
-                        Logger.getLogger(AdminCommand.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger
+                            .getLogger(AdminCommand.class.getName())
+                            .log(Level.SEVERE, null, ex);
                         return false;
                     }
                 }
-                p.changeMap(c.getPlayer().getMap(), c.getPlayer().getMap().getPortal("sp"));
+                p.changeMap(
+                    c.getPlayer().getMap(),
+                    c.getPlayer().getMap().getPortal("sp")
+                );
             }
             return true;
         }
     }
-    
+
     public static class SuperEquip extends CommandExecute {
+
         @Override
         public boolean execute(Client c, String[] splitted) {
             if (splitted.length != 3) {
@@ -301,10 +433,14 @@ public class AdminCommand {
                 id = Integer.parseInt(splitted[1]);
                 stat = (short) Integer.parseInt(splitted[2]);
             } catch (NumberFormatException nfe) {
-                c.getPlayer().dropMessage("Error occured while parsing values. Please recheck and try again.");
+                c
+                    .getPlayer()
+                    .dropMessage(
+                        "Error occured while parsing values. Please recheck and try again."
+                    );
                 return false;
             }
-            
+
             Equip eq = new Equip(id, (byte) -1);
 
             eq.setAcc(stat);
@@ -317,11 +453,11 @@ public class AdminCommand {
             eq.setStr(stat);
             eq.setWatk(stat);
             eq.setWdef(stat);
-            InventoryManipulator.addFromDrop(c, eq, new String(), false); 
+            InventoryManipulator.addFromDrop(c, eq, new String(), false);
             return true;
         }
     }
-    
+
     public static class NPC extends CommandExecute {
 
         @Override
@@ -333,12 +469,24 @@ public class AdminCommand {
                 npc.setCy(c.getPlayer().getPosition().y);
                 npc.setRx0(c.getPlayer().getPosition().x);
                 npc.setRx1(c.getPlayer().getPosition().x);
-                npc.setFh(c.getPlayer().getMap().getFootholds().findBelow(c.getPlayer().getPosition()).getId());
+                npc.setFh(
+                    c
+                        .getPlayer()
+                        .getMap()
+                        .getFootholds()
+                        .findBelow(c.getPlayer().getPosition())
+                        .getId()
+                );
                 npc.getStats().setCustom(true);
                 c.getPlayer().getMap().addMapObject(npc);
-                c.getPlayer().getMap().broadcastMessage(PacketCreator.SpawnNPC(npc, true));
+                c
+                    .getPlayer()
+                    .getMap()
+                    .broadcastMessage(PacketCreator.SpawnNPC(npc, true));
             } else {
-                c.getPlayer().dropMessage(6, "You have entered an invalid Npc-Id");
+                c
+                    .getPlayer()
+                    .dropMessage(6, "You have entered an invalid Npc-Id");
                 return false;
             }
             return true;
@@ -350,11 +498,23 @@ public class AdminCommand {
         @Override
         public boolean execute(Client c, String[] splitted) {
             Point pos = c.getPlayer().getPosition();
-            c.getPlayer().dropMessage(6, "X: " + pos.x + " | Y: " + pos.y + " | RX0: " + (pos.x) + " | RX1: " + (pos.x));
+            c
+                .getPlayer()
+                .dropMessage(
+                    6,
+                    "X: " +
+                    pos.x +
+                    " | Y: " +
+                    pos.y +
+                    " | RX0: " +
+                    (pos.x) +
+                    " | RX1: " +
+                    (pos.x)
+                );
             return true;
         }
     }
-    
+
     public static class Notice extends CommandExecute {
 
         private static int getNoticeType(String typestring) {
@@ -420,7 +580,9 @@ public class AdminCommand {
                     c.getPlayer().getMap().broadcastMessage(packet);
                     break;
                 case 1:
-                    ChannelServer.getInstance(c.getChannel()).broadcastPacket(packet);
+                    ChannelServer
+                        .getInstance(c.getChannel())
+                        .broadcastPacket(packet);
                     break;
                 case 2:
                     BroadcastService.broadcastMessage(packet);
@@ -431,7 +593,7 @@ public class AdminCommand {
             return true;
         }
     }
-    
+
     public static class Find extends CommandExecute {
 
         @Override
@@ -439,26 +601,48 @@ public class AdminCommand {
             ItemInformationProvider ii = ItemInformationProvider.getInstance();
             Player mc = c.getPlayer();
             if (splitted.length == 1) {
-                mc.dropMessage(splitted[0] + ": <NPC> <MOB> <ITEM> <MAP> <SKILL>");
+                mc.dropMessage(
+                    splitted[0] + ": <NPC> <MOB> <ITEM> <MAP> <SKILL>"
+                );
             } else {
-
                 String type = splitted[1];
                 String search = StringUtil.joinStringFrom(splitted, 2);
                 MapleData data = null;
-                MapleDataProvider dataProvider = MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzpath") + "/" + "String"));
-                mc.dropMessage("<<Type: " + type + " | Search: " + search + ">>");
-                if (type.equalsIgnoreCase("NPC") || type.equalsIgnoreCase("NPCS")) {
+                MapleDataProvider dataProvider = MapleDataProviderFactory.getDataProvider(
+                    new File(System.getProperty("wzpath") + "/" + "String")
+                );
+                mc.dropMessage(
+                    "<<Type: " + type + " | Search: " + search + ">>"
+                );
+                if (
+                    type.equalsIgnoreCase("NPC") ||
+                    type.equalsIgnoreCase("NPCS")
+                ) {
                     List<String> retNpcs = new ArrayList<>();
                     data = dataProvider.getData("Npc.img");
                     List<Pair<Integer, String>> npcPairList = new LinkedList<>();
                     for (MapleData npcIdData : data.getChildren()) {
-                        int npcIdFromData = Integer.parseInt(npcIdData.getName());
-                        String npcNameFromData = MapleDataTool.getString(npcIdData.getChildByPath("name"), "NO-NAME");
-                        npcPairList.add(new Pair<>(npcIdFromData, npcNameFromData));
+                        int npcIdFromData = Integer.parseInt(
+                            npcIdData.getName()
+                        );
+                        String npcNameFromData = MapleDataTool.getString(
+                            npcIdData.getChildByPath("name"),
+                            "NO-NAME"
+                        );
+                        npcPairList.add(
+                            new Pair<>(npcIdFromData, npcNameFromData)
+                        );
                     }
                     for (Pair<Integer, String> npcPair : npcPairList) {
-                        if (npcPair.getRight().toLowerCase().contains(search.toLowerCase())) {
-                            retNpcs.add(npcPair.getLeft() + " - " + npcPair.getRight());
+                        if (
+                            npcPair
+                                .getRight()
+                                .toLowerCase()
+                                .contains(search.toLowerCase())
+                        ) {
+                            retNpcs.add(
+                                npcPair.getLeft() + " - " + npcPair.getRight()
+                            );
                         }
                     }
                     if (retNpcs != null && retNpcs.size() > 0) {
@@ -468,21 +652,43 @@ public class AdminCommand {
                     } else {
                         mc.dropMessage("No NPC's Found");
                     }
-
-                } else if (type.equalsIgnoreCase("MAP") || type.equalsIgnoreCase("MAPS")) {
+                } else if (
+                    type.equalsIgnoreCase("MAP") ||
+                    type.equalsIgnoreCase("MAPS")
+                ) {
                     List<String> retMaps = new ArrayList<>();
                     data = dataProvider.getData("Map.img");
                     List<Pair<Integer, String>> mapPairList = new LinkedList<>();
                     for (MapleData mapAreaData : data.getChildren()) {
                         for (MapleData mapIdData : mapAreaData.getChildren()) {
-                            int mapIdFromData = Integer.parseInt(mapIdData.getName());
-                            String mapNameFromData = MapleDataTool.getString(mapIdData.getChildByPath("streetName"), "NO-NAME") + " - " + MapleDataTool.getString(mapIdData.getChildByPath("mapName"), "NO-NAME");
-                            mapPairList.add(new Pair<>(mapIdFromData, mapNameFromData));
+                            int mapIdFromData = Integer.parseInt(
+                                mapIdData.getName()
+                            );
+                            String mapNameFromData =
+                                MapleDataTool.getString(
+                                    mapIdData.getChildByPath("streetName"),
+                                    "NO-NAME"
+                                ) +
+                                " - " +
+                                MapleDataTool.getString(
+                                    mapIdData.getChildByPath("mapName"),
+                                    "NO-NAME"
+                                );
+                            mapPairList.add(
+                                new Pair<>(mapIdFromData, mapNameFromData)
+                            );
                         }
                     }
                     for (Pair<Integer, String> mapPair : mapPairList) {
-                        if (mapPair.getRight().toLowerCase().contains(search.toLowerCase())) {
-                            retMaps.add(mapPair.getLeft() + " - " + mapPair.getRight());
+                        if (
+                            mapPair
+                                .getRight()
+                                .toLowerCase()
+                                .contains(search.toLowerCase())
+                        ) {
+                            retMaps.add(
+                                mapPair.getLeft() + " - " + mapPair.getRight()
+                            );
                         }
                     }
                     if (retMaps != null && retMaps.size() > 0) {
@@ -492,19 +698,37 @@ public class AdminCommand {
                     } else {
                         mc.dropMessage("No Maps Found");
                     }
-
-                } else if (type.equalsIgnoreCase("MOB") || type.equalsIgnoreCase("MOBS") || type.equalsIgnoreCase("MONSTER") || type.equalsIgnoreCase("MONSTERS")) {
+                } else if (
+                    type.equalsIgnoreCase("MOB") ||
+                    type.equalsIgnoreCase("MOBS") ||
+                    type.equalsIgnoreCase("MONSTER") ||
+                    type.equalsIgnoreCase("MONSTERS")
+                ) {
                     List<String> retMobs = new ArrayList<>();
                     data = dataProvider.getData("Mob.img");
                     List<Pair<Integer, String>> mobPairList = new LinkedList<>();
                     for (MapleData mobIdData : data.getChildren()) {
-                        int mobIdFromData = Integer.parseInt(mobIdData.getName());
-                        String mobNameFromData = MapleDataTool.getString(mobIdData.getChildByPath("name"), "NO-NAME");
-                        mobPairList.add(new Pair<>(mobIdFromData, mobNameFromData));
+                        int mobIdFromData = Integer.parseInt(
+                            mobIdData.getName()
+                        );
+                        String mobNameFromData = MapleDataTool.getString(
+                            mobIdData.getChildByPath("name"),
+                            "NO-NAME"
+                        );
+                        mobPairList.add(
+                            new Pair<>(mobIdFromData, mobNameFromData)
+                        );
                     }
                     for (Pair<Integer, String> mobPair : mobPairList) {
-                        if (mobPair.getRight().toLowerCase().contains(search.toLowerCase())) {
-                            retMobs.add(mobPair.getLeft() + " - " + mobPair.getRight());
+                        if (
+                            mobPair
+                                .getRight()
+                                .toLowerCase()
+                                .contains(search.toLowerCase())
+                        ) {
+                            retMobs.add(
+                                mobPair.getLeft() + " - " + mobPair.getRight()
+                            );
                         }
                     }
                     if (retMobs != null && retMobs.size() > 0) {
@@ -514,15 +738,26 @@ public class AdminCommand {
                     } else {
                         mc.dropMessage("No Mob's Found");
                     }
-
-                } else if (type.equalsIgnoreCase("REACTOR") || type.equalsIgnoreCase("REACTORS")) {
+                } else if (
+                    type.equalsIgnoreCase("REACTOR") ||
+                    type.equalsIgnoreCase("REACTORS")
+                ) {
                     mc.dropMessage("NOT ADDED YET");
-
-                } else if (type.equalsIgnoreCase("ITEM") || type.equalsIgnoreCase("ITEMS")) {
+                } else if (
+                    type.equalsIgnoreCase("ITEM") ||
+                    type.equalsIgnoreCase("ITEMS")
+                ) {
                     List<String> retItems = new ArrayList<>();
                     ItemInformationProvider miip = ItemInformationProvider.getInstance();
-                    for (Map.Entry<Integer, String> itemEntry : miip.getAllItems().entrySet()) {
-                        if (itemEntry.getValue().toLowerCase().contains(search.toLowerCase())) {
+                    for (Map.Entry<Integer, String> itemEntry : miip
+                        .getAllItems()
+                        .entrySet()) {
+                        if (
+                            itemEntry
+                                .getValue()
+                                .toLowerCase()
+                                .contains(search.toLowerCase())
+                        ) {
                             int id = itemEntry.getKey();
                             retItems.add(id + " - " + miip.getName(id));
                         }
@@ -534,19 +769,40 @@ public class AdminCommand {
                     } else {
                         mc.dropMessage("No Item's Found");
                     }
-
-                } else if (type.equalsIgnoreCase("SKILL") || type.equalsIgnoreCase("SKILLS")) {
+                } else if (
+                    type.equalsIgnoreCase("SKILL") ||
+                    type.equalsIgnoreCase("SKILLS")
+                ) {
                     List<String> retSkills = new ArrayList<String>();
                     data = dataProvider.getData("Skill.img");
                     List<Pair<Integer, String>> skillPairList = new LinkedList<Pair<Integer, String>>();
                     for (MapleData skillIdData : data.getChildren()) {
-                        int skillIdFromData = Integer.parseInt(skillIdData.getName());
-                        String skillNameFromData = MapleDataTool.getString(skillIdData.getChildByPath("name"), "NO-NAME");
-                        skillPairList.add(new Pair<Integer, String>(skillIdFromData, skillNameFromData));
+                        int skillIdFromData = Integer.parseInt(
+                            skillIdData.getName()
+                        );
+                        String skillNameFromData = MapleDataTool.getString(
+                            skillIdData.getChildByPath("name"),
+                            "NO-NAME"
+                        );
+                        skillPairList.add(
+                            new Pair<Integer, String>(
+                                skillIdFromData,
+                                skillNameFromData
+                            )
+                        );
                     }
                     for (Pair<Integer, String> skillPair : skillPairList) {
-                        if (skillPair.getRight().toLowerCase().contains(search.toLowerCase())) {
-                            retSkills.add(skillPair.getLeft() + " - " + skillPair.getRight());
+                        if (
+                            skillPair
+                                .getRight()
+                                .toLowerCase()
+                                .contains(search.toLowerCase())
+                        ) {
+                            retSkills.add(
+                                skillPair.getLeft() +
+                                " - " +
+                                skillPair.getRight()
+                            );
                         }
                     }
                     if (retSkills != null && retSkills.size() > 0) {
@@ -559,31 +815,42 @@ public class AdminCommand {
                 } else {
                     mc.dropMessage("Sorry, that search call is unavailable");
                 }
-            }   
+            }
             return true;
         }
     }
 
-    public static class ID extends Find {
-    }
+    public static class ID extends Find {}
 
-    public static class LookUp extends Find {
-    }
+    public static class LookUp extends Find {}
 
-    public static class Search extends Find {
-    }
+    public static class Search extends Find {}
 
     public static class Warp extends CommandExecute {
 
         @Override
         public boolean execute(Client c, String[] splitted) {
             ChannelServer cserv = c.getChannelServer();
-            Player victim = cserv.getPlayerStorage().getCharacterByName(splitted[1]);
+            Player victim = cserv
+                .getPlayerStorage()
+                .getCharacterByName(splitted[1]);
             if (victim != null) {
                 if (splitted.length == 2) {
-                    c.getPlayer().changeMap(victim.getMap(), victim.getMap().findClosestPlayerSpawnpoint(victim.getPosition()));
+                    c
+                        .getPlayer()
+                        .changeMap(
+                            victim.getMap(),
+                            victim
+                                .getMap()
+                                .findClosestPlayerSpawnpoint(
+                                    victim.getPosition()
+                                )
+                        );
                 } else {
-                    Field target = ChannelServer.getInstance(c.getChannel()).getMapFactory().getMap(Integer.parseInt(splitted[2]));
+                    Field target = ChannelServer
+                        .getInstance(c.getChannel())
+                        .getMapFactory()
+                        .getMap(Integer.parseInt(splitted[2]));
                     victim.changeMap(target, target.getPortal(0));
                 }
             } else {
@@ -591,35 +858,67 @@ public class AdminCommand {
                     victim = c.getPlayer();
                     int ch = FindService.findChannel(splitted[1]);
                     if (ch < 0) {
-                        Field target = c.getChannelServer().getMapFactory().getMap(Integer.parseInt(splitted[1]));
+                        Field target = c
+                            .getChannelServer()
+                            .getMapFactory()
+                            .getMap(Integer.parseInt(splitted[1]));
                         c.getPlayer().changeMap(target, target.getPortal(0));
                     } else {
-                        victim = ChannelServer.getInstance(ch).getPlayerStorage().getCharacterByName(splitted[1]);
-                        c.getPlayer().dropMessage(6, "Cross changing channel. Please wait.");
+                        victim =
+                            ChannelServer
+                                .getInstance(ch)
+                                .getPlayerStorage()
+                                .getCharacterByName(splitted[1]);
+                        c
+                            .getPlayer()
+                            .dropMessage(
+                                6,
+                                "Cross changing channel. Please wait."
+                            );
                         if (victim.getMapId() != c.getPlayer().getMapId()) {
-                            final Field mapp = c.getChannelServer().getMapFactory().getMap(victim.getMapId());
+                            final Field mapp = c
+                                .getChannelServer()
+                                .getMapFactory()
+                                .getMap(victim.getMapId());
                             c.getPlayer().changeMap(mapp, mapp.getPortal(0));
                         }
                         c.getPlayer().changeChannel(ch);
                     }
                 } catch (NumberFormatException e) {
-                    c.getPlayer().dropMessage(6, "Something went wrong " + e.getMessage());
+                    c
+                        .getPlayer()
+                        .dropMessage(
+                            6,
+                            "Something went wrong " + e.getMessage()
+                        );
                     return false;
                 }
             }
             return true;
         }
     }
-    
+
     public static class warpChHere extends CommandExecute {
+
         @Override
         public boolean execute(Client c, String[] splitted) {
             try {
-                for (Player p : c.getChannelServer().getPlayerStorage().getAllCharacters()) {
-                    p.changeMap(c.getPlayer().getMap(), c.getPlayer().getPosition());
+                for (Player p : c
+                    .getChannelServer()
+                    .getPlayerStorage()
+                    .getAllCharacters()) {
+                    p.changeMap(
+                        c.getPlayer().getMap(),
+                        c.getPlayer().getPosition()
+                    );
                     p.dropMessage(5, "You have been warped to the event");
                 }
-                c.getPlayer().dropMessage(5, "Every player in your channel have been warped here");
+                c
+                    .getPlayer()
+                    .dropMessage(
+                        5,
+                        "Every player in your channel have been warped here"
+                    );
             } catch (Exception e) {
                 System.out.println("Something went wrong: " + e);
                 return false;
@@ -627,20 +926,23 @@ public class AdminCommand {
             return true;
         }
     }
-    
+
     public static class WarpMapTo extends CommandExecute {
 
         @Override
         public boolean execute(Client c, String[] splitted) {
             try {
-                final Field target = c.getChannelServer().getMapFactory().getMap(Integer.parseInt(splitted[1]));
+                final Field target = c
+                    .getChannelServer()
+                    .getMapFactory()
+                    .getMap(Integer.parseInt(splitted[1]));
                 final Field from = c.getPlayer().getMap();
                 for (Player p : from.getCharactersThreadsafe()) {
                     p.changeMap(target, target.getPortal(0));
                 }
             } catch (NumberFormatException e) {
                 c.getPlayer().dropMessage(5, "Error: " + e.getMessage());
-                return false; 
+                return false;
             }
             return true;
         }
@@ -650,21 +952,42 @@ public class AdminCommand {
 
         @Override
         public boolean execute(Client c, String[] splitted) {
-            Player victim = c.getChannelServer().getPlayerStorage().getCharacterByName(splitted[1]);
+            Player victim = c
+                .getChannelServer()
+                .getPlayerStorage()
+                .getCharacterByName(splitted[1]);
             if (victim != null) {
-                victim.changeMap(c.getPlayer().getMap(), c.getPlayer().getMap().findClosestPlayerSpawnpoint(c.getPlayer().getPosition()));
+                victim.changeMap(
+                    c.getPlayer().getMap(),
+                    c
+                        .getPlayer()
+                        .getMap()
+                        .findClosestPlayerSpawnpoint(
+                            c.getPlayer().getPosition()
+                        )
+                );
             } else {
                 int ch = FindService.findChannel(splitted[1]);
                 if (ch < 0) {
                     c.getPlayer().dropMessage(5, "Not found.");
                     return false;
                 }
-                victim = ChannelServer.getInstance(ch).getPlayerStorage().getCharacterByName(splitted[1]);
-                c.getPlayer().dropMessage(5, "Victim is cross changing channel.");
+                victim =
+                    ChannelServer
+                        .getInstance(ch)
+                        .getPlayerStorage()
+                        .getCharacterByName(splitted[1]);
+                c
+                    .getPlayer()
+                    .dropMessage(5, "Victim is cross changing channel.");
                 victim.dropMessage(5, "Cross changing channel.");
-                
+
                 if (victim.getMapId() != c.getPlayer().getMapId()) {
-                    final Field map = victim.getClient().getChannelServer().getMapFactory().getMap(c.getPlayer().getMapId());
+                    final Field map = victim
+                        .getClient()
+                        .getChannelServer()
+                        .getMapFactory()
+                        .getMap(c.getPlayer().getMapId());
                     victim.changeMap(map, map.getPortal(0));
                 }
                 victim.changeChannel(c.getChannel());
@@ -672,26 +995,38 @@ public class AdminCommand {
             return true;
         }
     }
-    
+
     public static class rgm extends CommandExecute {
+
         @Override
         public boolean execute(Client c, String[] splitted) {
-           Player victim = c.getChannelServer().getPlayerStorage().getCharacterByName(splitted[1]); 
-           if (victim != null) {
-                victim.dropMessage("[GM - Responde] " + StringUtil.joinStringFrom(splitted, 2));
+            Player victim = c
+                .getChannelServer()
+                .getPlayerStorage()
+                .getCharacterByName(splitted[1]);
+            if (victim != null) {
+                victim.dropMessage(
+                    "[GM - Responde] " + StringUtil.joinStringFrom(splitted, 2)
+                );
                 return true;
             } else {
-               int ch = FindService.findChannel(splitted[1]);
+                int ch = FindService.findChannel(splitted[1]);
                 if (ch < 0) {
-                    PlayerNote.sendNote(c.getPlayer(), splitted[1], StringUtil.joinStringFrom(splitted, 2));
-                    c.getPlayer().dropMessage(5, "N�o encontrado, nota enviada!");
+                    PlayerNote.sendNote(
+                        c.getPlayer(),
+                        splitted[1],
+                        StringUtil.joinStringFrom(splitted, 2)
+                    );
+                    c
+                        .getPlayer()
+                        .dropMessage(5, "N�o encontrado, nota enviada!");
                     return false;
                 }
             }
-          return true;
+            return true;
         }
     }
-    
+
     public static class PNPC extends CommandExecute {
 
         @Override
@@ -709,14 +1044,33 @@ public class AdminCommand {
                     npc.setCy(c.getPlayer().getPosition().y);
                     npc.setRx0(c.getPlayer().getPosition().x + 50);
                     npc.setRx1(c.getPlayer().getPosition().x - 50);
-                    npc.setFh(c.getPlayer().getMap().getFootholds().findBelow(c.getPlayer().getPosition()).getId());
+                    npc.setFh(
+                        c
+                            .getPlayer()
+                            .getMap()
+                            .getFootholds()
+                            .findBelow(c.getPlayer().getPosition())
+                            .getId()
+                    );
                     npc.getStats().setCustom(false);
 
                     Connection con = DatabaseConnection.getConnection();
-                    try (PreparedStatement ps = con.prepareStatement("INSERT INTO spawns ( idd, f, fh, cy, rx0, rx1, type, x, y, mid ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )")) {
+                    try (
+                        PreparedStatement ps = con.prepareStatement(
+                            "INSERT INTO spawns ( idd, f, fh, cy, rx0, rx1, type, x, y, mid ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )"
+                        )
+                    ) {
                         ps.setInt(1, npcId);
                         ps.setInt(2, 0);
-                        ps.setInt(3, c.getPlayer().getMap().getFootholds().findBelow(c.getPlayer().getPosition()).getId());
+                        ps.setInt(
+                            3,
+                            c
+                                .getPlayer()
+                                .getMap()
+                                .getFootholds()
+                                .findBelow(c.getPlayer().getPosition())
+                                .getId()
+                        );
                         ps.setInt(4, c.getPlayer().getPosition().y);
                         ps.setInt(5, c.getPlayer().getPosition().x + 50);
                         ps.setInt(6, c.getPlayer().getPosition().x - 50);
@@ -727,9 +1081,14 @@ public class AdminCommand {
                         ps.executeUpdate();
                     }
                     c.getPlayer().getMap().addMapObject(npc);
-                    c.getPlayer().getMap().broadcastMessage(PacketCreator.SpawnNPC(npc));
+                    c
+                        .getPlayer()
+                        .getMap()
+                        .broadcastMessage(PacketCreator.SpawnNPC(npc));
                 } catch (SQLException ex) {
-                    c.getPlayer().dropMessage(6, "Failed to save NPC to the database");
+                    c
+                        .getPlayer()
+                        .dropMessage(6, "Failed to save NPC to the database");
                 }
             } else {
                 c.getPlayer().dropMessage("You have entered an invalid Npc-Id");
@@ -738,20 +1097,25 @@ public class AdminCommand {
             return true;
         }
     }
-    
+
     public static class SReactor extends CommandExecute {
 
         @Override
         public boolean execute(Client c, String[] splitted) {
-            ReactorStats reactorSt = ReactorFactory.getReactor(Integer.parseInt(splitted[1]));
-            Reactor reactor = new Reactor(reactorSt, Integer.parseInt(splitted[1]));
+            ReactorStats reactorSt = ReactorFactory.getReactor(
+                Integer.parseInt(splitted[1])
+            );
+            Reactor reactor = new Reactor(
+                reactorSt,
+                Integer.parseInt(splitted[1])
+            );
             reactor.setDelay(-1);
             reactor.setPosition(c.getPlayer().getPosition());
             c.getPlayer().getMap().spawnReactor(reactor);
             return true;
         }
     }
-    
+
     public static class PMOB extends CommandExecute {
 
         @Override
@@ -770,13 +1134,32 @@ public class AdminCommand {
                     mob.setCy(c.getPlayer().getPosition().y);
                     mob.setRx0(c.getPlayer().getPosition().x + 50);
                     mob.setRx1(c.getPlayer().getPosition().x - 50);
-                    mob.setFh(c.getPlayer().getMap().getFootholds().findBelow(c.getPlayer().getPosition()).getId());
-                    
+                    mob.setFh(
+                        c
+                            .getPlayer()
+                            .getMap()
+                            .getFootholds()
+                            .findBelow(c.getPlayer().getPosition())
+                            .getId()
+                    );
+
                     Connection con = DatabaseConnection.getConnection();
-                    try (PreparedStatement ps = con.prepareStatement("INSERT INTO spawns ( idd, f, fh, cy, rx0, rx1, type, x, y, mid, mobtime ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )")) {
+                    try (
+                        PreparedStatement ps = con.prepareStatement(
+                            "INSERT INTO spawns ( idd, f, fh, cy, rx0, rx1, type, x, y, mid, mobtime ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )"
+                        )
+                    ) {
                         ps.setInt(1, npcId);
                         ps.setInt(2, 0);
-                        ps.setInt(3, c.getPlayer().getMap().getFootholds().findBelow(c.getPlayer().getPosition()).getId());
+                        ps.setInt(
+                            3,
+                            c
+                                .getPlayer()
+                                .getMap()
+                                .getFootholds()
+                                .findBelow(c.getPlayer().getPosition())
+                                .getId()
+                        );
                         ps.setInt(4, c.getPlayer().getPosition().y);
                         ps.setInt(5, c.getPlayer().getPosition().x + 50);
                         ps.setInt(6, c.getPlayer().getPosition().x - 50);
@@ -789,7 +1172,9 @@ public class AdminCommand {
                     }
                     c.getPlayer().getMap().addMonsterSpawn(mob, mobTime, -1);
                 } catch (SQLException ex) {
-                    c.getPlayer().dropMessage(6, "Failed to save NPC to the database");
+                    c
+                        .getPlayer()
+                        .dropMessage(6, "Failed to save NPC to the database");
                 }
             } else {
                 c.getPlayer().dropMessage("You have entered an invalid Npc-Id");
@@ -798,8 +1183,9 @@ public class AdminCommand {
             return true;
         }
     }
-    
+
     public static class ShowTrace extends CommandExecute {
+
         @Override
         public boolean execute(Client c, String[] splitted) {
             if (splitted.length < 2) {
@@ -815,8 +1201,9 @@ public class AdminCommand {
             return true;
         }
     }
-    
+
     public static class Threads extends CommandExecute {
+
         @Override
         public boolean execute(Client c, String[] splitted) {
             Thread[] threads = new Thread[Thread.activeCount()];

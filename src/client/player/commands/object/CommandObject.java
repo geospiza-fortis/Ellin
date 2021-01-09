@@ -5,7 +5,6 @@ import constants.CommandConstants.CommandType;
 
 public class CommandObject {
 
-
     private final String command;
     private final int administrativeLevelReq;
     private final CommandExecute exe;

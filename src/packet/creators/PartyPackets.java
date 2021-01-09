@@ -21,8 +21,13 @@ import server.maps.object.FieldDoorObject;
 import tools.StringUtil;
 
 public class PartyPackets {
-    
-    public static OutPacket UpdateParty(int forChannel, MapleParty party, MaplePartyOperation op, MaplePartyCharacter target) {
+
+    public static OutPacket UpdateParty(
+        int forChannel,
+        MapleParty party,
+        MaplePartyOperation op,
+        MaplePartyCharacter target
+    ) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.PARTY_OPERATION.getValue());
         switch (op) {
@@ -66,9 +71,16 @@ public class PartyPackets {
         }
         return wp.getPacket();
     }
-    
-    private static void AddPartyStatus(int forChannel, MapleParty party, WritingPacket wp, boolean leaving) {
-        List<MaplePartyCharacter> partymembers = new ArrayList<>(party.getMembers());
+
+    private static void AddPartyStatus(
+        int forChannel,
+        MapleParty party,
+        WritingPacket wp,
+        boolean leaving
+    ) {
+        List<MaplePartyCharacter> partymembers = new ArrayList<>(
+            party.getMembers()
+        );
         while (partymembers.size() < 6) {
             partymembers.add(new MaplePartyCharacter());
         }
@@ -76,7 +88,9 @@ public class PartyPackets {
             wp.writeInt(partychar.getId());
         }
         for (MaplePartyCharacter partychar : partymembers) {
-            wp.writeAsciiString(StringUtil.getRightPaddedStr(partychar.getName(), '\0', 13));
+            wp.writeAsciiString(
+                StringUtil.getRightPaddedStr(partychar.getName(), '\0', 13)
+            );
         }
         for (MaplePartyCharacter partychar : partymembers) {
             wp.writeInt(partychar.getJobId());
@@ -104,7 +118,7 @@ public class PartyPackets {
                 if (partychar.getDoors().size() > 0) {
                     boolean deployedPortal = false;
                     for (MapleDoor door : partychar.getDoors()) {
-                        if(door.getOwnerId() == partychar.getId()) {
+                        if (door.getOwnerId() == partychar.getId()) {
                             FieldDoorObject mdo = door.getTownDoor();
                             wp.writeInt(mdo.getTown().getId());
                             wp.writeInt(mdo.getArea().getId());
@@ -114,7 +128,7 @@ public class PartyPackets {
                         }
                     }
 
-                    if(!deployedPortal) {
+                    if (!deployedPortal) {
                         wp.writeInt(MapConstants.NULL_MAP);
                         wp.writeInt(MapConstants.NULL_MAP);
                         wp.writeInt(0);
@@ -134,7 +148,7 @@ public class PartyPackets {
             }
         }
     }
-    
+
     public static OutPacket PartyCreated(MaplePartyCharacter partychar) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.PARTY_OPERATION.getValue());
@@ -168,7 +182,7 @@ public class PartyPackets {
         }
         return wp.getPacket();
     }
-    
+
     public static OutPacket PartyStatusMessage(byte opCode) {
         WritingPacket wp = new WritingPacket(3);
         wp.writeShort(SendPacketOpcode.PARTY_OPERATION.getValue());
@@ -193,8 +207,12 @@ public class PartyPackets {
         wp.writeMapleAsciiString(name);
         return wp.getPacket();
     }
-    
-    public static OutPacket PartyPortal(int townID, int targetID, Point position) {
+
+    public static OutPacket PartyPortal(
+        int townID,
+        int targetID,
+        Point position
+    ) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.PARTY_OPERATION.getValue());
         wp.writeShort(0x22);

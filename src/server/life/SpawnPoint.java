@@ -1,6 +1,6 @@
 /*
  This file is part of the OdinMS Maple Story Server
- Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+ Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
  Matthias Butz <matze@odinms.de>
  Jan Christian Meyer <vimes@odinms.de>
 
@@ -25,7 +25,7 @@ import java.awt.Point;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class SpawnPoint {
-    
+
     private final int mobTime, fh, f, team, monsterId;
     private long nextPossibleSpawn;
     private final Point pos;
@@ -36,19 +36,26 @@ public class SpawnPoint {
     private final boolean immobile;
     private boolean temporary = false;
 
-    public SpawnPoint(final MapleMonster monster, final Point pos, boolean immobile, final int mobTime, int mobInterval, final int team) {
+    public SpawnPoint(
+        final MapleMonster monster,
+        final Point pos,
+        boolean immobile,
+        final int mobTime,
+        int mobInterval,
+        final int team
+    ) {
         super();
         this.monsterId = monster.getId();
         this.pos = new Point(pos);
         this.fh = monster.getFh();
-	this.f = monster.getF();
+        this.f = monster.getF();
         this.mobTime = mobTime;
         this.immobile = immobile;
         this.mobInterval = mobInterval;
         this.nextPossibleSpawn = System.currentTimeMillis();
         this.team = team;
     }
-    
+
     public int getSpawned() {
         return spawnedMonsters.intValue();
     }
@@ -56,11 +63,11 @@ public class SpawnPoint {
     public final boolean shouldSpawn() {
         return shouldSpawn(System.currentTimeMillis());
     }
-    
+
     public void setDenySpawn(boolean val) {
         denySpawn = val;
     }
-    
+
     public boolean getDenySpawn() {
         return denySpawn;
     }
@@ -69,49 +76,56 @@ public class SpawnPoint {
         if (mobTime < 0 || denySpawn) {
             return false;
         }
-        if (((mobTime != 0 || immobile) && spawnedMonsters.get() > 0) || spawnedMonsters.get() > 1) {
+        if (
+            ((mobTime != 0 || immobile) && spawnedMonsters.get() > 0) ||
+            spawnedMonsters.get() > 1
+        ) {
             return false;
         }
-        
+
         return nextPossibleSpawn <= now;
     }
-    
+
     public boolean shouldForceSpawn() {
         return !(mobTime < 0 || spawnedMonsters.get() > 0);
     }
 
     public final MapleMonster getMonster() {
-        final MapleMonster mob = new MapleMonster(MapleLifeFactory.getMonster(monsterId));
+        final MapleMonster mob = new MapleMonster(
+            MapleLifeFactory.getMonster(monsterId)
+        );
         mob.setPosition(new Point(pos));
         mob.setTeam(team);
         mob.setFh(fh);
         mob.setF(f);
         spawnedMonsters.incrementAndGet();
-        mob.addListener(new MonsterListener() {
-            @Override
-            public void monsterKilled(int aniTime) {
-                nextPossibleSpawn = System.currentTimeMillis();
-                if (mobTime > 0) {
-                    nextPossibleSpawn += mobTime * 1000;
-                } else {
-                    nextPossibleSpawn += aniTime;
+        mob.addListener(
+            new MonsterListener() {
+                @Override
+                public void monsterKilled(int aniTime) {
+                    nextPossibleSpawn = System.currentTimeMillis();
+                    if (mobTime > 0) {
+                        nextPossibleSpawn += mobTime * 1000;
+                    } else {
+                        nextPossibleSpawn += aniTime;
+                    }
+                    spawnedMonsters.decrementAndGet();
                 }
-                spawnedMonsters.decrementAndGet();
+
+                @Override
+                public void monsterDamaged(Player from, int trueDmg) {}
+
+                @Override
+                public void monsterHealed(int trueHeal) {}
             }
-            
-            @Override
-            public void monsterDamaged(Player from, int trueDmg) {}
-            
-            @Override
-            public void monsterHealed(int trueHeal) {}
-        });
+        );
 
         if (mobTime == 0) {
             nextPossibleSpawn = System.currentTimeMillis() + mobInterval;
         }
         return mob;
     }
-    
+
     public int getMonsterId() {
         return monsterId;
     }
@@ -131,16 +145,16 @@ public class SpawnPoint {
     public void setTemporary(boolean temporary) {
         this.temporary = temporary;
     }
-    
+
     public final int getMobTime() {
         return mobTime;
     }
 
     public final int getF() {
-	return f;
+        return f;
     }
-    
+
     public final int getFh() {
-	return fh;
+        return fh;
     }
 }

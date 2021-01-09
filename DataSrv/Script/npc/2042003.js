@@ -18,7 +18,12 @@ var room = -1;
 
 function start() {
     if (!MonsterCarnival.isLobbyMap(cm.getMapId())) {
-        MCTracker.log("Assistant called on invalid map " + cm.getMapId() + " by player " + cm.getName());
+        MCTracker.log(
+            "Assistant called on invalid map " +
+                cm.getMapId() +
+                " by player " +
+                cm.getName()
+        );
         cm.sendOk("You are not authorized to do this.");
         cm.dispose();
         return;
@@ -40,10 +45,10 @@ function action(mode, type, selection) {
             cm.dispose();
             return;
         }
-        options = ["#L1#Leave the room.#l",
-                   "#L2#Close NPC#l"];
+        options = ["#L1#Leave the room.#l", "#L2#Close NPC#l"];
 
-        text = "Welcome to Carnival PQ. I am #rAssistant Red#k. What can I do for you?#b\r\n";
+        text =
+            "Welcome to Carnival PQ. I am #rAssistant Red#k. What can I do for you?#b\r\n";
         for (var i = 0; i < options.length; i++) {
             text += options[i];
             text += "\r\n";
@@ -70,4 +75,4 @@ function action(mode, type, selection) {
         }
         cm.dispose();
     }
-}  
+}

@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -84,11 +84,12 @@ public class DatabaseConnection {
         try {
             Class.forName("com.mysql.jdbc.Driver"); // touch the mysql driver
         } catch (ClassNotFoundException e) {
-            System.out.println("SQL Driver Not Found. Consider death by clams.");
+            System.out.println(
+                "SQL Driver Not Found. Consider death by clams."
+            );
             e.printStackTrace();
         }
     }
-
 
     public static Connection getConnection() {
         Connection c = con.get();
@@ -110,14 +111,21 @@ public class DatabaseConnection {
     }
 
     private static class ThreadLocalConnection extends ThreadLocal<Connection> {
+
         public static final Collection<Connection> allConnections = new LinkedList<>();
 
         @Override
         protected Connection initialValue() {
             try {
-                return DriverManager.getConnection(Database.DB_URL, Database.DB_USER, Database.DB_PASS);
+                return DriverManager.getConnection(
+                    Database.DB_URL,
+                    Database.DB_USER,
+                    Database.DB_PASS
+                );
             } catch (SQLException e) {
-                System.out.println("[SEVERE] Unable to make database connection.");
+                System.out.println(
+                    "[SEVERE] Unable to make database connection."
+                );
                 e.printStackTrace();
                 return null;
             }

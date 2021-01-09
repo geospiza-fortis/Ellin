@@ -67,7 +67,11 @@ public class FindService {
             findLock.readLock().unlock();
         }
         if (ret != null) {
-            if (ret != -10 && ret != -20 && ChannelServer.getInstance(ret) == null) { 
+            if (
+                ret != -10 &&
+                ret != -20 &&
+                ChannelServer.getInstance(ret) == null
+            ) {
                 forceDeregister(id);
                 return -1;
             }
@@ -85,7 +89,11 @@ public class FindService {
             findLock.readLock().unlock();
         }
         if (ret != null) {
-            if (ret != -10 && ret != -20 && ChannelServer.getInstance(ret) == null) { 
+            if (
+                ret != -10 &&
+                ret != -20 &&
+                ChannelServer.getInstance(ret) == null
+            ) {
                 forceDeregister(st);
                 return -1;
             }
@@ -94,8 +102,13 @@ public class FindService {
         return -1;
     }
 
-    public static CharacterIdChannelPair[] multiBuddyFind(int charIdFrom, int[] characterIds) {
-        List<CharacterIdChannelPair> foundsChars = new ArrayList<>(characterIds.length);
+    public static CharacterIdChannelPair[] multiBuddyFind(
+        int charIdFrom,
+        int[] characterIds
+    ) {
+        List<CharacterIdChannelPair> foundsChars = new ArrayList<>(
+            characterIds.length
+        );
         for (int i : characterIds) {
             int channel = findChannel(i);
             if (channel > 0) {
@@ -103,6 +116,8 @@ public class FindService {
             }
         }
         Collections.sort(foundsChars);
-        return foundsChars.toArray(new CharacterIdChannelPair[foundsChars.size()]);
-    }  
+        return foundsChars.toArray(
+            new CharacterIdChannelPair[foundsChars.size()]
+        );
+    }
 }

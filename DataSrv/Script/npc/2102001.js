@@ -28,14 +28,14 @@ function start() {
 
 function action(mode, type, selection) {
     if (status == 0) {
-        cm.sendYesNo("Você deseja deixar o gênio?");
+        cm.sendYesNo("You want to leave the genie?");
         status++;
     } else {
         if (mode < 1) {
             cm.dispose();
         } else {
             if (status == 1) {
-                cm.sendNext ("Tudo bem, fale comigo quando quiser novamente!");
+                cm.sendNext("Okay, talk to me when you want again!");
                 status++;
             } else if (status == 2) {
                 cm.warp(260000100, 0);

@@ -5,13 +5,14 @@
  */
 package packet.creators;
 
+import static handling.login.handler.CharLoginHeaders.*;
+
 import client.Client;
 import client.player.Player;
 import client.player.PlayerJob;
 import constants.ServerProperties;
 import handling.login.LoginBalloon;
 import handling.login.LoginServer;
-import static handling.login.handler.CharLoginHeaders.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
@@ -27,17 +28,22 @@ import tools.HexTool;
  * @author GabrielSin
  */
 public class LoginPackets {
-    
+
     /**
      * Sends a hello packet.
-     * 
+     *
      * @param mapleVersion The maple client version.
      * @param sendIv the IV used by the server for sending
      * @param recvIv the IV used by the server for receiving
-     * @param testServer 
+     * @param testServer
      * @return
      */
-    public static OutPacket GetHello(short mapleVersion, byte[] sendIv, byte[] recvIv, boolean testServer) {
+    public static OutPacket GetHello(
+        short mapleVersion,
+        byte[] sendIv,
+        byte[] recvIv,
+        boolean testServer
+    ) {
         WritingPacket mplew = new WritingPacket(16);
         mplew.writeShort(0x0D);
         mplew.writeShort(ServerProperties.World.MAPLE_VERSION);
@@ -47,20 +53,20 @@ public class LoginPackets {
         mplew.write(SERVER_GLOBAL);
         return mplew.getPacket();
     }
-    
+
     /**
-    * Sends a ping packet.
-    * @return The packet.
-    */
+     * Sends a ping packet.
+     * @return The packet.
+     */
     public static OutPacket PingMessage() {
         WritingPacket wp = new WritingPacket(2);
         wp.writeShort(SendPacketOpcode.PING.getValue());
         return wp.getPacket();
     }
-    
+
     /**
      * Gets a login failed packet.
-     * 
+     *
      * Possible values for <code>reason</code>:<br>
      * 3: ID deleted or blocked<br>
      * 4: Incorrect password<br>
@@ -80,7 +86,7 @@ public class LoginPackets {
      * 23: License agreement<br>
      * 25: Maple Europe notice =[<br>
      * 27: Some weird full client notice, probably for trial versions<br>
-     * 
+     *
      * @param reason The reason logging in failed.
      * @return The login failed packet.
      */
@@ -91,7 +97,7 @@ public class LoginPackets {
         wp.writeShort(0);
         return wp.getPacket();
     }
-    
+
     public static OutPacket GetPermBan(byte reason) {
         WritingPacket wp = new WritingPacket(16);
         wp.writeShort(SendPacketOpcode.LOGIN_STATUS.getValue());
@@ -101,7 +107,7 @@ public class LoginPackets {
         wp.write(HexTool.getByteArrayFromHexString("01 01 01 01 00"));
         return wp.getPacket();
     }
-    
+
     public static OutPacket GetTempBan(long timestampTill, byte reason) {
         WritingPacket wp = new WritingPacket(17);
         wp.writeShort(SendPacketOpcode.LOGIN_STATUS.getValue());
@@ -111,12 +117,12 @@ public class LoginPackets {
         wp.writeLong(timestampTill);
         return wp.getPacket();
     }
-    
+
     /**
-    * Gets a successful authentication and PIN Request packet.
-    * @param c
-    * @return The PIN request packet.
-    */
+     * Gets a successful authentication and PIN Request packet.
+     * @param c
+     * @return The PIN request packet.
+     */
     public static OutPacket GetAuthSuccess(Client c) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.LOGIN_STATUS.getValue());
@@ -124,32 +130,32 @@ public class LoginPackets {
         wp.write(0);
         wp.writeInt(0);
         wp.writeInt(c.getAccountID());
-        wp.write(c.getGender()); 
+        wp.write(c.getGender());
         wp.write(c.isGm() ? 1 : 0);
         wp.write(0);
         wp.writeMapleAsciiString(c.getAccountName());
-        wp.write(0); 
+        wp.write(0);
         wp.write(0);
         wp.writeLong(0);
         wp.writeLong(0);
-        wp.writeInt(8); 
+        wp.writeInt(8);
         return wp.getPacket();
     }
-    
+
     /**
-     * 
+     *
      * @param cid
      * @param state
      * @return
-     */ 
-     public static OutPacket DeleteCharResponse(int cid, int state) {
+     */
+    public static OutPacket DeleteCharResponse(int cid, int state) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.DELETE_CHAR_RESPONSE.getValue());
         wp.writeInt(cid);
         wp.write(state);
         return wp.getPacket();
     }
-     
+
     public static OutPacket AddNewCharEntry(Player chr) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.ADD_NEW_CHAR_ENTRY.getValue());
@@ -157,7 +163,7 @@ public class LoginPackets {
         AddCharEntry(wp, chr);
         return wp.getPacket();
     }
-    
+
     public static OutPacket AddNewCharEntry(Player p, boolean worked) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.ADD_NEW_CHAR_ENTRY.getValue());
@@ -165,83 +171,85 @@ public class LoginPackets {
         AddCharEntry(wp, p);
         return wp.getPacket();
     }
-    
+
     /**
-    * Adds an entry for a character to an existing
-    * WritingPacket.
-    * 
-    * @param mplew The MaplePacketLittleEndianWrite instance to write the stats to.
-    * @param chr The character to add.
-    */
+     * Adds an entry for a character to an existing
+     * WritingPacket.
+     *
+     * @param mplew The MaplePacketLittleEndianWrite instance to write the stats to.
+     * @param chr The character to add.
+     */
     private static void AddCharEntry(WritingPacket wp, Player chr) {
         PacketCreator.addCharStats(wp, chr);
         PacketCreator.AddCharLook(wp, chr, false);
         if (!chr.getJob().isA(PlayerJob.GM)) {
             wp.writeBool(true);
             wp.writeInt(chr.getWorldRank());
-            wp.writeInt(chr.getWorldRankChange()); 
+            wp.writeInt(chr.getWorldRankChange());
             wp.writeInt(chr.getJobRank());
             wp.writeInt(chr.getJobRankChange());
         } else {
             wp.writeBool(false);
         }
-    }   
-    
+    }
+
     /**
-    * Gets a packet detailing a PIN operation.
-    * Possible values for <code>mode</code>:<br>
-    * 0 - PIN was accepted<br>
-    * 1 - Register a new PIN<br>
-    * 2 - Invalid pin / Reenter<br>
-    * 3 - Connection failed due to system error<br>
-    * 4 - Enter the pin
-    * 
-    * @param mode The mode.
-    * @return 
-    */
+     * Gets a packet detailing a PIN operation.
+     * Possible values for <code>mode</code>:<br>
+     * 0 - PIN was accepted<br>
+     * 1 - Register a new PIN<br>
+     * 2 - Invalid pin / Reenter<br>
+     * 3 - Connection failed due to system error<br>
+     * 4 - Enter the pin
+     *
+     * @param mode The mode.
+     * @return
+     */
     public static OutPacket PinOperation(byte mode) {
         WritingPacket wp = new WritingPacket(3);
         wp.writeShort(SendPacketOpcode.PIN_OPERATION.getValue());
         wp.write(mode);
         return wp.getPacket();
     }
-    
-     public static OutPacket PinRegistered() { 
-        WritingPacket mplew = new WritingPacket(); 
-        mplew.writeShort(SendPacketOpcode.PIN_ASSIGNED.getValue()); 
-        mplew.write(PIN_ACCEPTED); 
-        return mplew.getPacket(); 
+
+    public static OutPacket PinRegistered() {
+        WritingPacket mplew = new WritingPacket();
+        mplew.writeShort(SendPacketOpcode.PIN_ASSIGNED.getValue());
+        mplew.write(PIN_ACCEPTED);
+        return mplew.getPacket();
     }
 
-    
     /**
-    * Gets a packet requesting the client enter a PIN.
+     * Gets a packet requesting the client enter a PIN.
      * @param status
-    * @return The request PIN packet.
-    */
+     * @return The request PIN packet.
+     */
     public static OutPacket RequestPinStatus(byte status) {
-        switch(status) {
+        switch (status) {
             case 0:
                 return PinOperation(PIN_ACCEPTED);
-            case 1: 
+            case 1:
                 return PinOperation(PIN_REGISTER);
-            case 2: 
+            case 2:
                 return PinOperation(PIN_REJECTED);
-            case 4: 
+            case 4:
                 return PinOperation(PIN_REQUEST);
-                
         }
         return null;
     }
-    
+
     /**
-    * Gets a packet detailing a server and its channels.
+     * Gets a packet detailing a server and its channels.
      * @param serverId The index of the server to create information about.
-    * @param serverName The name of the server.
-    * @param channelLoad Load of the channel - 1200 seems to be max.
-    * @return The server info packet.
-    */
-    public static OutPacket getServerList(int serverId, String serverName, Map<Integer, Integer> channelLoad) {
+     * @param serverName The name of the server.
+     * @param channelLoad Load of the channel - 1200 seems to be max.
+     * @return The server info packet.
+     */
+    public static OutPacket getServerList(
+        int serverId,
+        String serverName,
+        Map<Integer, Integer> channelLoad
+    ) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.SERVERLIST.getValue());
         wp.write(serverId);
@@ -280,26 +288,26 @@ public class LoginPackets {
             wp.writeShort(balloon.nY);
             wp.writeMapleAsciiString(balloon.sMessage);
         }
-        return wp.getPacket();  
+        return wp.getPacket();
     }
-    
+
     public static OutPacket getEndOfServerList() {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.SERVERLIST.getValue());
         wp.write(0xFF);
         return wp.getPacket();
     }
-    
+
     /**
-    * Gets a packet detailing a server status message.
-    * Possible values for <code>status</code>:<br>
-    * 0 - Normal<br>
-    * 1 - Highly populated<br>
-    * 2 - Full
-    * 
-    * @param status The server status.
-    * @return The server status packet.
-    */
+     * Gets a packet detailing a server status message.
+     * Possible values for <code>status</code>:<br>
+     * 0 - Normal<br>
+     * 1 - Highly populated<br>
+     * 2 - Full
+     *
+     * @param status The server status.
+     * @return The server status packet.
+     */
     public static OutPacket GetServerStatus(int status) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.SERVERSTATUS.getValue());
@@ -307,49 +315,54 @@ public class LoginPackets {
         wp.write(1);
         return wp.getPacket();
     }
-    
+
     /**
-    * Gets a packet telling the client the IP of the channel server.
-    * @param port The port the channel is on.
-    * @param clientId The ID of the client.
-    * @return The server IP packet.
-    */
+     * Gets a packet telling the client the IP of the channel server.
+     * @param port The port the channel is on.
+     * @param clientId The ID of the client.
+     * @return The server IP packet.
+     */
     public static OutPacket GetServerIP(int port, int clientId) {
         WritingPacket wp = new WritingPacket();
 
         wp.writeShort(SendPacketOpcode.SERVER_IP.getValue());
         wp.writeShort(0);
         try {
-            wp.write(InetAddress.getByName(ServerProperties.World.HOST).getAddress());
+            wp.write(
+                InetAddress.getByName(ServerProperties.World.HOST).getAddress()
+            );
         } catch (UnknownHostException e) {
             wp.write(ServerProperties.World.HOST_BYTE);
         }
         wp.writeShort(port);
-        wp.writeInt(clientId); 
+        wp.writeInt(clientId);
         wp.writeZeroBytes(5);
         return wp.getPacket();
     }
-    
-    public static OutPacket CharNameResponse(String charname, boolean nameUsed) {
+
+    public static OutPacket CharNameResponse(
+        String charname,
+        boolean nameUsed
+    ) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.CHAR_NAME_RESPONSE.getValue());
         wp.writeMapleAsciiString(charname);
         wp.writeBool(nameUsed);
         return wp.getPacket();
     }
-    
+
     /**
-    * Gets the response to a relog request.
-    * 
-    * @return The relog response packet.
-    */
+     * Gets the response to a relog request.
+     *
+     * @return The relog response packet.
+     */
     public static OutPacket GetRelogResponse() {
         WritingPacket wp = new WritingPacket(3);
         wp.writeShort(SendPacketOpcode.RELOG_RESPONSE.getValue());
         wp.write(1);
         return wp.getPacket();
     }
-    
+
     public static OutPacket ShowAllCharacter(int chars) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.ALL_CHARLIST.getValue());
@@ -358,8 +371,11 @@ public class LoginPackets {
         wp.writeInt(chars + (3 - chars % 3));
         return wp.getPacket();
     }
-    
-    public static OutPacket ShowAllCharacterInfo(int worldID, List<Player> chars) {
+
+    public static OutPacket ShowAllCharacterInfo(
+        int worldID,
+        List<Player> chars
+    ) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.ALL_CHARLIST.getValue());
         wp.write(0);
@@ -370,13 +386,13 @@ public class LoginPackets {
         }
         return wp.getPacket();
     }
-    
+
     /**
-    * Gets a packet with a list of characters.
-    * @param c The MapleClient to load characters of.
+     * Gets a packet with a list of characters.
+     * @param c The MapleClient to load characters of.
      * @param serverID The ID of the server requested.
-    * @return The character list packet.
-    */
+     * @return The character list packet.
+     */
     public static OutPacket GetCharList(Client c, int serverID) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.CHARLIST.getValue());
@@ -384,9 +400,9 @@ public class LoginPackets {
         List<Player> chars = c.loadCharacters(serverID);
         wp.write((byte) chars.size());
         for (Player chr : chars) {
-             AddCharEntry(wp, chr);
+            AddCharEntry(wp, chr);
         }
         wp.writeInt(c.getCharacterSlots());
         return wp.getPacket();
-    }   
+    }
 }

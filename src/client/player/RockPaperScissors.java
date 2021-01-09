@@ -6,7 +6,7 @@ import server.itens.InventoryManipulator;
 import tools.Randomizer;
 
 /**
- * @author AuraSEA/kevintjuh93 
+ * @author AuraSEA/kevintjuh93
  */
 
 public class RockPaperScissors {
@@ -16,7 +16,16 @@ public class RockPaperScissors {
     private boolean win = false;
 
     public RockPaperScissors(final Client c, final byte mode) {
-        c.getSession().write(PacketCreator.GetRockPaperScissorsMode((byte) (0x09 + mode), -1, -1, -1));
+        c
+            .getSession()
+            .write(
+                PacketCreator.GetRockPaperScissorsMode(
+                    (byte) (0x09 + mode),
+                    -1,
+                    -1,
+                    -1
+                )
+            );
         if (mode == 0) {
             c.getPlayer().gainMeso(-1000, true, true, true);
         }
@@ -26,13 +35,44 @@ public class RockPaperScissors {
         if (ableAnswer && !win && answer >= 0 && answer <= 2) {
             final int response = Randomizer.nextInt(3);
             if (response == answer) {
-                c.getSession().write(PacketCreator.GetRockPaperScissorsMode((byte) 0x0B, -1, (byte) response, (byte) round));
-            } else if ((answer == 0 && response == 2) || (answer == 1 && response == 0) || (answer == 2 && response == 1)) {
-                c.getSession().write(PacketCreator.GetRockPaperScissorsMode((byte) 0x0B, -1, (byte) response, (byte) (round + 1)));
+                c
+                    .getSession()
+                    .write(
+                        PacketCreator.GetRockPaperScissorsMode(
+                            (byte) 0x0B,
+                            -1,
+                            (byte) response,
+                            (byte) round
+                        )
+                    );
+            } else if (
+                (answer == 0 && response == 2) ||
+                (answer == 1 && response == 0) ||
+                (answer == 2 && response == 1)
+            ) {
+                c
+                    .getSession()
+                    .write(
+                        PacketCreator.GetRockPaperScissorsMode(
+                            (byte) 0x0B,
+                            -1,
+                            (byte) response,
+                            (byte) (round + 1)
+                        )
+                    );
                 ableAnswer = false;
                 win = true;
-            } else { 
-                c.getSession().write(PacketCreator.GetRockPaperScissorsMode((byte) 0x0B, -1, (byte) response, (byte) -1));
+            } else {
+                c
+                    .getSession()
+                    .write(
+                        PacketCreator.GetRockPaperScissorsMode(
+                            (byte) 0x0B,
+                            -1,
+                            (byte) response,
+                            (byte) -1
+                        )
+                    );
                 ableAnswer = false;
             }
             return true;
@@ -44,7 +84,16 @@ public class RockPaperScissors {
     public final boolean timeOut(final Client c) {
         if (ableAnswer && !win) {
             ableAnswer = false;
-            c.getSession().write(PacketCreator.GetRockPaperScissorsMode((byte) 0x0A, -1, -1, -1));
+            c
+                .getSession()
+                .write(
+                    PacketCreator.GetRockPaperScissorsMode(
+                        (byte) 0x0A,
+                        -1,
+                        -1,
+                        -1
+                    )
+                );
             return true;
         }
         reward(c);
@@ -57,7 +106,16 @@ public class RockPaperScissors {
             if (round < 10) {
                 win = false;
                 ableAnswer = true;
-                c.getSession().write(PacketCreator.GetRockPaperScissorsMode((byte) 0x0C, -1, -1, -1));
+                c
+                    .getSession()
+                    .write(
+                        PacketCreator.GetRockPaperScissorsMode(
+                            (byte) 0x0C,
+                            -1,
+                            -1,
+                            -1
+                        )
+                    );
                 return true;
             }
         }
@@ -67,7 +125,7 @@ public class RockPaperScissors {
 
     public final void reward(final Client c) {
         if (win) {
-           InventoryManipulator.addById(c, 4031332 + round, (short) 1, "");
+            InventoryManipulator.addById(c, 4031332 + round, (short) 1, "");
         } else if (round == 0) {
             c.getPlayer().gainMeso(500, true, true, true);
         }
@@ -76,6 +134,10 @@ public class RockPaperScissors {
 
     public final void dispose(final Client c) {
         reward(c);
-        c.getSession().write(PacketCreator.GetRockPaperScissorsMode((byte) 0x0D, -1, -1, -1));
+        c
+            .getSession()
+            .write(
+                PacketCreator.GetRockPaperScissorsMode((byte) 0x0D, -1, -1, -1)
+            );
     }
 }

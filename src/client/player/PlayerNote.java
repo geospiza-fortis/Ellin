@@ -12,10 +12,16 @@ import packet.creators.PacketCreator;
  */
 
 public class PlayerNote {
-    
+
     public static void sendNote(Player p, String to, String msg, int fame) {
         try {
-            try (PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement("INSERT INTO notes (`to`, `from`, `message`, `timestamp`, `fame`) VALUES (?, ?, ?, ?, ?)")) {
+            try (
+                PreparedStatement ps = DatabaseConnection
+                    .getConnection()
+                    .prepareStatement(
+                        "INSERT INTO notes (`to`, `from`, `message`, `timestamp`, `fame`) VALUES (?, ?, ?, ?, ?)"
+                    )
+            ) {
                 ps.setString(1, to);
                 ps.setString(2, p.getName());
                 ps.setString(3, msg);
@@ -28,10 +34,21 @@ public class PlayerNote {
             System.err.println("Unable to send note" + e);
         }
     }
-    
-    public static void sendNote(String sender, String to, String msg, int fame) {
+
+    public static void sendNote(
+        String sender,
+        String to,
+        String msg,
+        int fame
+    ) {
         try {
-            try (PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement("INSERT INTO notes (`to`, `from`, `message`, `timestamp`, `fame`) VALUES (?, ?, ?, ?, ?)")) {
+            try (
+                PreparedStatement ps = DatabaseConnection
+                    .getConnection()
+                    .prepareStatement(
+                        "INSERT INTO notes (`to`, `from`, `message`, `timestamp`, `fame`) VALUES (?, ?, ?, ?, ?)"
+                    )
+            ) {
                 ps.setString(1, to);
                 ps.setString(2, sender);
                 ps.setString(3, msg);
@@ -44,10 +61,16 @@ public class PlayerNote {
             System.err.println("Unable to send note" + e);
         }
     }
-    
+
     public static void sendNote(Player p, String to, String msg) {
         try {
-            try (PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement("INSERT INTO notes (`to`, `from`, `message`, `timestamp`) VALUES (?, ?, ?, ?)")) {
+            try (
+                PreparedStatement ps = DatabaseConnection
+                    .getConnection()
+                    .prepareStatement(
+                        "INSERT INTO notes (`to`, `from`, `message`, `timestamp`) VALUES (?, ?, ?, ?)"
+                    )
+            ) {
                 ps.setString(1, to);
                 ps.setString(2, p.getName());
                 ps.setString(3, msg);
@@ -63,7 +86,15 @@ public class PlayerNote {
 
     public static void showNote(Player p) {
         try {
-            try (PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement("SELECT * FROM notes WHERE `to`=?", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)) {
+            try (
+                PreparedStatement ps = DatabaseConnection
+                    .getConnection()
+                    .prepareStatement(
+                        "SELECT * FROM notes WHERE `to`=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE
+                    )
+            ) {
                 ps.setString(1, p.getName());
                 try (ResultSet rs = ps.executeQuery()) {
                     rs.last();
@@ -75,15 +106,17 @@ public class PlayerNote {
             System.err.println("Unable to show note" + e);
         }
     }
-    
+
     public static void deleteNote(Player p, int id, int fame) {
         try {
             Connection con = DatabaseConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement("SELECT fame FROM notes WHERE `id`=?");
+            PreparedStatement ps = con.prepareStatement(
+                "SELECT fame FROM notes WHERE `id`=?"
+            );
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                if (rs.getInt("fame") == fame && fame > 0 && p != null) { 
+                if (rs.getInt("fame") == fame && fame > 0 && p != null) {
                     p.addFame(fame);
                     p.getStat().updateSingleStat(PlayerStat.FAME, p.getFame());
                     p.announce(PacketCreator.GetShowFameGain(fame));
@@ -99,10 +132,14 @@ public class PlayerNote {
             System.err.println("Unable to delete note" + e);
         }
     }
-    
+
     public static void deleteNote(int id) throws SQLException {
         Connection con = DatabaseConnection.getConnection();
-        try (PreparedStatement ps = con.prepareStatement("DELETE FROM notes WHERE `id`=?")) {
+        try (
+            PreparedStatement ps = con.prepareStatement(
+                "DELETE FROM notes WHERE `id`=?"
+            )
+        ) {
             ps.setInt(1, id);
             ps.executeUpdate();
         }

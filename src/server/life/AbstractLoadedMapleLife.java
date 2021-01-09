@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -23,9 +23,9 @@ package server.life;
 
 import server.maps.object.AbstractAnimatedFieldObject;
 
+public abstract class AbstractLoadedMapleLife
+    extends AbstractAnimatedFieldObject {
 
-public abstract class AbstractLoadedMapleLife extends AbstractAnimatedFieldObject {
-    
     private final int id;
     private int f;
     private boolean hide;

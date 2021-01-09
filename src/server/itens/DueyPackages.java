@@ -25,6 +25,7 @@ import client.player.inventory.Item;
 import java.util.Calendar;
 
 public class DueyPackages {
+
     private String sender = null;
     private Item item = null;
     private int mesos = 0;
@@ -38,7 +39,7 @@ public class DueyPackages {
         packageId = pId;
     }
 
-    public DueyPackages(int pId) { 
+    public DueyPackages(int pId) {
         this.packageId = pId;
     }
 

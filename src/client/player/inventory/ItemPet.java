@@ -1,6 +1,6 @@
 /*
 This file is part of the OdinMS Maple Story Server
-Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc> 
+Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc>
 Matthias Butz <matze@odinms.de>
 Jan Christian Meyer <vimes@odinms.de>
 
@@ -20,32 +20,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package client.player.inventory;
 
-import client.player.inventory.types.InventoryType;
-import tools.ObjectParser;
 import client.player.Player;
+import client.player.inventory.types.InventoryType;
+import database.DatabaseConnection;
 import java.awt.Point;
+import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.io.Serializable;
-
-import java.util.List;
-import database.DatabaseConnection;
 import java.util.ArrayList;
+import java.util.List;
 import server.itens.ItemInformationProvider;
 import server.movement.AbsoluteLifeMovement;
 import server.movement.LifeMovement;
 import server.movement.LifeMovementFragment;
+import tools.ObjectParser;
 
 public class ItemPet implements Serializable {
 
     private static final long serialVersionUID = 9179541993413738569L;
-    
+
     private String name;
     private Point position;
     private int foothold = 0, stance = 0, uniqueid, petItemId, secondsLeft = 0;
     private byte fullness = 100, level = 1, summoned = 0;
-    private short inventorypos = 0; 
+    private short inventorypos = 0;
     private short closeness = 0;
     private List<Integer> exceptionList;
 
@@ -55,17 +54,29 @@ public class ItemPet implements Serializable {
         this.uniqueid = uniqueId;
     }
 
-    private ItemPet(final int petItemId, final int uniqueId, final short inventoryPos) {
+    private ItemPet(
+        final int petItemId,
+        final int uniqueId,
+        final short inventoryPos
+    ) {
         this.exceptionList = new ArrayList<>();
         this.petItemId = petItemId;
         this.uniqueid = uniqueId;
         this.inventorypos = inventoryPos;
     }
 
-    public static ItemPet loadDatabase(final int itemId, final int petId, final short inventoryPos) {
+    public static ItemPet loadDatabase(
+        final int itemId,
+        final int petId,
+        final short inventoryPos
+    ) {
         try {
             final ItemPet ret = new ItemPet(itemId, petId, inventoryPos);
-            try (PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement("SELECT * FROM pets WHERE petid = ?")) {
+            try (
+                PreparedStatement ps = DatabaseConnection
+                    .getConnection()
+                    .prepareStatement("SELECT * FROM pets WHERE petid = ?")
+            ) {
                 ps.setInt(1, petId);
                 try (ResultSet rs = ps.executeQuery()) {
                     if (!rs.next()) {
@@ -79,8 +90,8 @@ public class ItemPet implements Serializable {
                     ret.setFullness(rs.getByte("fullness"));
                     ret.setSecondsLeft(rs.getInt("seconds"));
                     String[] excluded = rs.getString("excluded").split(",");
-                    for(String id : excluded){
-                        if (id.length() > 0){
+                    for (String id : excluded) {
+                        if (id.length() > 0) {
                             ret.addItemException(ObjectParser.isInt(id));
                         }
                     }
@@ -95,14 +106,20 @@ public class ItemPet implements Serializable {
 
     public final void saveDatabase() {
         try {
-            try (PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement("UPDATE pets SET name = ?, level = ?, closeness = ?, fullness = ?, seconds = ?, excluded = ? WHERE petid = ?")) {
+            try (
+                PreparedStatement ps = DatabaseConnection
+                    .getConnection()
+                    .prepareStatement(
+                        "UPDATE pets SET name = ?, level = ?, closeness = ?, fullness = ?, seconds = ?, excluded = ? WHERE petid = ?"
+                    )
+            ) {
                 ps.setString(1, name);
                 ps.setByte(2, level);
                 ps.setShort(3, closeness);
                 ps.setByte(4, fullness);
                 ps.setInt(5, secondsLeft);
                 StringBuilder excluded = new StringBuilder();
-                for (int itemId : exceptionList){
+                for (int itemId : exceptionList) {
                     excluded.append(itemId);
                     excluded.append(",");
                 }
@@ -119,15 +136,37 @@ public class ItemPet implements Serializable {
     }
 
     public static ItemPet createPet(final int itemId, final int uniqueId) {
-        return createPet(itemId, ItemInformationProvider.getInstance().getName(itemId), 1, 0, 100, uniqueId, itemId == 5000054 ? 18000 : 0);
+        return createPet(
+            itemId,
+            ItemInformationProvider.getInstance().getName(itemId),
+            1,
+            0,
+            100,
+            uniqueId,
+            itemId == 5000054 ? 18000 : 0
+        );
     }
 
-    public static ItemPet createPet(int itemid, String name, int level, int closeness, int fullness, int uniqueid, int secondsLeft) {
+    public static ItemPet createPet(
+        int itemid,
+        String name,
+        int level,
+        int closeness,
+        int fullness,
+        int uniqueid,
+        int secondsLeft
+    ) {
         if (uniqueid <= -1) {
             uniqueid = InventoryIdentifier.getInstance();
         }
         try {
-            try (PreparedStatement pse = DatabaseConnection.getConnection().prepareStatement("INSERT INTO pets (petid, name, level, closeness, fullness, seconds) VALUES (?, ?, ?, ?, ?, ?)")) {
+            try (
+                PreparedStatement pse = DatabaseConnection
+                    .getConnection()
+                    .prepareStatement(
+                        "INSERT INTO pets (petid, name, level, closeness, fullness, seconds) VALUES (?, ?, ?, ?, ?, ?)"
+                    )
+            ) {
                 pse.setInt(1, uniqueid);
                 pse.setString(2, name);
                 pse.setByte(3, (byte) level);
@@ -157,8 +196,8 @@ public class ItemPet implements Serializable {
         this.name = name;
     }
 
-     public final boolean getSummoned() {
-	return summoned > 0;
+    public final boolean getSummoned() {
+        return summoned > 0;
     }
 
     public final byte getSummonedValue() {
@@ -166,7 +205,7 @@ public class ItemPet implements Serializable {
     }
 
     public final void setSummoned(final int summoned) {
-        this.summoned = (byte)summoned;
+        this.summoned = (byte) summoned;
     }
 
     public final short getInventoryPosition() {
@@ -247,7 +286,9 @@ public class ItemPet implements Serializable {
         return false;
     }
 
-    public final void updatePosition(final List<LifeMovementFragment> movement) {
+    public final void updatePosition(
+        final List<LifeMovementFragment> movement
+    ) {
         for (final LifeMovementFragment move : movement) {
             if (move instanceof LifeMovement) {
                 if (move instanceof AbsoluteLifeMovement) {
@@ -265,17 +306,17 @@ public class ItemPet implements Serializable {
     public final void setSecondsLeft(int sl) {
         this.secondsLeft = sl;
     }
-    
-    public List<Integer> getExceptionList(){
+
+    public List<Integer> getExceptionList() {
         return exceptionList;
     }
 
-    public void addItemException(int x){
+    public void addItemException(int x) {
         if (!exceptionList.contains(x)) {
             exceptionList.add(x);
         }
     }
-    
+
     public static boolean hasLabelRing(Player p, byte pos) {
         short slot = 0;
         switch (pos) {
@@ -291,7 +332,7 @@ public class ItemPet implements Serializable {
         }
         return p.getInventory(InventoryType.EQUIPPED).getItem(slot) != null;
     }
-    
+
     public static boolean hasQuoteRing(Player p, byte pos) {
         short slot = 0;
         switch (pos) {

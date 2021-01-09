@@ -1,6 +1,6 @@
 /*
 This file is part of the OdinMS Maple Story Server
-Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc> 
+Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc>
 Matthias Butz <matze@odinms.de>
 Jan Christian Meyer <vimes@odinms.de>
 
@@ -30,19 +30,24 @@ import java.awt.image.SampleModel;
 import java.awt.image.WritableRaster;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
-
 import provider.MapleCanvas;
 
 public class PNGMapleCanvas implements MapleCanvas {
 
-    private static final int[] ZAHLEN = new int[]{2, 1, 0, 3};
+    private static final int[] ZAHLEN = new int[] { 2, 1, 0, 3 };
     private final int height;
     private final int width;
     private final int dataLength;
     private final int format;
     private final byte[] data;
 
-    public PNGMapleCanvas(int width, int height, int dataLength, int format, byte[] data) {
+    public PNGMapleCanvas(
+        int width,
+        int height,
+        int dataLength,
+        int format,
+        byte[] data
+    ) {
         super();
         this.height = height;
         this.width = width;
@@ -121,30 +126,38 @@ public class PNGMapleCanvas implements MapleCanvas {
                 for (int i = 0; i < sizeUncompressed; i++) {
                     byte low = (byte) (uc[i] & 0x0F);
                     byte high = (byte) (uc[i] & 0xF0);
-                    
+
                     writeBuf[(i << 1)] = (byte) (((low << 4) | low) & 0xFF);
-                    writeBuf[(i << 1) + 1] = (byte) (high | ((high >>> 4) & 0xF));
-                }   break;
+                    writeBuf[(i << 1) + 1] =
+                        (byte) (high | ((high >>> 4) & 0xF));
+                }
+                break;
             case 2:
                 writeBuf = uc;
                 break;
             case 513:
                 for (int i = 0; i < declen; i += 2) {
                     byte bBits = (byte) ((uc[i] & 0x1F) << 3);
-                    byte gBits = (byte) (((uc[i + 1] & 0x07) << 5) | ((uc[i] & 0xE0) >> 3));
+                    byte gBits = (byte) (
+                        ((uc[i + 1] & 0x07) << 5) | ((uc[i] & 0xE0) >> 3)
+                    );
                     byte rBits = (byte) (uc[i + 1] & 0xF8);
-                    
+
                     writeBuf[(i << 1)] = (byte) (bBits | (bBits >> 5));
                     writeBuf[(i << 1) + 1] = (byte) (gBits | (gBits >> 6));
                     writeBuf[(i << 1) + 2] = (byte) (rBits | (rBits >> 5));
                     writeBuf[(i << 1) + 3] = (byte) 0xFF;
-                }   break;
+                }
+                break;
             case 517:
                 byte b = 0x00;
                 int pixelIndex = 0;
                 for (int i = 0; i < declen; i++) {
                     for (int j = 0; j < 8; j++) {
-                        b = (byte) (((uc[i] & (0x01 << (7 - j))) >> (7 - j)) * 255);
+                        b =
+                            (byte) (
+                                ((uc[i] & (0x01 << (7 - j))) >> (7 - j)) * 255
+                            );
                         for (int k = 0; k < 16; k++) {
                             pixelIndex = (i << 9) + (j << 6) + k * 2;
                             writeBuf[pixelIndex] = b;
@@ -153,17 +166,33 @@ public class PNGMapleCanvas implements MapleCanvas {
                             writeBuf[pixelIndex + 3] = (byte) 0xFF;
                         }
                     }
-                }   break;
+                }
+                break;
             default:
                 break;
         }
 
         DataBufferByte imgData = new DataBufferByte(writeBuf, sizeUncompressed);
 
-        SampleModel sm = new PixelInterleavedSampleModel(DataBuffer.TYPE_BYTE, getWidth(), getHeight(), 4, getWidth() * 4, ZAHLEN);
-        WritableRaster imgRaster = Raster.createWritableRaster(sm, imgData, new Point(0, 0));
+        SampleModel sm = new PixelInterleavedSampleModel(
+            DataBuffer.TYPE_BYTE,
+            getWidth(),
+            getHeight(),
+            4,
+            getWidth() * 4,
+            ZAHLEN
+        );
+        WritableRaster imgRaster = Raster.createWritableRaster(
+            sm,
+            imgData,
+            new Point(0, 0)
+        );
 
-        BufferedImage bf = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
+        BufferedImage bf = new BufferedImage(
+            getWidth(),
+            getHeight(),
+            BufferedImage.TYPE_INT_ARGB
+        );
         bf.setData(imgRaster);
 
         return bf;

@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -21,30 +21,30 @@
 
 package server.itens;
 
+import client.Client;
+import client.player.inventory.Item;
+import client.player.inventory.ItemFactory;
+import client.player.inventory.types.InventoryType;
+import constants.ItemConstants;
+import database.DatabaseConnection;
+import database.DatabaseException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import client.Client;
-import client.player.inventory.types.InventoryType;
-import client.player.inventory.Item;
-import client.player.inventory.ItemFactory;
-import constants.ItemConstants;
-import database.DatabaseConnection;
-import database.DatabaseException;
-import java.sql.Statement;
 import packet.creators.PacketCreator;
 import tools.Pair;
 
 public class StorageKeeper {
-    
+
     private final int id;
-    private int meso;   
+    private int meso;
     private final int accountId;
     private byte slots;
     private boolean changed = false;
@@ -61,7 +61,14 @@ public class StorageKeeper {
 
     public static int create(int id) throws SQLException {
         ResultSet rs;
-        try (PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement("INSERT INTO storages (accountid, slots, meso) VALUES (?, ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
+        try (
+            PreparedStatement ps = DatabaseConnection
+                .getConnection()
+                .prepareStatement(
+                    "INSERT INTO storages (accountid, slots, meso) VALUES (?, ?, ?)",
+                    Statement.RETURN_GENERATED_KEYS
+                )
+        ) {
             ps.setInt(1, id);
             ps.setInt(2, 4);
             ps.setInt(3, 0);
@@ -78,22 +85,33 @@ public class StorageKeeper {
         rs.close();
         throw new DatabaseException("Inserting char failed.");
     }
-    
+
     public static StorageKeeper loadStorage(int id) {
         StorageKeeper ret = null;
         int storeId;
         try {
-            PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement("SELECT * FROM storages WHERE accountid = ?");
+            PreparedStatement ps = DatabaseConnection
+                .getConnection()
+                .prepareStatement("SELECT * FROM storages WHERE accountid = ?");
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
                 storeId = rs.getInt("storageid");
-                ret = new StorageKeeper(storeId, rs.getByte("slots"), rs.getInt("meso"), id);
+                ret =
+                    new StorageKeeper(
+                        storeId,
+                        rs.getByte("slots"),
+                        rs.getInt("meso"),
+                        id
+                    );
                 rs.close();
                 ps.close();
 
-                for (Pair<Item, InventoryType> mit : ItemFactory.STORAGE.loadItems(id, false)) {
+                for (Pair<Item, InventoryType> mit : ItemFactory.STORAGE.loadItems(
+                    id,
+                    false
+                )) {
                     ret.items.add(mit.getLeft());
                 }
             } else {
@@ -107,13 +125,19 @@ public class StorageKeeper {
         }
         return ret;
     }
-    
-     public void saveToDB() {
+
+    public void saveToDB() {
         if (!changed) {
             return;
         }
         try {
-            try (PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement("UPDATE storages SET slots = ?, meso = ? WHERE storageid = ?")) {
+            try (
+                PreparedStatement ps = DatabaseConnection
+                    .getConnection()
+                    .prepareStatement(
+                        "UPDATE storages SET slots = ?, meso = ? WHERE storageid = ?"
+                    )
+            ) {
                 ps.setInt(1, slots);
                 ps.setInt(2, meso);
                 ps.setInt(3, id);
@@ -121,9 +145,16 @@ public class StorageKeeper {
             }
 
             List<Pair<Item, InventoryType>> listing = new ArrayList<>();
-            items.forEach((item) -> {
-                listing.add(new Pair<>(item, ItemConstants.getInventoryType(item.getItemId())));
-            });
+            items.forEach(
+                item -> {
+                    listing.add(
+                        new Pair<>(
+                            item,
+                            ItemConstants.getInventoryType(item.getItemId())
+                        )
+                    );
+                }
+            );
             ItemFactory.STORAGE.saveItems(listing, accountId);
         } catch (SQLException ex) {
             System.err.println("Error saving storage" + ex);
@@ -140,17 +171,20 @@ public class StorageKeeper {
         typeItems.put(type, new ArrayList<>(filterItems(type)));
         return ret;
     }
-    
-    public void arrange() { 
-        Collections.sort(items, (Item o1, Item o2) -> {
-            if (o1.getItemId() < o2.getItemId()) {
-                return -1;
-            } else if (o1.getItemId() == o2.getItemId()) {
-                return 0;
-            } else {
-                return 1;
+
+    public void arrange() {
+        Collections.sort(
+            items,
+            (Item o1, Item o2) -> {
+                if (o1.getItemId() < o2.getItemId()) {
+                    return -1;
+                } else if (o1.getItemId() == o2.getItemId()) {
+                    return 0;
+                } else {
+                    return 1;
+                }
             }
-        });
+        );
         for (InventoryType type : InventoryType.values()) {
             typeItems.put(type, items);
         }
@@ -170,9 +204,17 @@ public class StorageKeeper {
     private List<Item> filterItems(InventoryType type) {
         List<Item> ret = new LinkedList<>();
 
-        items.stream().filter((item) -> (ItemConstants.getInventoryType(item.getItemId()) == type)).forEachOrdered((item) -> {
-            ret.add(item);
-        });
+        items
+            .stream()
+            .filter(
+                item ->
+                    (ItemConstants.getInventoryType(item.getItemId()) == type)
+            )
+            .forEachOrdered(
+                item -> {
+                    ret.add(item);
+                }
+            );
         return ret;
     }
 
@@ -191,30 +233,49 @@ public class StorageKeeper {
         return -1;
     }
 
-     public void sendStorage(Client c, int npcId) {
-        Collections.sort(items, (Item o1, Item o2) -> {
-            if (ItemConstants.getInventoryType(o1.getItemId()).getType() < ItemConstants.getInventoryType(o2.getItemId()).getType()) {
-                return -1;
-            } else if (ItemConstants.getInventoryType(o1.getItemId()) == ItemConstants.getInventoryType(o2.getItemId())) {
-                return 0;
-            } else {
-                return 1;
+    public void sendStorage(Client c, int npcId) {
+        Collections.sort(
+            items,
+            (Item o1, Item o2) -> {
+                if (
+                    ItemConstants.getInventoryType(o1.getItemId()).getType() <
+                    ItemConstants.getInventoryType(o2.getItemId()).getType()
+                ) {
+                    return -1;
+                } else if (
+                    ItemConstants.getInventoryType(o1.getItemId()) ==
+                    ItemConstants.getInventoryType(o2.getItemId())
+                ) {
+                    return 0;
+                } else {
+                    return 1;
+                }
             }
-        });
+        );
         for (InventoryType type : InventoryType.values()) {
             typeItems.put(type, new ArrayList<>(items));
         }
-        c.getSession().write(PacketCreator.GetStorage(npcId, slots, items, meso));
+        c
+            .getSession()
+            .write(PacketCreator.GetStorage(npcId, slots, items, meso));
     }
 
     public void sendStored(Client c, InventoryType type) {
-        c.getSession().write(PacketCreator.StoreStorage(slots, type, typeItems.get(type)));
+        c
+            .getSession()
+            .write(
+                PacketCreator.StoreStorage(slots, type, typeItems.get(type))
+            );
     }
 
     public void sendTakenOut(Client c, InventoryType type) {
-        c.getSession().write(PacketCreator.TakeOutStorage(slots, type, typeItems.get(type)));
+        c
+            .getSession()
+            .write(
+                PacketCreator.TakeOutStorage(slots, type, typeItems.get(type))
+            );
     }
-    
+
     public Item findById(int itemId) {
         for (Item item : items) {
             if (item.getItemId() == itemId) {
@@ -257,11 +318,11 @@ public class StorageKeeper {
         changed = true;
         this.slots = set;
     }
-    
+
     public void update(Client c) {
         c.getSession().write(PacketCreator.ArrangeStorage(slots, items, true));
     }
-    
+
     public void close() {
         typeItems.clear();
     }

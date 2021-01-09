@@ -12,11 +12,11 @@ import server.life.components.SelfDestruction;
 import tools.Pair;
 
 public class MapleMonsterStats {
-    
+
     private int PADamage;
     private int PDDamage;
     private int MADamage;
-    private int MDDamage; 
+    private int MDDamage;
     private int cp;
     private int exp;
     private int dropPeriod;
@@ -113,7 +113,10 @@ public class MapleMonsterStats {
     }
 
     public boolean isMobile() {
-        return animationTimes.containsKey("move") || animationTimes.containsKey("fly");
+        return (
+            animationTimes.containsKey("move") ||
+            animationTimes.containsKey("fly")
+        );
     }
 
     public List<Integer> getRevives() {
@@ -132,11 +135,11 @@ public class MapleMonsterStats {
         return undead;
     }
 
-    public void setEffectiveness (Element e, ElementalEffectiveness ee) {
+    public void setEffectiveness(Element e, ElementalEffectiveness ee) {
         resistance.put(e, ee);
     }
 
-    public ElementalEffectiveness getEffectiveness (Element e) {
+    public ElementalEffectiveness getEffectiveness(Element e) {
         ElementalEffectiveness elementalEffectiveness = resistance.get(e);
         if (elementalEffectiveness == null) {
             return ElementalEffectiveness.NORMAL;
@@ -170,9 +173,11 @@ public class MapleMonsterStats {
     }
 
     public void setSkills(List<Pair<Integer, Integer>> skills) {
-        skills.forEach((skill) -> {
-            this.skills.add(skill);
-        });
+        skills.forEach(
+            skill -> {
+                this.skills.add(skill);
+            }
+        );
     }
 
     public List<Pair<Integer, Integer>> getSkills() {
@@ -184,7 +189,12 @@ public class MapleMonsterStats {
     }
 
     public boolean hasSkill(int skillId, int level) {
-        return skills.stream().anyMatch((skill) -> (skill.getLeft() == skillId && skill.getRight() == level));
+        return skills
+            .stream()
+            .anyMatch(
+                skill ->
+                    (skill.getLeft() == skillId && skill.getRight() == level)
+            );
     }
 
     public void setFirstAttack(boolean firstAttack) {
@@ -257,7 +267,7 @@ public class MapleMonsterStats {
 
     public void setMDDamage(int MDDamage) {
         this.MDDamage = MDDamage;
-    } 
+    }
 
     public void setExplosive(boolean explosive) {
         this.explosive = explosive;
@@ -285,7 +295,7 @@ public class MapleMonsterStats {
     public void setSelfDestruction(SelfDestruction sd) {
         this.selfDestruction = sd;
     }
-    
+
     public BanishInfo getBanishInfo() {
         return banish;
     }
@@ -293,7 +303,7 @@ public class MapleMonsterStats {
     public void setBanishInfo(BanishInfo banish) {
         this.banish = banish;
     }
-    
+
     public int getAccuracy() {
         return this.accuracy;
     }

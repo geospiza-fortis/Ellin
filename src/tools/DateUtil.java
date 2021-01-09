@@ -25,30 +25,32 @@ import java.util.Date;
 import java.util.SimpleTimeZone;
 
 public class DateUtil {
-	private final static long FT_UT_OFFSET = 116444520000000000L;
 
-	public static boolean isDST() {
-		return SimpleTimeZone.getDefault().inDaylightTime(new Date());
-	}
+    private static final long FT_UT_OFFSET = 116444520000000000L;
 
-	/**
-	 * Converts a Unix Timestamp into File Time
-	 *
-	 * @param realTimestamp The actual timestamp in milliseconds.
-	 * @return A 64-bit long giving a filetime timestamp
-	 */
-	public static long getFileTimestamp(long timeStampinMillis) {
-		return getFileTimestamp(timeStampinMillis, false);
-	}
+    public static boolean isDST() {
+        return SimpleTimeZone.getDefault().inDaylightTime(new Date());
+    }
 
-	public static long getFileTimestamp(long timeStampinMillis, boolean roundToMinutes) {
-		if (isDST())
-			timeStampinMillis -= 3600000L;
-		long time;
-		if (roundToMinutes)
-			time = (timeStampinMillis / 1000 / 60) * 600000000;
-		else
-			time = timeStampinMillis * 10000;
-		return time + FT_UT_OFFSET;
-	}
+    /**
+     * Converts a Unix Timestamp into File Time
+     *
+     * @param realTimestamp The actual timestamp in milliseconds.
+     * @return A 64-bit long giving a filetime timestamp
+     */
+    public static long getFileTimestamp(long timeStampinMillis) {
+        return getFileTimestamp(timeStampinMillis, false);
+    }
+
+    public static long getFileTimestamp(
+        long timeStampinMillis,
+        boolean roundToMinutes
+    ) {
+        if (isDST()) timeStampinMillis -= 3600000L;
+        long time;
+        if (roundToMinutes) time =
+            (timeStampinMillis / 1000 / 60) * 600000000; else time =
+            timeStampinMillis * 10000;
+        return time + FT_UT_OFFSET;
+    }
 }

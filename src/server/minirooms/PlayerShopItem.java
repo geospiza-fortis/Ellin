@@ -9,14 +9,14 @@ public class PlayerShopItem {
     public short bundles;
     public short perBundle;
     public final int price;
-    public boolean doesExist; 
+    public boolean doesExist;
     private WeakReference<Merchant> merchant;
-    
+
     public PlayerShopItem(Item item, short bundles, int price) {
         this.item = item;
         this.bundles = bundles;
         this.price = price;
-        this.doesExist = true; 
+        this.doesExist = true;
     }
 
     public Item getItem() {
@@ -30,10 +30,10 @@ public class PlayerShopItem {
     public int getPrice() {
         return price;
     }
-    
-    public boolean isExist() { 
-        return doesExist; 
-    } 
+
+    public boolean isExist() {
+        return doesExist;
+    }
 
     public void setBundles(short bundles) {
         this.bundles = bundles;
@@ -48,10 +48,10 @@ public class PlayerShopItem {
     }
 
     public void setMerchant(Merchant merchant) {
-    	this.merchant = new WeakReference<>(merchant);
+        this.merchant = new WeakReference<>(merchant);
     }
-    
+
     public Merchant getMerchant() {
-    	return merchant.get();
+        return merchant.get();
     }
 }

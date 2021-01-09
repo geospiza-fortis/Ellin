@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
 					   Matthias Butz <matze@odinms.de>
 					   Jan Christian Meyer <vimes@odinms.de>
 
@@ -21,10 +21,10 @@
 */
 
 /* @Author Lerk
- * 
+ *
  * 2002000.js: Orbis Box - drops meso, orange/white pots, and Empty Potion Bottles (quest item)
-*/
+ */
 
 function act() {
-	rm.dropItems(true, 2, 60, 80);
+    rm.dropItems(true, 2, 60, 80);
 }

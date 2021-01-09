@@ -1,7 +1,6 @@
 package client.player.inventory.types;
 
 public enum InventoryType {
-	
     UNKNOWN(0),
     EQUIP(1),
     USE(2),
@@ -47,5 +46,5 @@ public enum InventoryType {
                 return CASH;
         }
         return UNKNOWN;
-    }	
+    }
 }

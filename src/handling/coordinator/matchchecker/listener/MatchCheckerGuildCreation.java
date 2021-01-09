@@ -28,42 +28,54 @@ import java.util.Set;
 import packet.creators.GuildPackets;
 import packet.transfer.write.OutPacket;
 
-
 /**
  *
  * @author Ronan
  */
 public class MatchCheckerGuildCreation implements MatchCheckerListenerRecipe {
-    
-    private static void broadcastGuildCreationDismiss(Set<Player> nonLeaderMatchPlayers) {
+
+    private static void broadcastGuildCreationDismiss(
+        Set<Player> nonLeaderMatchPlayers
+    ) {
         for (Player p : nonLeaderMatchPlayers) {
-          //  if (p.isLoggedinWorld()) {
-                p.announce(GuildPackets.GenericGuildMessage((byte) 0x26));
-           // }
+            //  if (p.isLoggedinWorld()) {
+            p.announce(GuildPackets.GenericGuildMessage((byte) 0x26));
+            // }
         }
     }
-    
+
     public static AbstractMatchCheckerListener loadListener() {
         return (new MatchCheckerGuildCreation()).getListener();
     }
-    
+
     @Override
     public AbstractMatchCheckerListener getListener() {
         return new AbstractMatchCheckerListener() {
-            
             @Override
-            public void onMatchCreated(Player leader, Set<Player> nonLeaderMatchPlayers, String message) {
-                OutPacket createGuildPacket = GuildPackets.ContractGuildMember(leader.getPartyId(), message, leader.getName());
-                
+            public void onMatchCreated(
+                Player leader,
+                Set<Player> nonLeaderMatchPlayers,
+                String message
+            ) {
+                OutPacket createGuildPacket = GuildPackets.ContractGuildMember(
+                    leader.getPartyId(),
+                    message,
+                    leader.getName()
+                );
+
                 for (Player chr : nonLeaderMatchPlayers) {
                     //if (chr.isLoggedinWorld()) {
-                        chr.announce(createGuildPacket);
-                   // }
+                    chr.announce(createGuildPacket);
+                    // }
                 }
             }
-            
+
             @Override
-            public void onMatchAccepted(int leaderid, Set<Player> matchPlayers, String message) {
+            public void onMatchAccepted(
+                int leaderid,
+                Set<Player> matchPlayers,
+                String message
+            ) {
                 Player leader = null;
                 for (Player chr : matchPlayers) {
                     if (chr.getId() == leaderid) {
@@ -71,100 +83,143 @@ public class MatchCheckerGuildCreation implements MatchCheckerListenerRecipe {
                         break;
                     }
                 }
-                
-                if (leader == null /*|| !leader.isLoggedinWorld()*/) {
+
+                if (leader == null/*|| !leader.isLoggedinWorld()*/) {
                     broadcastGuildCreationDismiss(matchPlayers);
                     return;
                 }
                 matchPlayers.remove(leader);
-                
+
                 if (leader.getGuildId() > 0) {
-                    leader.dropMessage(1, "You cannot create a new Guild while in one.");
+                    leader.dropMessage(
+                        1,
+                        "You cannot create a new Guild while in one."
+                    );
                     broadcastGuildCreationDismiss(matchPlayers);
                     return;
                 }
                 int partyid = leader.getPartyId();
                 if (partyid == -1 || !leader.isPartyLeader()) {
-                    leader.dropMessage(1, "You cannot establish the creation of a new Guild without leading a party.");
+                    leader.dropMessage(
+                        1,
+                        "You cannot establish the creation of a new Guild without leading a party."
+                    );
                     broadcastGuildCreationDismiss(matchPlayers);
                     return;
                 }
                 if (leader.getMapId() != 200000301) {
-                    leader.dropMessage(1, "You cannot establish the creation of a new Guild outside of the Guild Headquarters.");
+                    leader.dropMessage(
+                        1,
+                        "You cannot establish the creation of a new Guild outside of the Guild Headquarters."
+                    );
                     broadcastGuildCreationDismiss(matchPlayers);
                     return;
                 }
                 for (Player p : matchPlayers) {
                     if (leader.getMap().getCharacterById(p.getId()) == null) {
-                        leader.dropMessage(1, "You cannot establish the creation of a new Guild if one of the members is not present here.");
+                        leader.dropMessage(
+                            1,
+                            "You cannot establish the creation of a new Guild if one of the members is not present here."
+                        );
                         broadcastGuildCreationDismiss(matchPlayers);
                         return;
                     }
                 }
                 if (leader.getMeso() < GameConstants.GUILD_CRETECOST) {
-                    leader.dropMessage(1, "You do not have " + GameConstants.numberWithCommas(GameConstants.GUILD_CRETECOST) + " mesos to create a Guild.");
+                    leader.dropMessage(
+                        1,
+                        "You do not have " +
+                        GameConstants.numberWithCommas(
+                            GameConstants.GUILD_CRETECOST
+                        ) +
+                        " mesos to create a Guild."
+                    );
                     broadcastGuildCreationDismiss(matchPlayers);
                     return;
                 }
-                
+
                 int gid = GuildService.createGuild(leader.getId(), message);
                 if (gid == 0) {
-                    leader.getClient().getSession().write(GuildPackets.GenericGuildMessage((byte) 0x1C)); // 0x23
+                    leader
+                        .getClient()
+                        .getSession()
+                        .write(GuildPackets.GenericGuildMessage((byte) 0x1C)); // 0x23
                     broadcastGuildCreationDismiss(matchPlayers);
                     return;
                 }
-                final MapleGuild guild = GuildService.getGuild(leader.getGuildId(), leader.getClient().getChannel());
-                leader.gainMeso(-GameConstants.GUILD_CRETECOST, true, false, true);
-                
+                final MapleGuild guild = GuildService.getGuild(
+                    leader.getGuildId(),
+                    leader.getClient().getChannel()
+                );
+                leader.gainMeso(
+                    -GameConstants.GUILD_CRETECOST,
+                    true,
+                    false,
+                    true
+                );
+
                 leader.setGuildId(gid);
                 leader.setGuildRank(1);
                 leader.saveGuildStatus();
                 leader.dropMessage(1, "You have successfully created a Guild.");
-                
+
                 for (Player p : matchPlayers) {
                     boolean cofounder = p.getPartyId() == partyid;
-                    
+
                     MapleGuildCharacter mgc = p.getMGC();
                     mgc.setGuildId(gid);
                     mgc.setGuildRank(cofounder ? 2 : 5);
 
                     GuildService.addGuildMember(mgc);
-                   
+
                     mgc.setAllianceRank(5);
-                    
-                   // if (p.isLoggedinWorld()) {
-                        p.announce(GuildPackets.ShowGuildInfo(p));
-                        
-                        if (cofounder) {
-                            p.dropMessage(1, "You have successfully cofounded a Guild.");
-                        } else {
-                            p.dropMessage(1, "You have successfully joined the new Guild.");
-                        }
-                   // }
-                    
+
+                    // if (p.isLoggedinWorld()) {
+                    p.announce(GuildPackets.ShowGuildInfo(p));
+
+                    if (cofounder) {
+                        p.dropMessage(
+                            1,
+                            "You have successfully cofounded a Guild."
+                        );
+                    } else {
+                        p.dropMessage(
+                            1,
+                            "You have successfully joined the new Guild."
+                        );
+                    }
+                    // }
+
                     p.saveGuildStatus(); // update database
                 }
-                
+
                 guild.broadcastNameChanged();
                 guild.broadcastEmblemChanged();
             }
-            
+
             @Override
-            public void onMatchDeclined(int leaderid, Set<Player> matchPlayers, String message) {
+            public void onMatchDeclined(
+                int leaderid,
+                Set<Player> matchPlayers,
+                String message
+            ) {
                 for (Player p : matchPlayers) {
                     if (p.getId() == leaderid && p.getClient() != null) {
                         MapleParty.leaveParty(p.getParty(), p.getClient());
                     }
-                    
-                  //  if (p.isLoggedinWorld()) {
-                        p.announce(GuildPackets.GenericGuildMessage((byte)0x24));
-                   // }
+
+                    //  if (p.isLoggedinWorld()) {
+                    p.announce(GuildPackets.GenericGuildMessage((byte) 0x24));
+                    // }
                 }
             }
-            
+
             @Override
-            public void onMatchDismissed(int leaderid, Set<Player> matchPlayers, String message) {
-                
+            public void onMatchDismissed(
+                int leaderid,
+                Set<Player> matchPlayers,
+                String message
+            ) {
                 Player leader = null;
                 for (Player p : matchPlayers) {
                     if (p.getId() == leaderid) {
@@ -172,22 +227,24 @@ public class MatchCheckerGuildCreation implements MatchCheckerListenerRecipe {
                         break;
                     }
                 }
-                
+
                 String msg;
                 if (leader != null && leader.getParty() == null) {
-                    msg = "The Guild creation has been dismissed since the leader left the founding party.";
+                    msg =
+                        "The Guild creation has been dismissed since the leader left the founding party.";
                 } else {
-                    msg = "The Guild creation has been dismissed since a member was already in a party when they answered.";
+                    msg =
+                        "The Guild creation has been dismissed since a member was already in a party when they answered.";
                 }
-                
+
                 for (Player p : matchPlayers) {
                     if (p.getId() == leaderid && p.getClient() != null) {
                         MapleParty.leaveParty(p.getParty(), p.getClient());
                     }
-                    
-                  //  if (p.isLoggedinWorld()) {
-                        p.message(msg);
-                  //  }
+
+                    //  if (p.isLoggedinWorld()) {
+                    p.message(msg);
+                    //  }
                 }
             }
         };

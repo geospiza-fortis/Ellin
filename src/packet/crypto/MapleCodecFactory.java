@@ -27,6 +27,7 @@ import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolEncoder;
 
 public class MapleCodecFactory implements ProtocolCodecFactory {
+
     private final ProtocolEncoder encoder;
     private final ProtocolDecoder decoder;
 
@@ -45,4 +46,3 @@ public class MapleCodecFactory implements ProtocolCodecFactory {
         return decoder;
     }
 }
-

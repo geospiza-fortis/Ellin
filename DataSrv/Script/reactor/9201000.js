@@ -1,6 +1,6 @@
-/* 
+/*
  * This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -19,14 +19,14 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* 
+/*
  * @Author Lerk
- * 
+ *
  * spawn for Jr. Gargoyle (9300033) for Mark of Evil (4001035), Sharenian: Waterway Maze (990000630)
- * 
+ *
  * Guild Quest - part of stage 4
  */
 
-function act(){
-        rm.spawnMonster(9300033, 8, -100, 50);
+function act() {
+    rm.spawnMonster(9300033, 8, -100, 50);
 }

@@ -7,7 +7,7 @@
 package client.player.skills;
 
 /**
- * 
+ *
  * @author GabrielSin
  */
 public class PlayerSkillEntry {

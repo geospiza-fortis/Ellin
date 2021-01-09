@@ -1,8 +1,8 @@
 package server.maps;
 
 import java.util.concurrent.ScheduledFuture;
-import tools.TimerTools.MapTimer;
 import server.maps.portal.Portal;
+import tools.TimerTools.MapTimer;
 
 public class FieldMonitor {
 
@@ -13,11 +13,17 @@ public class FieldMonitor {
     public FieldMonitor(final Field map, String portal) {
         this.map = map;
         this.portal = map.getPortal(portal);
-        monitorSchedule = MapTimer.getInstance().register(() -> {
-            if (map.getCharacters().size() < 1) {
-                FieldMonitor.this.run();
-            }
-        }, 10000);
+        monitorSchedule =
+            MapTimer
+                .getInstance()
+                .register(
+                    () -> {
+                        if (map.getCharacters().size() < 1) {
+                            FieldMonitor.this.run();
+                        }
+                    },
+                    10000
+                );
     }
 
     private void run() {

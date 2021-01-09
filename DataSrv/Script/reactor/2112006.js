@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
 					   Matthias Butz <matze@odinms.de>
 					   Jan Christian Meyer <vimes@odinms.de>
 
@@ -21,10 +21,10 @@
 */
 
 /* @Author Lerk
- * 
+ *
  * 2112006.js: Zakum Party Quest Chest - drops an item (10k+ meso sack in Global)
-*/
+ */
 
-function act(){
-	rm.dropItems(true, 1, 500, 800);
+function act() {
+    rm.dropItems(true, 1, 500, 800);
 }

@@ -21,17 +21,16 @@ package handling.world.worker;
 
 import handling.channel.ChannelServer;
 
-
 /**
  * @author Ronan
  */
 public class MerchantWorker extends BaseWorker implements Runnable {
-    
+
     @Override
     public void run() {
         cserv.runHiredMerchantSchedule();
     }
-    
+
     public MerchantWorker(ChannelServer world) {
         super(world);
     }

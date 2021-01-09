@@ -26,48 +26,46 @@ import client.player.skills.PlayerSkill;
 import client.player.skills.PlayerSkillFactory;
 import community.MapleParty;
 import community.MaplePartyCharacter;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import tools.Pair;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Iterator;
-import java.util.Properties;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
-
-import javax.script.ScriptException;
-
-import server.MapleStatEffect;
-import server.life.MapleMonster;
 import constants.ItemConstants;
 import database.DatabaseConnection;
 import java.awt.Point;
 import java.io.File;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.script.ScriptException;
 import packet.creators.EffectPackets;
 import packet.creators.PacketCreator;
 import provider.MapleDataProviderFactory;
 import scripting.AbstractPlayerInteraction;
+import server.MapleStatEffect;
 import server.itens.ItemInformationProvider;
 import server.life.MapleLifeFactory;
+import server.life.MapleMonster;
 import server.life.npc.MapleNPC;
 import server.maps.Field;
 import server.maps.FieldManager;
 import server.maps.portal.Portal;
 import server.maps.reactors.Reactor;
 import tools.ConvertTool;
+import tools.Pair;
 import tools.TimerTools.EventTimer;
 import tools.locks.MonitoredLockType;
 import tools.locks.MonitoredReentrantLock;
@@ -79,7 +77,7 @@ import tools.locks.MonitoredReentrantReadWriteLock;
  * @author Ronan
  */
 public class EventInstanceManager {
-    
+
     private Map<Integer, Player> chars = new HashMap<>();
     private int leaderId = -1;
     private List<MapleMonster> mobs = new LinkedList<>();
@@ -92,12 +90,21 @@ public class EventInstanceManager {
     private long eventTime = 0;
     private List<Integer> mapIds = new LinkedList<>();
 
-    private final ReentrantReadWriteLock lock = new MonitoredReentrantReadWriteLock(MonitoredLockType.EIM, true);
+    private final ReentrantReadWriteLock lock = new MonitoredReentrantReadWriteLock(
+        MonitoredLockType.EIM,
+        true
+    );
     private final ReadLock rL = lock.readLock();
     private final WriteLock wL = lock.writeLock();
 
-    private final Lock pL = new MonitoredReentrantLock(MonitoredLockType.EIM_PARTY, true);
-    private final Lock sL = new MonitoredReentrantLock(MonitoredLockType.EIM_SCRIPT, true);
+    private final Lock pL = new MonitoredReentrantLock(
+        MonitoredLockType.EIM_PARTY,
+        true
+    );
+    private final Lock sL = new MonitoredReentrantLock(
+        MonitoredLockType.EIM_SCRIPT,
+        true
+    );
 
     private ScheduledFuture<?> eventSchedule = null;
     private boolean disposed = false;
@@ -116,11 +123,21 @@ public class EventInstanceManager {
     private Map<Integer, Pair<String, Integer>> openedGates = new HashMap<>();
 
     private Set<Integer> exclusiveItems = new HashSet<>();
-        
+
     public EventInstanceManager(EventManager em, String name) {
         this.em = em;
         this.name = name;
-        mapFactory = new FieldManager(this, MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzpath") + "/Map")), MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzpath") + "/String")), (byte) 1);//Fk this
+        mapFactory =
+            new FieldManager(
+                this,
+                MapleDataProviderFactory.getDataProvider(
+                    new File(System.getProperty("wzpath") + "/Map")
+                ),
+                MapleDataProviderFactory.getDataProvider(
+                    new File(System.getProperty("wzpath") + "/String")
+                ),
+                (byte) 1
+            ); //Fk this
         mapFactory.setChannel(em.getChannelServer().getChannel());
     }
 
@@ -136,85 +153,89 @@ public class EventInstanceManager {
             sL.unlock();
         }
     }
-        
+
     public int getEventPlayersJobs() {
         int mask = 0;
-        for (Player chr: getPlayers()) {
+        for (Player chr : getPlayers()) {
             mask |= (1 << chr.getJob().getJobNiche());
         }
         return mask;
     }
-        
+
     public void applyEventPlayersItemBuff(int itemId) {
         List<Player> players = getPlayerList();
-        MapleStatEffect mse = ItemInformationProvider.getInstance().getItemEffect(itemId);
+        MapleStatEffect mse = ItemInformationProvider
+            .getInstance()
+            .getItemEffect(itemId);
         if (mse != null) {
-            for (Player player: players) {
+            for (Player player : players) {
                 mse.applyTo(player);
             }
         }
     }
-        
+
     public void applyEventPlayersSkillBuff(int skillId) {
         applyEventPlayersSkillBuff(skillId, Integer.MAX_VALUE);
     }
-        
+
     public void applyEventPlayersSkillBuff(int skillId, int skillLv) {
         List<Player> players = getPlayerList();
         PlayerSkill skill = PlayerSkillFactory.getSkill(skillId);
 
         if (skill != null) {
-            MapleStatEffect mse = skill.getEffect(Math.min(skillLv, skill.getMaxLevel()));
+            MapleStatEffect mse = skill.getEffect(
+                Math.min(skillLv, skill.getMaxLevel())
+            );
             if (mse != null) {
-                for (Player player: players) {
+                for (Player player : players) {
                     mse.applyTo(player);
                 }
             }
         }
     }
-        
+
     public void giveEventPlayersExp(int gain) {
         giveEventPlayersExp(gain, -1);
     }
-        
+
     public void giveEventPlayersExp(int gain, int mapId) {
         if (gain == 0) return;
 
         List<Player> players = getPlayerList();
 
         if (mapId == -1) {
-            for(Player mc: players) {
+            for (Player mc : players) {
                 mc.gainExp(gain, true, true);
             }
         } else {
-            for(Player mc: players) {
-                if(mc.getMapId() == mapId) mc.gainExp(gain, true, true);
+            for (Player mc : players) {
+                if (mc.getMapId() == mapId) mc.gainExp(gain, true, true);
             }
         }
     }
-        
+
     public void giveEventPlayersMeso(int gain) {
         giveEventPlayersMeso(gain, -1);
     }
-        
+
     public void giveEventPlayersMeso(int gain, int mapId) {
         if (gain == 0) return;
 
         List<Player> players = getPlayerList();
 
         if (mapId == -1) {
-            for(Player mc: players) {
+            for (Player mc : players) {
                 mc.gainMeso(gain, true);
             }
         } else {
-            for (Player mc: players) {
+            for (Player mc : players) {
                 if (mc.getMapId() == mapId) mc.gainMeso(gain, true);
             }
         }
     }
 
     public void registerPlayer(Player P) {
-        if (P == null){
+        if (P == null) {
             return;
         }
 
@@ -222,8 +243,7 @@ public class EventInstanceManager {
             wL.lock();
             try {
                 chars.put(P.getId(), P);
-            }
-            finally {
+            } finally {
                 wL.unlock();
             }
 
@@ -238,10 +258,10 @@ public class EventInstanceManager {
         } catch (ScriptException | NoSuchMethodException ex) {
             ex.printStackTrace();
         }
-    }  
-        
-    public void exitPlayer(Player p) { 
-        if (p == null){
+    }
+
+    public void exitPlayer(Player p) {
+        if (p == null) {
             return;
         }
         try {
@@ -257,7 +277,7 @@ public class EventInstanceManager {
             ex.printStackTrace();
         }
     }
-        
+
     public void dropMessage(int type, String message) {
         for (Player p : getPlayers()) {
             p.dropMessage(type, message);
@@ -268,58 +288,86 @@ public class EventInstanceManager {
         stopEventTimer();
         startEventTimer(time);
     }
-        
+
     public void startEventTimer(long time) {
         timeStarted = System.currentTimeMillis();
         eventTime = time;
 
-        for (Player p: getPlayers()) {
+        for (Player p : getPlayers()) {
             p.announce(PacketCreator.GetClockTimer((int) (time / 1000)));
         }
 
-        eventSchedule = EventTimer.getInstance().schedule(() -> {
-            try {
-                dismissEventTimer();
-                sL.lock();
-                try {
-                    em.getIv().invokeFunction("scheduledTimeout", EventInstanceManager.this);
-                } finally {
-                    sL.unlock();
-                }
-            } catch (ScriptException | NoSuchMethodException ex) {
-                Logger.getLogger(EventManager.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }, time);
+        eventSchedule =
+            EventTimer
+                .getInstance()
+                .schedule(
+                    () -> {
+                        try {
+                            dismissEventTimer();
+                            sL.lock();
+                            try {
+                                em
+                                    .getIv()
+                                    .invokeFunction(
+                                        "scheduledTimeout",
+                                        EventInstanceManager.this
+                                    );
+                            } finally {
+                                sL.unlock();
+                            }
+                        } catch (ScriptException | NoSuchMethodException ex) {
+                            Logger
+                                .getLogger(EventManager.class.getName())
+                                .log(Level.SEVERE, null, ex);
+                        }
+                    },
+                    time
+                );
     }
-        
+
     public void addEventTimer(long time) {
         if (eventSchedule != null) {
             if (eventSchedule.cancel(false)) {
                 long nextTime = getTimeLeft() + time;
                 eventTime += time;
 
-                eventSchedule = EventTimer.getInstance().schedule(() -> {
-                    try {
-                        dismissEventTimer();
-                        
-                        sL.lock();
-                        try {
-                            em.getIv().invokeFunction("scheduledTimeout", EventInstanceManager.this);
-                        } finally {
-                            sL.unlock();
-                        }
-                    } catch (ScriptException | NoSuchMethodException ex) {
-                        Logger.getLogger(EventManager.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }, nextTime);
+                eventSchedule =
+                    EventTimer
+                        .getInstance()
+                        .schedule(
+                            () -> {
+                                try {
+                                    dismissEventTimer();
+
+                                    sL.lock();
+                                    try {
+                                        em
+                                            .getIv()
+                                            .invokeFunction(
+                                                "scheduledTimeout",
+                                                EventInstanceManager.this
+                                            );
+                                    } finally {
+                                        sL.unlock();
+                                    }
+                                } catch (
+                                    ScriptException | NoSuchMethodException ex
+                                ) {
+                                    Logger
+                                        .getLogger(EventManager.class.getName())
+                                        .log(Level.SEVERE, null, ex);
+                                }
+                            },
+                            nextTime
+                        );
             }
         } else {
             startEventTimer(time);
         }
     }
-        
+
     private void dismissEventTimer() {
-        for (Player p: getPlayers()) {
+        for (Player p : getPlayers()) {
             p.getClient().getSession().write(PacketCreator.DestroyClock());
         }
 
@@ -327,7 +375,7 @@ public class EventInstanceManager {
         eventTime = 0;
         timeStarted = 0;
     }
-        
+
     public void stopEventTimer() {
         if (eventSchedule != null) {
             eventSchedule.cancel(false);
@@ -335,7 +383,7 @@ public class EventInstanceManager {
         }
         dismissEventTimer();
     }
-        
+
     public boolean isTimerStarted() {
         return eventTime > 0 && timeStarted > 0;
     }
@@ -349,7 +397,7 @@ public class EventInstanceManager {
             registerParty(p.getParty(), p.getMap());
         }
     }
-        
+
     public void registerParty(MapleParty party, Field map) {
         for (MaplePartyCharacter pc : party.getEligibleMembers()) {
             Player c = map.getCharacterById(pc.getId());
@@ -361,12 +409,20 @@ public class EventInstanceManager {
         try {
             sL.lock();
             try {
-                em.getIv().invokeFunction("playerUnregistered", EventInstanceManager.this, p);
+                em
+                    .getIv()
+                    .invokeFunction(
+                        "playerUnregistered",
+                        EventInstanceManager.this,
+                        p
+                    );
             } finally {
                 sL.unlock();
             }
         } catch (ScriptException | NoSuchMethodException ex) {
-            Logger.getLogger(EventManager.class.getName()).log(Level.SEVERE, null, ex);
+            Logger
+                .getLogger(EventManager.class.getName())
+                .log(Level.SEVERE, null, ex);
         }
 
         wL.lock();
@@ -381,7 +437,7 @@ public class EventInstanceManager {
 
         p.setEventInstance(null);
     }
-	
+
     public int getPlayerCount() {
         rL.lock();
         try {
@@ -390,7 +446,7 @@ public class EventInstanceManager {
             rL.unlock();
         }
     }
-        
+
     public Player getPlayerById(int id) {
         rL.lock();
         try {
@@ -417,9 +473,9 @@ public class EventInstanceManager {
             rL.unlock();
         }
     }
-        
+
     public void registerMonster(MapleMonster mob) {
-        if (!mob.getStats().isFriendly()) { 
+        if (!mob.getStats().isFriendly()) {
             mobs.add(mob);
         }
     }
@@ -436,8 +492,8 @@ public class EventInstanceManager {
             ex.printStackTrace();
         }
     }
-        
-    public void changedMap(Player chr, int mapId) {  
+
+    public void changedMap(Player chr, int mapId) {
         try {
             sL.lock();
             try {
@@ -447,8 +503,8 @@ public class EventInstanceManager {
             }
         } catch (ScriptException | NoSuchMethodException ex) {}
     }
-        
-    public void afterChangedMap(Player chr, int mapId) {    
+
+    public void afterChangedMap(Player chr, int mapId) {
         try {
             sL.lock();
             try {
@@ -458,7 +514,7 @@ public class EventInstanceManager {
             }
         } catch (ScriptException | NoSuchMethodException ex) {}
     }
-        
+
     public void changedLeader(Player ldr) {
         try {
             sL.lock();
@@ -472,7 +528,7 @@ public class EventInstanceManager {
         }
         leaderId = ldr.getId();
     }
-	
+
     public void monsterKilled(MapleMonster mob, boolean hasKiller) {
         sL.lock();
         try {
@@ -480,14 +536,18 @@ public class EventInstanceManager {
 
             if (eventStarted) {
                 try {
-                    em.getIv().invokeFunction("monsterKilled", mob, this, hasKiller);
+                    em
+                        .getIv()
+                        .invokeFunction("monsterKilled", mob, this, hasKiller);
                 } catch (ScriptException | NoSuchMethodException ex) {
                     ex.printStackTrace();
                 }
 
                 if (mobs.isEmpty()) {
                     try {
-                        em.getIv().invokeFunction("allMonstersDead", this, hasKiller);
+                        em
+                            .getIv()
+                            .invokeFunction("allMonstersDead", this, hasKiller);
                     } catch (ScriptException | NoSuchMethodException ex) {
                         ex.printStackTrace();
                     }
@@ -497,16 +557,18 @@ public class EventInstanceManager {
             sL.unlock();
         }
     }
-        
+
     public void friendlyKilled(MapleMonster mob, boolean hasKiller) {
         try {
             sL.lock();
             try {
-                em.getIv().invokeFunction("friendlyKilled", mob, this, hasKiller);
+                em
+                    .getIv()
+                    .invokeFunction("friendlyKilled", mob, this, hasKiller);
             } finally {
                 sL.unlock();
             }
-        } catch (ScriptException | NoSuchMethodException ex) { }
+        } catch (ScriptException | NoSuchMethodException ex) {}
     }
 
     public void playerKilled(Player p) {
@@ -567,7 +629,10 @@ public class EventInstanceManager {
 
             sL.lock();
             try {
-                inc = (int) em.getIv().invokeFunction("monsterValue", this, mob.getId());
+                inc =
+                    (int) em
+                        .getIv()
+                        .invokeFunction("monsterValue", this, mob.getId());
             } finally {
                 sL.unlock();
             }
@@ -612,7 +677,7 @@ public class EventInstanceManager {
 
         wL.lock();
         try {
-            for (Player p: chars.values()) p.setEventInstance(null);
+            for (Player p : chars.values()) p.setEventInstance(null);
             chars.clear();
 
             mobs.clear();
@@ -641,19 +706,29 @@ public class EventInstanceManager {
     }
 
     public void schedule(final String methodName, long delay) {
-        EventTimer.getInstance().schedule(() -> {
-            try {
-                sL.lock();
-                try {
-                    if (em == null) return;
-                    em.getIv().invokeFunction(methodName, EventInstanceManager.this);
-                } finally {
-                    sL.unlock();
-                }
-            } catch (ScriptException | NoSuchMethodException ex) {
-                ex.printStackTrace();
-            }
-        }, delay);
+        EventTimer
+            .getInstance()
+            .schedule(
+                () -> {
+                    try {
+                        sL.lock();
+                        try {
+                            if (em == null) return;
+                            em
+                                .getIv()
+                                .invokeFunction(
+                                    methodName,
+                                    EventInstanceManager.this
+                                );
+                        } finally {
+                            sL.unlock();
+                        }
+                    } catch (ScriptException | NoSuchMethodException ex) {
+                        ex.printStackTrace();
+                    }
+                },
+                delay
+            );
     }
 
     public String getName() {
@@ -667,7 +742,10 @@ public class EventInstanceManager {
         if (!mapFactory.isMapLoaded(mapId)) {
             sL.lock();
             try {
-                if (em.getProperty("shuffleReactors") != null && em.getProperty("shuffleReactors").equals("true")) {
+                if (
+                    em.getProperty("shuffleReactors") != null &&
+                    em.getProperty("shuffleReactors").equals("true")
+                ) {
                     map.shuffleReactors();
                 }
             } finally {
@@ -684,7 +762,7 @@ public class EventInstanceManager {
     public void setProperty(String key, Integer value) {
         setProperty(key, "" + value);
     }
-        
+
     public void setProperty(String key, String value) {
         pL.lock();
         try {
@@ -720,7 +798,7 @@ public class EventInstanceManager {
             pL.unlock();
         }
     }
-	
+
     public void leftParty(Player p) {
         try {
             sL.lock();
@@ -781,15 +859,18 @@ public class EventInstanceManager {
         return (p.getId() == getLeaderId());
     }
 
-    public final Field getInstanceMap(final int mapid) { 
+    public final Field getInstanceMap(final int mapid) {
         if (disposed) {
             return getMapFactory().getMap(mapid);
         }
         mapIds.add(mapid);
         return getMapFactory().getMap(mapid);
     }
-        
-    public final boolean disposeIfPlayerBelow(final byte size, final int towarp) {
+
+    public final boolean disposeIfPlayerBelow(
+        final byte size,
+        final int towarp
+    ) {
         if (disposed) {
             return true;
         }
@@ -824,7 +905,7 @@ public class EventInstanceManager {
         }
         return false;
     }
-        
+
     public void spawnNpc(int npcId, Point pos, Field map) {
         MapleNPC npc = MapleLifeFactory.getNPC(npcId);
         if (npc != null) {
@@ -837,10 +918,10 @@ public class EventInstanceManager {
             map.broadcastMessage(PacketCreator.SpawnNPC(npc));
         }
     }
-        
+
     public void dispatchUpdateQuestMobCount(int mobid, int mapid) {
         Map<Integer, Player> mapChars = getInstanceMap(mapid).getMapPlayers();
-        if(!mapChars.isEmpty()) {
+        if (!mapChars.isEmpty()) {
             List<Player> eventMembers = getPlayers();
 
             for (Player evChr : eventMembers) {
@@ -852,11 +933,11 @@ public class EventInstanceManager {
             }
         }
     }
-        
+
     public MapleMonster getMonster(int mid) {
-        return(MapleLifeFactory.getMonster(mid));
+        return (MapleLifeFactory.getMonster(mid));
     }
-        
+
     public void setEventClearStageExp(List<Integer> gain) {
         onMapClearExp.clear();
         onMapClearExp.addAll(ConvertTool.ConvertFromScriptInt(gain));
@@ -867,12 +948,12 @@ public class EventInstanceManager {
         onMapClearMeso.addAll(ConvertTool.ConvertFromScriptInt(gain));
     }
 
-    public Integer getClearStageExp(int stage) {  
+    public Integer getClearStageExp(int stage) {
         if (stage > onMapClearExp.size()) return 0;
         return onMapClearExp.get(stage - 1);
     }
 
-    public Integer getClearStageMeso(int stage) {   
+    public Integer getClearStageMeso(int stage) {
         if (stage > onMapClearMeso.size()) return 0;
         return onMapClearMeso.get(stage - 1);
     }
@@ -884,29 +965,35 @@ public class EventInstanceManager {
 
         return list;
     }
-        
-    private void dropExclusiveItems(Player chr) {
-        AbstractPlayerInteraction api = chr.getClient().getAbstractPlayerInteraction();
 
-        for (Integer item: exclusiveItems) {
+    private void dropExclusiveItems(Player chr) {
+        AbstractPlayerInteraction api = chr
+            .getClient()
+            .getAbstractPlayerInteraction();
+
+        for (Integer item : exclusiveItems) {
             api.removeAll(item);
         }
     }
-        
+
     public final void setExclusiveItems(List<Integer> items) {
         List<Integer> exclusive = ConvertTool.ConvertFromScriptInt(items);
 
         wL.lock();
         try {
-            for(Integer item: exclusive) {
+            for (Integer item : exclusive) {
                 exclusiveItems.add(item);
             }
         } finally {
             wL.unlock();
         }
     }
-        
-    public final void setEventRewards(List<Integer> rwds, List<Integer> qtys, int expGiven) {
+
+    public final void setEventRewards(
+        List<Integer> rwds,
+        List<Integer> qtys,
+        int expGiven
+    ) {
         setEventRewards(1, rwds, qtys, expGiven);
     }
 
@@ -914,13 +1001,22 @@ public class EventInstanceManager {
         setEventRewards(1, rwds, qtys);
     }
 
-    public final void setEventRewards(int eventLevel, List<Integer> rwds, List<Integer> qtys) {
+    public final void setEventRewards(
+        int eventLevel,
+        List<Integer> rwds,
+        List<Integer> qtys
+    ) {
         setEventRewards(eventLevel, rwds, qtys, 0);
     }
-        
-    public final void setEventRewards(int eventLevel, List<Integer> rwds, List<Integer> qtys, int expGiven) {
+
+    public final void setEventRewards(
+        int eventLevel,
+        List<Integer> rwds,
+        List<Integer> qtys,
+        int expGiven
+    ) {
         if (eventLevel <= 0 || eventLevel > 8) return;
-        eventLevel--;    
+        eventLevel--;
 
         List<Integer> rewardIds = ConvertTool.ConvertFromScriptInt(rwds);
         List<Integer> rewardQtys = ConvertTool.ConvertFromScriptInt(qtys);
@@ -934,7 +1030,7 @@ public class EventInstanceManager {
             wL.unlock();
         }
     }
-        
+
     private byte getRewardListRequirements(int level) {
         if (level >= collectionSet.size()) return 0;
 
@@ -942,18 +1038,20 @@ public class EventInstanceManager {
         List<Integer> list = collectionSet.get(level);
 
         for (Integer itemId : list) {
-            rewardTypes |= (1 << ItemConstants.getInventoryType(itemId).getType());
+            rewardTypes |=
+                (1 << ItemConstants.getInventoryType(itemId).getType());
         }
 
         return rewardTypes;
     }
-        
+
     private boolean hasRewardSlot(Player player, int eventLevel) {
-        byte listReq = getRewardListRequirements(eventLevel);   
+        byte listReq = getRewardListRequirements(eventLevel);
 
         for (byte type = 1; type <= 5; type++) {
-            if ((listReq >> type) % 2 == 1 && !player.hasEmptySlot(type))
-                return false;
+            if (
+                (listReq >> type) % 2 == 1 && !player.hasEmptySlot(type)
+            ) return false;
         }
 
         return true;
@@ -969,7 +1067,7 @@ public class EventInstanceManager {
 
         rL.lock();
         try {
-            eventLevel--;      
+            eventLevel--;
             if (eventLevel >= collectionSet.size()) return true;
 
             rewardsSet = collectionSet.get(eventLevel);
@@ -984,19 +1082,21 @@ public class EventInstanceManager {
 
         if (rewardsSet == null || rewardsSet.isEmpty()) {
             if (rewardExp > 0) player.gainExp(rewardExp);
-                return true;
+            return true;
         }
 
         if (!hasRewardSlot(player, eventLevel)) return false;
 
-        AbstractPlayerInteraction api = player.getClient().getAbstractPlayerInteraction();
+        AbstractPlayerInteraction api = player
+            .getClient()
+            .getAbstractPlayerInteraction();
         int rnd = (int) Math.floor(Math.random() * rewardsSet.size());
 
         api.gainItem(rewardsSet.get(rnd), rewardsQty.get(rnd).shortValue());
         if (rewardExp > 0) player.gainExp(rewardExp);
         return true;
     }
-        
+
     public final void startEvent() {
         try {
             sL.lock();
@@ -1021,33 +1121,44 @@ public class EventInstanceManager {
             sL.unlock();
         }
     }
-        
+
     public final boolean isEventCleared() {
         return eventCleared;
     }
 
     private boolean isEventTeamLeaderOn() {
-        for (Player p: getPlayers()) {
-            if(p.getId() == getLeaderId()) return true;
+        for (Player p : getPlayers()) {
+            if (p.getId() == getLeaderId()) return true;
         }
 
         return false;
     }
 
-    public final boolean checkEventTeamLacking(boolean leavingEventMap, int minPlayers) {
+    public final boolean checkEventTeamLacking(
+        boolean leavingEventMap,
+        int minPlayers
+    ) {
         if (eventCleared && getPlayerCount() > 1) return false;
 
-        if (!eventCleared && leavingEventMap && !isEventTeamLeaderOn()) return true;
+        if (
+            !eventCleared && leavingEventMap && !isEventTeamLeaderOn()
+        ) return true;
         if (getPlayerCount() < minPlayers) return true;
 
         return false;
     }
-        
-    public final boolean isEventTeamLackingNow(boolean leavingEventMap, int minPlayers, Player quitter) {
+
+    public final boolean isEventTeamLackingNow(
+        boolean leavingEventMap,
+        int minPlayers,
+        Player quitter
+    ) {
         if (eventCleared) {
-                if (leavingEventMap && getPlayerCount() <= 1) return true;
+            if (leavingEventMap && getPlayerCount() <= 1) return true;
         } else {
-            if (leavingEventMap && getLeaderId() == quitter.getId()) return true;
+            if (
+                leavingEventMap && getLeaderId() == quitter.getId()
+            ) return true;
             if (getPlayerCount() <= minPlayers) return true;
         }
 
@@ -1065,7 +1176,7 @@ public class EventInstanceManager {
 
             for (; iterator.hasNext();) {
                 mc = iterator.next();
-                if(mc.getMapId() != mapId) return false;
+                if (mc.getMapId() != mapId) return false;
             }
 
             return true;
@@ -1073,13 +1184,12 @@ public class EventInstanceManager {
             rL.unlock();
         }
     }
-        
+
     public final void warpEventTeam(int warpFrom, int warpTo) {
         List<Player> players = getPlayerList();
 
         for (Player p : players) {
-            if (p.getMapId() == warpFrom)
-                p.changeMap(warpTo);
+            if (p.getMapId() == warpFrom) p.changeMap(warpTo);
         }
     }
 
@@ -1090,13 +1200,16 @@ public class EventInstanceManager {
             p.changeMap(warpTo);
         }
     }
-        
-    public final void warpEventTeamToMapSpawnPoint(int warpFrom, int warpTo, int toSp) {
+
+    public final void warpEventTeamToMapSpawnPoint(
+        int warpFrom,
+        int warpTo,
+        int toSp
+    ) {
         List<Player> players = getPlayerList();
 
         for (Player p : players) {
-            if (p.getMapId() == warpFrom)
-                p.changeMap(warpTo, toSp);
+            if (p.getMapId() == warpFrom) p.changeMap(warpTo, toSp);
         }
     }
 
@@ -1107,7 +1220,7 @@ public class EventInstanceManager {
             p.changeMap(warpTo, toSp);
         }
     }
-        
+
     public final int getLeaderId() {
         rL.lock();
         try {
@@ -1134,7 +1247,7 @@ public class EventInstanceManager {
             wL.unlock();
         }
     }
-        
+
     public final void showWrongEffect() {
         showWrongEffect(getLeader().getMapId());
     }
@@ -1166,12 +1279,19 @@ public class EventInstanceManager {
         showClearEffect(true, mapId, mapObj, newState);
     }
 
-    public final void showClearEffect(boolean hasGate, int mapId, String mapObj, int newState) {
+    public final void showClearEffect(
+        boolean hasGate,
+        int mapId,
+        String mapObj,
+        int newState
+    ) {
         Field map = getMapInstance(mapId);
         map.broadcastMessage(EffectPackets.ShowEffect("quest/party/clear"));
         map.broadcastMessage(EffectPackets.PlaySound("Party1/Clear"));
         if (hasGate) {
-            map.broadcastMessage(EffectPackets.EnvironmentChange(mapObj, newState));
+            map.broadcastMessage(
+                EffectPackets.EnvironmentChange(mapObj, newState)
+            );
             wL.lock();
             try {
                 openedGates.put(map.getId(), new Pair<>(mapObj, newState));
@@ -1180,28 +1300,37 @@ public class EventInstanceManager {
             }
         }
     }
-        
+
     public final void recoverOpenedGate(Player p, int thisMapId) {
         rL.lock();
         try {
             if (openedGates.containsKey(thisMapId)) {
                 Pair<String, Integer> gateData = openedGates.get(thisMapId);
-                p.announce(EffectPackets.EnvironmentChange(gateData.getLeft(), gateData.getRight()));
+                p.announce(
+                    EffectPackets.EnvironmentChange(
+                        gateData.getLeft(),
+                        gateData.getRight()
+                    )
+                );
             }
         } finally {
             rL.unlock();
         }
     }
-        
+
     public final void giveEventPlayersStageReward(int thisStage) {
         List<Integer> list = getClearStageBonus(thisStage);
         giveEventPlayersExp(list.get(0));
         giveEventPlayersMeso(list.get(1));
     }
 
-    public final void linkToNextStage(int thisStage, String eventFamily, int thisMapId) {
+    public final void linkToNextStage(
+        int thisStage,
+        String eventFamily,
+        int thisMapId
+    ) {
         giveEventPlayersStageReward(thisStage);
-        thisStage--;    
+        thisStage--;
 
         Field nextStage = getMapInstance(thisMapId);
         Portal portal = nextStage.getPortal("next00");
@@ -1209,18 +1338,23 @@ public class EventInstanceManager {
             portal.setScriptName(eventFamily + thisStage);
         }
     }
-        
-    public final void linkPortalToScript(int thisStage, String portalName, String scriptName, int thisMapId) {
+
+    public final void linkPortalToScript(
+        int thisStage,
+        String portalName,
+        String scriptName,
+        int thisMapId
+    ) {
         giveEventPlayersStageReward(thisStage);
-        thisStage--;   
-        
+        thisStage--;
+
         Field nextStage = getMapInstance(thisMapId);
         Portal portal = nextStage.getPortal(portalName);
         if (portal != null) {
             portal.setScriptName(scriptName);
         }
     }
-        
+
     public final void gridInsert(Player chr, int newStatus) {
         wL.lock();
         try {
@@ -1229,7 +1363,7 @@ public class EventInstanceManager {
             wL.unlock();
         }
     }
-       
+
     public final void gridRemove(Player chr) {
         wL.lock();
         try {
@@ -1248,7 +1382,7 @@ public class EventInstanceManager {
             rL.unlock();
         }
     }
-        
+
     public final int gridSize() {
         rL.lock();
         try {
@@ -1257,7 +1391,7 @@ public class EventInstanceManager {
             rL.unlock();
         }
     }
-        
+
     public final void gridClear() {
         wL.lock();
         try {
@@ -1266,18 +1400,30 @@ public class EventInstanceManager {
             wL.unlock();
         }
     }
-        
-    public boolean activatedAllReactorsOnMap(int mapId, int minReactorId, int maxReactorId) {
-        return activatedAllReactorsOnMap(this.getMapInstance(mapId), minReactorId, maxReactorId);
+
+    public boolean activatedAllReactorsOnMap(
+        int mapId,
+        int minReactorId,
+        int maxReactorId
+    ) {
+        return activatedAllReactorsOnMap(
+            this.getMapInstance(mapId),
+            minReactorId,
+            maxReactorId
+        );
     }
- 
-    public boolean activatedAllReactorsOnMap(Field map, int minReactorId, int maxReactorId) {
+
+    public boolean activatedAllReactorsOnMap(
+        Field map,
+        int minReactorId,
+        int maxReactorId
+    ) {
         if (map == null) return true;
         for (Reactor r : map.getReactorsByIdRange(minReactorId, maxReactorId)) {
             if (r.getReactorType() != -1) {
                 return false;
             }
         }
-        return true;     
+        return true;
     }
 }

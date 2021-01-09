@@ -3,9 +3,8 @@ package server.movement;
 import java.awt.Point;
 import packet.transfer.write.WritingPacket;
 
+public class ChairMovement extends AbstractLifeMovement {
 
-public class ChairMovement extends AbstractLifeMovement  {
-	
     private int unk;
 
     public ChairMovement(int type, Point position, int duration, int newstate) {
@@ -30,4 +29,3 @@ public class ChairMovement extends AbstractLifeMovement  {
         wp.writeShort(getDuration());
     }
 }
-

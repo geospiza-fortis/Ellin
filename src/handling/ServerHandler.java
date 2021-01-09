@@ -1,19 +1,18 @@
 package handling;
 
-import packet.transfer.write.OutPacket;
-import client.Client;
-import constants.ServerProperties;
 import cashshop.CashCouponRequest;
 import cashshop.CashShopOperation;
+import client.Client;
 import constants.GameConstants;
-import java.io.IOException;
+import constants.ServerProperties;
 import handling.channel.ChannelServer;
+import handling.channel.handler.*;
 import handling.channel.handler.MTSHandler;
 import handling.channel.handler.MonsterCarnivalHandler;
-import handling.channel.handler.*;
 import handling.login.LoginServer;
 import handling.login.handler.*;
 import handling.mina.PacketReader;
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicLong;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
@@ -21,12 +20,14 @@ import packet.creators.LoginPackets;
 import packet.creators.PacketCreator;
 import packet.crypto.MapleCrypto;
 import packet.opcode.RecvPacketOpcode;
+import packet.transfer.write.OutPacket;
 import tools.FileLogger;
 import tools.HexTool;
 import tools.Randomizer;
 
-public class ServerHandler extends org.apache.mina.core.service.IoHandlerAdapter {
-    
+public class ServerHandler
+    extends org.apache.mina.core.service.IoHandlerAdapter {
+
     private int channel = -1;
     private static AtomicLong sessionId = new AtomicLong(7777);
 
@@ -35,58 +36,125 @@ public class ServerHandler extends org.apache.mina.core.service.IoHandlerAdapter
     }
 
     @Override
-    public void messageSent(IoSession session, Object message) throws Exception {
+    public void messageSent(IoSession session, Object message)
+        throws Exception {
         Runnable r = ((OutPacket) message).getOnSend();
-        if (r != null)
-            r.run();
+        if (r != null) r.run();
         super.messageSent(session, message);
     }
 
     @Override
-    public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
-        if (cause instanceof IOException || cause instanceof ClassCastException) {
+    public void exceptionCaught(IoSession session, Throwable cause)
+        throws Exception {
+        if (
+            cause instanceof IOException || cause instanceof ClassCastException
+        ) {
             return;
         }
         Client mc = (Client) session.getAttribute(Client.CLIENT_KEY);
         if (mc != null && mc.getPlayer() != null) {
-            FileLogger.printError(FileLogger.EXCEPTION_CAUGHT, cause, "Exception caused by: " + mc.getPlayer());
+            FileLogger.printError(
+                FileLogger.EXCEPTION_CAUGHT,
+                cause,
+                "Exception caused by: " + mc.getPlayer()
+            );
         }
     }
 
     @Override
     public void sessionOpened(IoSession session) throws Exception {
-       if (channel > -1) {
-	    if (ChannelServer.getInstance(channel).isShutdown() || ChannelServer.getInstance(channel) == null) {
-		session.close();
-		return;
-	    }
-	} else {
+        if (channel > -1) {
+            if (
+                ChannelServer.getInstance(channel).isShutdown() ||
+                ChannelServer.getInstance(channel) == null
+            ) {
+                session.close();
+                return;
+            }
+        } else {
             if (LoginServer.isShutdown()) {
                 session.close();
                 return;
             }
         }
-       
-        final byte serverRecv[] = new byte[]{70, 114, 122, (byte) Randomizer.nextInt(255)};
-        final byte serverSend[] = new byte[]{82, 48, 120, (byte) Randomizer.nextInt(255)};
+
+        final byte serverRecv[] = new byte[] {
+            70,
+            114,
+            122,
+            (byte) Randomizer.nextInt(255),
+        };
+        final byte serverSend[] = new byte[] {
+            82,
+            48,
+            120,
+            (byte) Randomizer.nextInt(255),
+        };
         final byte ivRecv[] = serverRecv;
         final byte ivSend[] = serverSend;
-        byte key[] = {0x13, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, (byte) 0xB4, 0x00, 0x00, 0x00, 0x1B, 0x00, 0x00, 0x00, 0x0F, 0x00, 0x00, 0x00, 0x33, 0x00, 0x00, 0x00, 0x52, 0x00, 0x00, 0x00};
-      
-        MapleCrypto sendCypher = new MapleCrypto(key, ivSend, (short) (0xFFFF - ServerProperties.World.MAPLE_VERSION));
-        MapleCrypto recvCypher = new MapleCrypto(key, ivRecv, ServerProperties.World.MAPLE_VERSION);
+        byte key[] = {
+            0x13,
+            0x00,
+            0x00,
+            0x00,
+            0x08,
+            0x00,
+            0x00,
+            0x00,
+            0x06,
+            0x00,
+            0x00,
+            0x00,
+            (byte) 0xB4,
+            0x00,
+            0x00,
+            0x00,
+            0x1B,
+            0x00,
+            0x00,
+            0x00,
+            0x0F,
+            0x00,
+            0x00,
+            0x00,
+            0x33,
+            0x00,
+            0x00,
+            0x00,
+            0x52,
+            0x00,
+            0x00,
+            0x00,
+        };
+
+        MapleCrypto sendCypher = new MapleCrypto(
+            key,
+            ivSend,
+            (short) (0xFFFF - ServerProperties.World.MAPLE_VERSION)
+        );
+        MapleCrypto recvCypher = new MapleCrypto(
+            key,
+            ivRecv,
+            ServerProperties.World.MAPLE_VERSION
+        );
         Client client = new Client(sendCypher, recvCypher, session);
-        
+
         client.setChannel(channel);
-        client.setSessionId(sessionId.getAndIncrement()); 
-        session.write(LoginPackets.GetHello(ServerProperties.World.MAPLE_VERSION, ivSend, ivRecv, false));
-        
-        
+        client.setSessionId(sessionId.getAndIncrement());
+        session.write(
+            LoginPackets.GetHello(
+                ServerProperties.World.MAPLE_VERSION,
+                ivSend,
+                ivRecv,
+                false
+            )
+        );
+
         session.setAttribute(Client.CLIENT_KEY, client);
         FileLogger.print("ListIP.txt", "IP: " + session.getRemoteAddress());
     }
-    
-      @Override
+
+    @Override
     public void sessionClosed(IoSession session) throws Exception {
         Client client = (Client) session.getAttribute(Client.CLIENT_KEY);
         if (client != null) {
@@ -96,39 +164,42 @@ public class ServerHandler extends org.apache.mina.core.service.IoHandlerAdapter
                 FileLogger.printError(FileLogger.ACCOUNT_STUCK, t);
             } finally {
                 session.close();
-                session.removeAttribute(Client.CLIENT_KEY);      
+                session.removeAttribute(Client.CLIENT_KEY);
             }
         }
         super.sessionClosed(session);
     }
 
-      @Override
+    @Override
     public void messageReceived(final IoSession session, final Object message) {
         try {
-            PacketReader packet = new PacketReader((byte[])message);
+            PacketReader packet = new PacketReader((byte[]) message);
             final short header_num = packet.readShort();
             for (final RecvPacketOpcode recv : RecvPacketOpcode.values()) {
                 if (recv.getValue() == header_num) {
-                    final Client c = (Client) session.getAttribute(Client.CLIENT_KEY);
+                    final Client c = (Client) session.getAttribute(
+                        Client.CLIENT_KEY
+                    );
                     handlePacket(recv, packet, c);
                     return;
                 }
             }
         } catch (Exception e) {
-           FileLogger.printError(FileLogger.PACKET_LOG, e);
+            FileLogger.printError(FileLogger.PACKET_LOG, e);
         }
     }
 
     @Override
-    public void sessionIdle(final IoSession session, final IdleStatus status) throws Exception {
+    public void sessionIdle(final IoSession session, final IdleStatus status)
+        throws Exception {
         final Client client = (Client) session.getAttribute(Client.CLIENT_KEY);
         if (client != null) {
             client.sendPing();
         }
         super.sessionIdle(session, status);
     }
-    
-     public static boolean isSpamHeader(RecvPacketOpcode header) {
+
+    public static boolean isSpamHeader(RecvPacketOpcode header) {
         switch (header) {
             case MOVE_LIFE:
             case MOVE_PLAYER:
@@ -145,15 +216,37 @@ public class ServerHandler extends org.apache.mina.core.service.IoHandlerAdapter
         }
         return false;
     }
-     
-    public static final void handlePacket(final RecvPacketOpcode header, final PacketReader reader, final Client c) throws Exception {
+
+    public static final void handlePacket(
+        final RecvPacketOpcode header,
+        final PacketReader reader,
+        final Client c
+    ) throws Exception {
         if (GameConstants.LOG_PACKETS && !isSpamHeader(header)) {
             String tab = "";
             for (int i = 4; i > header.name().length() / 8; i--) {
                 tab += "\t";
             }
-            System.out.println("[Recv]\t" + header.name() + tab + "|\t" + header.getValue() + "\t|\t" + HexTool.getOpcodeToString(header.getValue()));
-            FileLogger.log("PacketLog.txt", "\r\n\r\n[Recv]\t" + header.name() + tab + "|\t" + header.getValue() + "\t|\t" + HexTool.getOpcodeToString(header.getValue()) + "\r\n\r\n");
+            System.out.println(
+                "[Recv]\t" +
+                header.name() +
+                tab +
+                "|\t" +
+                header.getValue() +
+                "\t|\t" +
+                HexTool.getOpcodeToString(header.getValue())
+            );
+            FileLogger.log(
+                "PacketLog.txt",
+                "\r\n\r\n[Recv]\t" +
+                header.name() +
+                tab +
+                "|\t" +
+                header.getValue() +
+                "\t|\t" +
+                HexTool.getOpcodeToString(header.getValue()) +
+                "\r\n\r\n"
+            );
         }
         switch (header) {
             case PONG:
@@ -161,13 +254,19 @@ public class ServerHandler extends org.apache.mina.core.service.IoHandlerAdapter
                 break;
             case AFTER_LOGIN:
                 if (ServerProperties.Login.ENABLE_PIN) {
-                   CharLoginHandler.AfterLogin(reader, c);
+                    CharLoginHandler.AfterLogin(reader, c);
                 } else {
-                  c.getSession().write(LoginPackets.PinOperation((byte) CharLoginHeaders.PIN_ACCEPTED));
+                    c
+                        .getSession()
+                        .write(
+                            LoginPackets.PinOperation(
+                                (byte) CharLoginHeaders.PIN_ACCEPTED
+                            )
+                        );
                 }
                 break;
             case SERVERLIST_REQUEST:
-            case SERVERLIST_REREQUEST:    
+            case SERVERLIST_REREQUEST:
                 CharLoginHandler.ServerListRequest(c);
                 break;
             case ACCEPT_TOS:
@@ -182,69 +281,72 @@ public class ServerHandler extends org.apache.mina.core.service.IoHandlerAdapter
             case CHARLIST_REQUEST:
                 CharLoginHandler.CharlistRequest(reader, c);
                 break;
-            case CHAR_SELECT:    
+            case CHAR_SELECT:
                 CharLoginHandler.CharacterSelect(reader, c);
-                break; 
+                break;
             case LOGIN_PASSWORD:
                 CharLoginHandler.Login(reader, c);
-                break;  
+                break;
             case RELOG:
                 c.getSession().write(LoginPackets.GetRelogResponse());
-                break;   
-           case SERVERSTATUS_REQUEST:
+                break;
+            case SERVERSTATUS_REQUEST:
                 CharLoginHandler.ServerStatusRequest(c);
                 break;
-           case CHECK_CHAR_NAME:
-                CharLoginHandler.CheckCharName(reader.readMapleAsciiString(), c);
+            case CHECK_CHAR_NAME:
+                CharLoginHandler.CheckCharName(
+                    reader.readMapleAsciiString(),
+                    c
+                );
                 break;
-           case CREATE_CHAR:
+            case CREATE_CHAR:
                 CharLoginHandler.CreateChar(reader, c);
                 break;
-           case DELETE_CHAR:
+            case DELETE_CHAR:
                 CharLoginHandler.DeleteChar(reader, c);
-                break;  
-           case VIEW_ALL_CHAR:
+                break;
+            case VIEW_ALL_CHAR:
                 CharLoginHandler.ViewChar(reader, c);
                 break;
-           case PICK_ALL_CHAR:
+            case PICK_ALL_CHAR:
                 CharLoginHandler.PickCharHandler(reader, c);
                 break;
-           // END OF LOGIN SERVER
-           case CLIENT_ERROR:
+            // END OF LOGIN SERVER
+            case CLIENT_ERROR:
                 break;
             case CHANGE_CHANNEL:
                 InterServerHandler.ChangeChannel(reader, c);
                 break;
             case GENERAL_CHAT:
                 ChatHandler.GeneralChat(reader, c);
-                break;    
+                break;
             case WHISPER:
                 ChatHandler.Whisper_Find(reader, c);
-                break;   
+                break;
             case NPC_TALK:
                 NPCHandler.NPCTalk(reader, c);
-                break;    
+                break;
             case NPC_TALK_MORE:
                 NPCHandler.NPCMoreTalk(reader, c);
-                break;    
+                break;
             case QUEST_ACTION:
                 NPCHandler.QuestAction(reader, c);
-                break;    
+                break;
             case NPC_SHOP:
                 NPCHandler.NPCShop(reader, c, c.getPlayer());
-                break;    
+                break;
             case ITEM_GATHER:
                 InventoryHandler.ItemGather(reader, c);
-                break;                
+                break;
             case ITEM_MOVE:
                 InventoryHandler.ItemMove(reader, c);
-                break;   
+                break;
             case MESO_DROP:
                 PlayerHandler.DropMeso(reader, c);
-                break; 
+                break;
             case PLAYER_LOGGEDIN:
                 InterServerHandler.Loggedin(reader, c);
-                break;  
+                break;
             case CHANGE_MAP:
                 if (reader.available() == 0) {
                     InterServerHandler.LeaveCS(reader, c);
@@ -254,10 +356,10 @@ public class ServerHandler extends org.apache.mina.core.service.IoHandlerAdapter
                 break;
             case MOVE_LIFE:
                 MobHandler.MoveMonster(reader, c);
-                break; 
+                break;
             case MELEE_ATTACK:
                 PlayerHandler.MeleeAttack(reader, c);
-                break;    
+                break;
             case RANGED_ATTACK:
                 PlayerHandler.RangedAttack(reader, c);
                 break;
@@ -266,10 +368,10 @@ public class ServerHandler extends org.apache.mina.core.service.IoHandlerAdapter
                 break;
             case TAKE_DAMAGE:
                 PlayerHandler.TakeDamage(reader, c);
-                break;    
+                break;
             case MOVE_PLAYER:
                 PlayerHandler.MovePlayer(reader, c.getPlayer());
-                break;  
+                break;
             case USE_CASH_ITEM:
                 InventoryHandler.UseCashItem(reader, c);
                 break;
@@ -281,7 +383,7 @@ public class ServerHandler extends org.apache.mina.core.service.IoHandlerAdapter
                 break;
             case USE_UPGRADE_SCROLL:
                 InventoryHandler.UseUpgradeScroll(reader, c);
-                break;                
+                break;
             case USE_SUMMON_BAG:
                 InventoryHandler.UseSummonBag(reader, c);
                 break;
@@ -290,7 +392,7 @@ public class ServerHandler extends org.apache.mina.core.service.IoHandlerAdapter
                 break;
             case HEAL_OVER_TIME:
                 PlayerHandler.ReplenishHpMp(reader, c);
-                break;                
+                break;
             case ITEM_PICKUP:
                 InventoryHandler.PickupPlayer(reader, c);
                 break;
@@ -299,7 +401,7 @@ public class ServerHandler extends org.apache.mina.core.service.IoHandlerAdapter
                 break;
             case SPECIAL_MOVE:
                 PlayerHandler.SpecialMove(reader, c);
-                break;                
+                break;
             case USE_INNER_PORTAL:
                 PlayerHandler.InnerPortal(reader, c);
                 break;
@@ -308,7 +410,7 @@ public class ServerHandler extends org.apache.mina.core.service.IoHandlerAdapter
                 break;
             case CANCEL_BUFF:
                 PlayerHandler.CancelBuffHandler(reader, c);
-                break;                
+                break;
             case CANCEL_ITEM_EFFECT:
                 PlayerHandler.CancelItemEffect(reader, c);
                 break;
@@ -329,19 +431,19 @@ public class ServerHandler extends org.apache.mina.core.service.IoHandlerAdapter
                 break;
             case CHANGE_MAP_SPECIAL:
                 PlayerHandler.ChangeMapSpecial(reader, c);
-                break;                
+                break;
             case STORAGE:
                 NPCHandler.Storage(reader, c);
                 break;
             case GIVE_FAME:
                 PlayersHandler.GiveFame(reader, c);
-                break; 
+                break;
             case PARTY_OPERATION:
                 PartyHandler.handlePartyOperation(reader, c);
-                break;                
+                break;
             case DENY_PARTY_REQUEST:
                 PartyHandler.PartyResponse(reader, c);
-                break;                
+                break;
             case PARTYCHAT:
                 ChatHandler.PrivateChat(reader, c);
                 break;
@@ -350,11 +452,11 @@ public class ServerHandler extends org.apache.mina.core.service.IoHandlerAdapter
                 break;
             case ENTER_MTS:
                 MTSHandler.EnterMTS(reader, c);
-                break;               
+                break;
             case ENTER_CASH_SHOP:
                 InterServerHandler.EnterCS(reader, c);
                 break;
-             case DAMAGE_SUMMON:
+            case DAMAGE_SUMMON:
                 SummonHandler.DamageSummon(reader, c);
                 break;
             case MOVE_SUMMON:
@@ -370,13 +472,13 @@ public class ServerHandler extends org.apache.mina.core.service.IoHandlerAdapter
                 break;
             case USE_ITEMEFFECT:
                 PlayerHandler.UseItemEffect(reader, c);
-                break;  
+                break;
             case CHAIR:
                 PlayerHandler.UseChair(reader, c);
-                break;    
+                break;
             case USE_CHAIR_ITEM:
                 PlayerHandler.UseItemChair(reader, c);
-                break;            
+                break;
             case DAMAGE_REACTOR:
                 PlayersHandler.HitReactor(reader, c);
                 break;
@@ -385,58 +487,58 @@ public class ServerHandler extends org.apache.mina.core.service.IoHandlerAdapter
                 break;
             case DENY_GUILD_REQUEST:
                 GuildHandler.DenyGuildRequest(reader, c);
-                break;    
+                break;
             case BBS_OPERATION:
                 BBSHandler.BBSOperation(reader, c);
-                break;                
+                break;
             case SKILL_EFFECT:
                 PlayerHandler.SkillEffect(reader, c);
                 break;
-             case MESSENGER:
+            case MESSENGER:
                 ChatHandler.Messenger(reader, c);
                 break;
             case NPC_ACTION:
                 NPCHandler.NPCAnimation(reader, c);
-                break;                 
+                break;
             case TOUCHING_CS:
                 InterServerHandler.TouchingCS(reader, c);
-                break; 
-             case BUY_CS_ITEM:
+                break;
+            case BUY_CS_ITEM:
                 CashShopOperation.CashShopAction(reader, c);
-                break;               
+                break;
             case COUPON_CODE:
                 CashCouponRequest.CouponCode(reader, c);
                 break;
-             case SPAWN_PET:
+            case SPAWN_PET:
                 PetHandler.SpawnPet(reader, c);
                 break;
             case MOVE_PET:
                 PetHandler.MovePet(reader, c);
-                break;                 
+                break;
             case PET_CHAT:
                 PetHandler.PetChat(reader, c);
-                break;  
+                break;
             case PET_COMMAND:
                 PetHandler.PetCommand(reader, c);
-                break; 
+                break;
             case PET_FOOD:
                 PetHandler.PetFood(reader, c);
                 break;
-             case PET_LOOT:
+            case PET_LOOT:
                 InventoryHandler.PetMapItemPickUp(reader, c);
                 break;
             case AUTO_AGGRO:
                 MobHandler.AutoAggro(reader, c);
-                break;                 
+                break;
             case MONSTER_BOMB:
                 MobHandler.MonsterBomb(reader, c);
                 break;
             case CANCEL_DEBUFF:
-               // BuffHandler.CancelDebuff(reader, c);
-                break;                
-             case USE_SKILL_BOOK:
+                // BuffHandler.CancelDebuff(reader, c);
+                break;
+            case USE_SKILL_BOOK:
                 InventoryHandler.UseSkillBook(reader, c);
-                break;               
+                break;
             case SKILL_MACRO:
                 PlayerHandler.SkillMacroAssign(reader, c);
                 break;
@@ -444,26 +546,31 @@ public class ServerHandler extends org.apache.mina.core.service.IoHandlerAdapter
                 PlayersHandler.Note(reader, c);
                 break;
             case MAPLETV:
-                break;                
+                break;
             case ENABLE_ACTION:
                 PlayersHandler.EnableActions(reader, c);
-                break; 
+                break;
             case USE_CATCH_ITEM:
                 InventoryHandler.UseCatchItem(reader, c);
-                break;                
+                break;
             case USE_MOUNT_FOOD:
                 InventoryHandler.UseMountFood(reader, c);
                 break;
             case CLOSE_CHALKBOARD:
                 c.getPlayer().setChalkboard(null);
-                c.getPlayer().getMap().broadcastMessage(PacketCreator.UseChalkBoard(c.getPlayer(), true));
+                c
+                    .getPlayer()
+                    .getMap()
+                    .broadcastMessage(
+                        PacketCreator.UseChalkBoard(c.getPlayer(), true)
+                    );
                 break;
             case DUEY_ACTION:
                 NPCHandler.Duey(reader, c);
                 break;
             case MONSTER_CARNIVAL:
                 MonsterCarnivalHandler.MonsterCarnivalParty(reader, c);
-                break;               
+                break;
             case RING_ACTION:
                 PlayersHandler.RingAction(reader, c);
                 break;
@@ -478,21 +585,21 @@ public class ServerHandler extends org.apache.mina.core.service.IoHandlerAdapter
                 break;
             case UNSTUCK:
                 c.getSession().write(PacketCreator.EnableActions());
-                break; 
+                break;
             case MOB_DAMAGE_MOB:
                 MobHandler.FriendlyDamage(reader, c);
                 break;
             case MTS_OP:
-               // MTSHandler.MTS(reader, c);
-                break;   
-            case UNKNOWN:    
+                // MTSHandler.MTS(reader, c);
+                break;
+            case UNKNOWN:
                 break;
             case ALLIANCE_OPERATION:
                 AllianceHandler.HandleAlliance(reader, c);
-                break; 
+                break;
             case PET_AUTO_POT:
                 PetHandler.PetAutoPotion(reader, c);
-                break; 
+                break;
             case FREDRICK_REQUEST:
                 HiredMerchantHandler.FredrickRequest(reader, c);
                 break;
@@ -501,7 +608,7 @@ public class ServerHandler extends org.apache.mina.core.service.IoHandlerAdapter
                 break;
             case SILVER_BOX:
                 InventoryHandler.UseSilverBox(reader, c);
-                break;  
+                break;
             case OWL_WARP:
                 InventoryHandler.OwlWarp(reader, c);
                 break;
@@ -518,9 +625,12 @@ public class ServerHandler extends org.apache.mina.core.service.IoHandlerAdapter
                 break;
             default:
                 if (reader.available() >= 0) {
-                    FileLogger.logPacket(String.valueOf(header), "[" + header.toString() + "] " + reader.toString());
+                    FileLogger.logPacket(
+                        String.valueOf(header),
+                        "[" + header.toString() + "] " + reader.toString()
+                    );
                 }
                 break;
         }
-    } 
+    }
 }

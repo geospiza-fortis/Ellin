@@ -12,11 +12,10 @@ import java.util.Map.Entry;
 
 public class SpeedQuizFactory {
 
-    private final static SpeedQuizFactory instance = new SpeedQuizFactory();
+    private static final SpeedQuizFactory instance = new SpeedQuizFactory();
     private final Map<QuizEntry, Integer> quiz = new HashMap<>();
 
-    public SpeedQuizFactory() {
-    }
+    public SpeedQuizFactory() {}
 
     public static SpeedQuizFactory getInstance() {
         return instance;
@@ -28,9 +27,21 @@ public class SpeedQuizFactory {
         }
         try {
             Connection con = DatabaseConnection.getConnection();
-            try (PreparedStatement ps = con.prepareStatement("SELECT * FROM `wz_speedquiz`"); ResultSet rs = ps.executeQuery()) {
+            try (
+                PreparedStatement ps = con.prepareStatement(
+                    "SELECT * FROM `wz_speedquiz`"
+                );
+                ResultSet rs = ps.executeQuery()
+            ) {
                 while (rs.next()) {
-                    quiz.put(new QuizEntry(rs.getByte("type"), rs.getInt("objectid"), rs.getString("answer")), rs.getInt("questionNo"));
+                    quiz.put(
+                        new QuizEntry(
+                            rs.getByte("type"),
+                            rs.getInt("objectid"),
+                            rs.getString("answer")
+                        ),
+                        rs.getInt("questionNo")
+                    );
                 }
             }
         } catch (Exception e) {
@@ -38,7 +49,10 @@ public class SpeedQuizFactory {
         }
     }
 
-    public List<QuizEntry> getQuizDataType(final int questionId, final byte type) {
+    public List<QuizEntry> getQuizDataType(
+        final int questionId,
+        final byte type
+    ) {
         List<QuizEntry> entries = new LinkedList<>();
         for (final Entry<QuizEntry, Integer> q : quiz.entrySet()) {
             if (q.getValue() == questionId && q.getKey().getType() == type) {
@@ -72,4 +86,4 @@ public class SpeedQuizFactory {
             return answer;
         }
     }
-}  
+}

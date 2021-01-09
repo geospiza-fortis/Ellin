@@ -6,7 +6,7 @@
 
 package server.minirooms.components;
 
- public class SoldItem {
+public class SoldItem {
 
     int itemid, mesos;
     short quantity;

@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -20,22 +20,21 @@
 */
 package server.life;
 
+import database.DatabaseConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import database.DatabaseConnection;
-import java.sql.SQLException;
-
 public class MapleMonsterQuestInformationProvider {
 
     private static MapleMonsterQuestInformationProvider instance = null;
     private final Map<Integer, List<QuestDropEntry>> drops = new HashMap<>();
-    
+
     public static MapleMonsterQuestInformationProvider getInstance() {
         if (instance == null) {
             instance = new MapleMonsterQuestInformationProvider();
@@ -49,15 +48,25 @@ public class MapleMonsterQuestInformationProvider {
         }
         List<QuestDropEntry> ret = new LinkedList<>();
         PreparedStatement ps = null;
-	ResultSet rs = null;
+        ResultSet rs = null;
         Connection con = null;
         try {
             con = DatabaseConnection.getConnection();
-            ps = con.prepareStatement("SELECT itemid, chance, monsterid, questid FROM monsterquestdrops " + " WHERE (monsterid = ? AND chance >= 0) OR (monsterid <= 0)");
+            ps =
+                con.prepareStatement(
+                    "SELECT itemid, chance, monsterid, questid FROM monsterquestdrops " +
+                    " WHERE (monsterid = ? AND chance >= 0) OR (monsterid <= 0)"
+                );
             ps.setInt(1, monsterId);
             rs = ps.executeQuery();
             while (rs.next()) {
-                ret.add(new QuestDropEntry(rs.getInt("itemid"), rs.getInt("chance"),  rs.getInt("questid")));
+                ret.add(
+                    new QuestDropEntry(
+                        rs.getInt("itemid"),
+                        rs.getInt("chance"),
+                        rs.getInt("questid")
+                    )
+                );
             }
             con.close();
         } catch (SQLException e) {
@@ -76,7 +85,7 @@ public class MapleMonsterQuestInformationProvider {
             } catch (SQLException ignore) {
                 return ret;
             }
-	}
+        }
         drops.put(monsterId, ret);
         return ret;
     }
@@ -84,7 +93,7 @@ public class MapleMonsterQuestInformationProvider {
     public void clearDrops() {
         drops.clear();
     }
-    
+
     public static class QuestDropEntry {
 
         public QuestDropEntry(int itemId, int chance, int questid) {

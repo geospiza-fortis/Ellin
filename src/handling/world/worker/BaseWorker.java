@@ -25,12 +25,12 @@ import handling.channel.ChannelServer;
  * @author Ronan
  */
 public abstract class BaseWorker implements Runnable {
-    
+
     protected ChannelServer cserv;
-    
+
     @Override
     public void run() {}
-    
+
     public BaseWorker(ChannelServer world) {
         cserv = world;
     }

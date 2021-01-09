@@ -1,6 +1,6 @@
 /*
 This file is part of the OdinMS Maple Story Server
-Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc> 
+Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc>
 Matthias Butz <matze@odinms.de>
 Jan Christian Meyer <vimes@odinms.de>
 
@@ -70,7 +70,10 @@ public final class MapleMessenger implements Serializable {
 
     public void silentAddMember(MapleMessengerCharacter member) {
         for (int i = 0; i < silentLink.length; i++) {
-            if (silentLink[i] != null && silentLink[i].equalsIgnoreCase(member.getName())) {
+            if (
+                silentLink[i] != null &&
+                silentLink[i].equalsIgnoreCase(member.getName())
+            ) {
                 addMem(i, member);
                 silentLink[i] = null;
                 return;
@@ -101,7 +104,10 @@ public final class MapleMessenger implements Serializable {
     public int getPositionByName(String name) {
         for (int i = 0; i < members.length; i++) {
             MapleMessengerCharacter messengerchar = members[i];
-            if (messengerchar != null && messengerchar.getName().equalsIgnoreCase(name)) {
+            if (
+                messengerchar != null &&
+                messengerchar.getName().equalsIgnoreCase(name)
+            ) {
                 return i;
             }
         }
@@ -145,15 +151,14 @@ public final class MapleMessenger implements Serializable {
 
     public String getMemberNamesDEBUG() {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0;i < members.length;i++) {
-	    if (members[i] != null) {
+        for (int i = 0; i < members.length; i++) {
+            if (members[i] != null) {
                 sb.append(members[i].getName());
                 if (i != members.length - 1) {
                     sb.append(',');
                 }
-	    }
+            }
         }
         return sb.toString();
     }
 }
-

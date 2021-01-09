@@ -1,6 +1,6 @@
 /*
 This file is part of the OdinMS Maple Story Server
-Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc> 
+Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc>
 Matthias Butz <matze@odinms.de>
 Jan Christian Meyer <vimes@odinms.de>
 
@@ -20,63 +20,102 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package client.player.commands.object;
 
-import client.Client;
-import java.util.ArrayList;
-import constants.CommandConstants.CommandType;
 import static constants.CommandConstants.CommandType.TRADE;
+
+import client.Client;
+import client.player.Player;
+import client.player.commands.AdminCommand;
+import client.player.commands.DonorCommand;
+import client.player.commands.GMCommand;
+import client.player.commands.PlayerCommand;
+import constants.CommandConstants.CommandType;
 import constants.CommandConstants.CoomandRank;
 import database.DatabaseConnection;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import client.player.Player;
-import client.player.commands.AdminCommand;
-import client.player.commands.DonorCommand;
-import client.player.commands.GMCommand;
-import client.player.commands.PlayerCommand;
 import tools.FileLogger;
 
 public class CommandProcessor {
 
-    private final static HashMap<String, CommandObject> commands = new HashMap<>();
-    private final static HashMap<Integer, ArrayList<String>> commandList = new HashMap<>();
+    private static final HashMap<String, CommandObject> commands = new HashMap<>();
+    private static final HashMap<Integer, ArrayList<String>> commandList = new HashMap<>();
 
     static {
-
         Class<?>[] CommandFiles = {
-            PlayerCommand.class, DonorCommand.class, GMCommand.class, AdminCommand.class
+            PlayerCommand.class,
+            DonorCommand.class,
+            GMCommand.class,
+            AdminCommand.class,
         };
 
         for (Class<?> clasz : CommandFiles) {
             try {
-                CoomandRank rankNeeded = (CoomandRank) clasz.getMethod("getPlayerLevelRequired", new Class<?>[]{}).invoke(null, (Object[]) null);
+                CoomandRank rankNeeded = (CoomandRank) clasz
+                    .getMethod("getPlayerLevelRequired", new Class<?>[] {})
+                    .invoke(null, (Object[]) null);
                 Class<?>[] a = clasz.getDeclaredClasses();
                 ArrayList<String> cL = new ArrayList<>();
                 for (Class<?> c : a) {
                     try {
-                        if (!Modifier.isAbstract(c.getModifiers()) && !c.isSynthetic()) {
+                        if (
+                            !Modifier.isAbstract(c.getModifiers()) &&
+                            !c.isSynthetic()
+                        ) {
                             Object o = c.newInstance();
                             boolean enabled;
                             try {
-                                enabled = c.getDeclaredField("enabled").getBoolean(c.getDeclaredField("enabled"));
+                                enabled =
+                                    c
+                                        .getDeclaredField("enabled")
+                                        .getBoolean(
+                                            c.getDeclaredField("enabled")
+                                        );
                             } catch (NoSuchFieldException ex) {
-                                enabled = true; 
+                                enabled = true;
                             }
                             if (o instanceof CommandExecute && enabled) {
-                                cL.add(rankNeeded.getCommandPrefix() + c.getSimpleName().toLowerCase());
-                                commands.put(rankNeeded.getCommandPrefix() + c.getSimpleName().toLowerCase(), new CommandObject(rankNeeded.getCommandPrefix() + c.getSimpleName().toLowerCase(), (CommandExecute) o, rankNeeded.getLevel()));;
+                                cL.add(
+                                    rankNeeded.getCommandPrefix() +
+                                    c.getSimpleName().toLowerCase()
+                                );
+                                commands.put(
+                                    rankNeeded.getCommandPrefix() +
+                                    c.getSimpleName().toLowerCase(),
+                                    new CommandObject(
+                                        rankNeeded.getCommandPrefix() +
+                                        c.getSimpleName().toLowerCase(),
+                                        (CommandExecute) o,
+                                        rankNeeded.getLevel()
+                                    )
+                                );
                             }
                         }
-                    } catch (IllegalAccessException | IllegalArgumentException | InstantiationException | SecurityException ex) {
-                        FileLogger.printError(FileLogger.COMMANDS_EXCEPTION, ex);
+                    } catch (
+                        IllegalAccessException
+                        | IllegalArgumentException
+                        | InstantiationException
+                        | SecurityException ex
+                    ) {
+                        FileLogger.printError(
+                            FileLogger.COMMANDS_EXCEPTION,
+                            ex
+                        );
                     }
                 }
                 Collections.sort(cL);
                 commandList.put(rankNeeded.getLevel(), cL);
-            } catch (IllegalAccessException | IllegalArgumentException | NoSuchMethodException | SecurityException | InvocationTargetException ex) {
+            } catch (
+                IllegalAccessException
+                | IllegalArgumentException
+                | NoSuchMethodException
+                | SecurityException
+                | InvocationTargetException ex
+            ) {
                 FileLogger.printError(FileLogger.COMMANDS_EXCEPTION, ex);
             }
         }
@@ -93,8 +132,12 @@ public class CommandProcessor {
         }
     }
 
-    public static boolean processCommand(Client c, String line, CommandType type) {
-        Player p = c.getPlayer(); 
+    public static boolean processCommand(
+        Client c,
+        String line,
+        CommandType type
+    ) {
+        Player p = c.getPlayer();
         if (p != null) {
             if (line.charAt(0) == CoomandRank.NORMAL.getCommandPrefix()) {
                 String[] splitted = line.split(" ");
@@ -108,7 +151,7 @@ public class CommandProcessor {
                 try {
                     boolean ret = commandOb.execute(c, splitted);
                 } catch (Exception e) {
-                        showMessage(c, "There was an error.", type);
+                    showMessage(c, "There was an error.", type);
                     if (p.isGameMaster()) {
                         showMessage(c, "Error: " + e, type);
                     }
@@ -117,24 +160,38 @@ public class CommandProcessor {
             }
 
             if (p.getAdministrativeLevel() > CoomandRank.NORMAL.getLevel()) {
-                if (line.charAt(0) == CoomandRank.DONOR.getCommandPrefix() || line.charAt(0) == CoomandRank.GM.getCommandPrefix() || line.charAt(0) == CoomandRank.ADMIN.getCommandPrefix()) {
-
+                if (
+                    line.charAt(0) == CoomandRank.DONOR.getCommandPrefix() ||
+                    line.charAt(0) == CoomandRank.GM.getCommandPrefix() ||
+                    line.charAt(0) == CoomandRank.ADMIN.getCommandPrefix()
+                ) {
                     String[] splitted = line.split(" ");
                     splitted[0] = splitted[0].toLowerCase();
 
-                    if (line.charAt(0) == '!') { 
+                    if (line.charAt(0) == '!') {
                         CommandObject commandOb = commands.get(splitted[0]);
                         if (commandOb == null || commandOb.getType() != type) {
-                            showMessage(c, "This command does not exist.", type);
+                            showMessage(
+                                c,
+                                "This command does not exist.",
+                                type
+                            );
                             return true;
                         }
-                        if (p.getAdministrativeLevel() >= commandOb.getAdministrativeLevel()) {
+                        if (
+                            p.getAdministrativeLevel() >=
+                            commandOb.getAdministrativeLevel()
+                        ) {
                             boolean ret = commandOb.execute(c, splitted);
-                            if (ret) { 
+                            if (ret) {
                                 saveCommandsDatabase(c.getPlayer(), line);
                             }
                         } else {
-                            showMessage(c, "You do not have privileges to use this command.", type);
+                            showMessage(
+                                c,
+                                "You do not have privileges to use this command.",
+                                type
+                            );
                         }
                         return true;
                     }
@@ -147,7 +204,12 @@ public class CommandProcessor {
     private static void saveCommandsDatabase(Player p, String command) {
         PreparedStatement ps = null;
         try {
-            ps = DatabaseConnection.getConnection().prepareStatement("INSERT INTO gmlog (cid, command, mapid) VALUES (?, ?, ?)");
+            ps =
+                DatabaseConnection
+                    .getConnection()
+                    .prepareStatement(
+                        "INSERT INTO gmlog (cid, command, mapid) VALUES (?, ?, ?)"
+                    );
             ps.setInt(1, p.getId());
             ps.setString(2, command);
             ps.setInt(3, p.getMap().getId());
@@ -157,11 +219,9 @@ public class CommandProcessor {
         } finally {
             try {
                 if (ps != null) {
-                   ps.close();
+                    ps.close();
                 }
-            } catch (SQLException e) {
-
-            }
+            } catch (SQLException e) {}
         }
     }
 }

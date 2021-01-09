@@ -15,8 +15,8 @@ import tools.Randomizer;
 
 public class SpeedQuiz {
 
-    private final static int INITIAL_QUESTION = 50; 
-    private final static int TIME = 15; 
+    private static final int INITIAL_QUESTION = 50;
+    private static final int TIME = 15;
     private final int npc;
     private final byte type;
     private int question;
@@ -28,7 +28,7 @@ public class SpeedQuiz {
         this.points = 0;
         this.answer = null;
         this.npc = npc;
-        this.type = (byte) Randomizer.nextInt(3); 
+        this.type = (byte) Randomizer.nextInt(3);
         getNewQuestion(c, question);
     }
 
@@ -38,7 +38,7 @@ public class SpeedQuiz {
             return;
         }
         CheckAnswer(answerGiven);
-        if (question == 1) { 
+        if (question == 1) {
             reward(c);
             return;
         }
@@ -47,17 +47,34 @@ public class SpeedQuiz {
     }
 
     private void getNewQuestion(final Client c, final int questionNo) {
-        final NPCConversationManager cm = NPCScriptManager.getInstance().getCM(c);
+        final NPCConversationManager cm = NPCScriptManager
+            .getInstance()
+            .getCM(c);
         if (cm.getNpc() != npc) {
             return;
         }
 
-        final List<QuizEntry> entries = SpeedQuizFactory.getInstance().getQuizDataType(questionNo, type);
-        final QuizEntry random = entries.get(Randomizer.nextInt(entries.size()));
+        final List<QuizEntry> entries = SpeedQuizFactory
+            .getInstance()
+            .getQuizDataType(questionNo, type);
+        final QuizEntry random = entries.get(
+            Randomizer.nextInt(entries.size())
+        );
 
         this.answer = random.getAnswer();
-        
-        c.getSession().write(PacketCreator.GetSpeedQuiz(npc, random.getType(), random.getObjectId(), points, questionNo, TIME));
+
+        c
+            .getSession()
+            .write(
+                PacketCreator.GetSpeedQuiz(
+                    npc,
+                    random.getType(),
+                    random.getObjectId(),
+                    points,
+                    questionNo,
+                    TIME
+                )
+            );
         cm.setLastMsg((byte) 6);
     }
 
@@ -70,31 +87,51 @@ public class SpeedQuiz {
     }
 
     private void giveUp(final Client c) {
-        final NPCConversationManager cm = NPCScriptManager.getInstance().getCM(c);
+        final NPCConversationManager cm = NPCScriptManager
+            .getInstance()
+            .getCM(c);
         if (points > 0) {
             c.getPlayer().gainMeso(100 * points, true, true, true); // todo change reward? give up = lesser rewards
         }
-        cm.sendNext("Ahhh...Its sad that you're giving up the quiz although you managed to answer " + points + " questions. Here's some mesos as a token of appreciation from me.");
+        cm.sendNext(
+            "Ahhh...Its sad that you're giving up the quiz although you managed to answer " +
+            points +
+            " questions. Here's some mesos as a token of appreciation from me."
+        );
         cm.dispose();
         c.getPlayer().setSpeedQuiz(null);
     }
 
     private void reward(final Client c) {
-        final NPCConversationManager cm = NPCScriptManager.getInstance().getCM(c);
+        final NPCConversationManager cm = NPCScriptManager
+            .getInstance()
+            .getCM(c);
         if (points == 50) {
             if (cm.canHold(1302000, 1)) {
-                cm.sendNext("Amazing~ You solved every question. But, I'm sorry to tell you...there hasn't been a single trace of Master M. But since you worked so hard, I'll give you this.");
+                cm.sendNext(
+                    "Amazing~ You solved every question. But, I'm sorry to tell you...there hasn't been a single trace of Master M. But since you worked so hard, I'll give you this."
+                );
                 c.getPlayer().gainMeso(100000000, true, true, true);
             } else {
-                cm.sendNext("I'm really sorry that you do not have enough space to keep the reward...Oh well..Check your inventory next time and try again.");
+                cm.sendNext(
+                    "I'm really sorry that you do not have enough space to keep the reward...Oh well..Check your inventory next time and try again."
+                );
             }
         } else if (points == 0) {
-            cm.sendNext("Wow...You didn't obtained a point at all. Therefore, I can't give you any rewards.");
+            cm.sendNext(
+                "Wow...You didn't obtained a point at all. Therefore, I can't give you any rewards."
+            );
         } else {
-            cm.sendNext("Well done, you've obtained " + points + " points out of " + INITIAL_QUESTION + " points. Here's some reward for you.");
+            cm.sendNext(
+                "Well done, you've obtained " +
+                points +
+                " points out of " +
+                INITIAL_QUESTION +
+                " points. Here's some reward for you."
+            );
             c.getPlayer().gainMeso(100 * points, true, true, true);
         }
         cm.dispose();
         c.getPlayer().setSpeedQuiz(null);
     }
-} 
+}

@@ -25,15 +25,15 @@ import handling.channel.ChannelServer;
  * @author Ronan
  */
 public class ServerMessageWorker extends BaseWorker implements Runnable {
-    
+
     @Override
     public void run() {
         // It's purpose is for tracking whether the player client currently displays a boss HPBar and, if so,
         // temporarily disable the server message for that player.
-        
+
         cserv.runDisabledServerMessagesSchedule();
     }
-    
+
     public ServerMessageWorker(ChannelServer cs) {
         super(cs);
     }

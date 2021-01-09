@@ -1,6 +1,6 @@
 ///*
 //    This file is part of the OdinMS Maple Story Server
-//    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+//    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
 //                       Matthias Butz <matze@odinms.de>
 //                       Jan Christian Meyer <vimes@odinms.de>
 //
@@ -105,7 +105,7 @@
 
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -131,27 +131,50 @@
 */
 
 function start() {
-    if (cm.c.getPlayer().getMapId() == 103000100 || cm.c.getPlayer().getMapId() == 600010001)
-        cm.sendYesNo("A viagem e para " + (cm.c.getPlayer().getMapId() == 103000100 ? "New Leaf City of Masteria" : "Kerning City of Victoria Island") + " vai lhe custar #b5000 mesos#k. Tem certeza de que deseja comprar um #b#t" + (4031711 + parseInt(cm.c.getPlayer().getMapId() / 300000000)) + "##k?");
-    else if (cm.c.getPlayer().getMapId() == 600010002 || cm.c.getPlayer().getMapId() == 600010004)
-        cm.sendYesNo("Voce quer sair antes que o trem comecar? Não havera reembolso.");
+    if (
+        cm.c.getPlayer().getMapId() == 103000100 ||
+        cm.c.getPlayer().getMapId() == 600010001
+    )
+        cm.sendYesNo(
+            "A viagem e para " +
+                (cm.c.getPlayer().getMapId() == 103000100
+                    ? "New Leaf City of Masteria"
+                    : "Kerning City of Victoria Island") +
+                " vai lhe custar #b5000 mesos#k. Tem certeza de que deseja comprar um #b#t" +
+                (4031711 + parseInt(cm.c.getPlayer().getMapId() / 300000000)) +
+                "##k?"
+        );
+    else if (
+        cm.c.getPlayer().getMapId() == 600010002 ||
+        cm.c.getPlayer().getMapId() == 600010004
+    )
+        cm.sendYesNo(
+            "Voce quer sair antes que o trem comecar? Não havera reembolso."
+        );
 }
 
 function action(mode, type, selection) {
-    if(mode != 1){
+    if (mode != 1) {
         cm.dispose();
         return;
     }
-    if (cm.c.getPlayer().getMapId() == 103000100 || cm.c.getPlayer().getMapId() == 600010001){
-        if(cm.getMeso() >= 5000){
+    if (
+        cm.c.getPlayer().getMapId() == 103000100 ||
+        cm.c.getPlayer().getMapId() == 600010001
+    ) {
+        if (cm.getMeso() >= 5000) {
             cm.gainMeso(-5000);
-            cm.gainItem(4031711 + parseInt(cm.c.getPlayer().getMapId() / 300000000), 1);
+            cm.gainItem(
+                4031711 + parseInt(cm.c.getPlayer().getMapId() / 300000000),
+                1
+            );
             cm.sendNext("Voce agora possui o ticket de viagem.");
-        }else
-            cm.sendNext("Voce nao possui mesos suficiente!");
-    }else{
+        } else cm.sendNext("Voce nao possui mesos suficiente!");
+    } else {
         cm.sendNext("Tudo bem, te vejo na proxima vez.");
-        cm.warp(cm.c.getPlayer().getMapId() == 600010002 ? 600010001 : 103000100);
+        cm.warp(
+            cm.c.getPlayer().getMapId() == 600010002 ? 600010001 : 103000100
+        );
     }
     cm.dispose();
 }

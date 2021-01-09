@@ -21,10 +21,8 @@
 */
 package server.maps;
 
-import server.maps.object.FieldObjectType;
-import server.maps.object.AbstractMapleFieldObject;
-import client.player.Player;
 import client.Client;
+import client.player.Player;
 import client.player.skills.PlayerSkill;
 import client.player.skills.PlayerSkillFactory;
 import constants.SkillConstants.FPMage;
@@ -36,9 +34,11 @@ import packet.transfer.write.OutPacket;
 import server.MapleStatEffect;
 import server.life.MapleMonster;
 import server.life.MobSkill;
-
+import server.maps.object.AbstractMapleFieldObject;
+import server.maps.object.FieldObjectType;
 
 public class MapleMist extends AbstractMapleFieldObject {
+
     private Rectangle mistPosition;
     private Player owner = null;
     private MapleMonster mob = null;
@@ -57,7 +57,11 @@ public class MapleMist extends AbstractMapleFieldObject {
         skillDelay = 0;
     }
 
-    public MapleMist(Rectangle mistPosition, Player owner, MapleStatEffect source) {
+    public MapleMist(
+        Rectangle mistPosition,
+        Player owner,
+        MapleStatEffect source
+    ) {
         this.mistPosition = mistPosition;
         this.owner = owner;
         this.source = source;
@@ -66,10 +70,10 @@ public class MapleMist extends AbstractMapleFieldObject {
         this.isRecoveryMist = false;
         this.isPoisonMist = false;
         switch (source.getSourceId()) {
-            case Shadower.Smokescreen:  
+            case Shadower.Smokescreen:
                 isPoisonMist = false;
                 break;
-            case FPMage.PoisonMist:  
+            case FPMage.PoisonMist:
                 isPoisonMist = true;
                 break;
         }
@@ -98,9 +102,9 @@ public class MapleMist extends AbstractMapleFieldObject {
     }
 
     public boolean isRecoveryMist() {
-    	return isRecoveryMist;
+        return isRecoveryMist;
     }
-    
+
     public int getSkillDelay() {
         return skillDelay;
     }
@@ -128,16 +132,42 @@ public class MapleMist extends AbstractMapleFieldObject {
 
     public final OutPacket makeSpawnData() {
         if (owner != null) {
-            return PacketCreator.SpawnMist(getObjectId(), owner.getId(), getSourceSkill().getId(), owner.getSkillLevel(PlayerSkillFactory.getSkill(source.getSourceId())), this);
+            return PacketCreator.SpawnMist(
+                getObjectId(),
+                owner.getId(),
+                getSourceSkill().getId(),
+                owner.getSkillLevel(
+                    PlayerSkillFactory.getSkill(source.getSourceId())
+                ),
+                this
+            );
         }
-        return PacketCreator.SpawnMist(getObjectId(), mob.getId(), skill.getSkillId(), skill.getSkillLevel(), this);
+        return PacketCreator.SpawnMist(
+            getObjectId(),
+            mob.getId(),
+            skill.getSkillId(),
+            skill.getSkillLevel(),
+            this
+        );
     }
 
     public final OutPacket makeFakeSpawnData(int level) {
         if (owner != null) {
-            return PacketCreator.SpawnMist(getObjectId(), owner.getId(), getSourceSkill().getId(), level, this);
+            return PacketCreator.SpawnMist(
+                getObjectId(),
+                owner.getId(),
+                getSourceSkill().getId(),
+                level,
+                this
+            );
         }
-        return PacketCreator.SpawnMist(getObjectId(), mob.getId(), skill.getSkillId(), skill.getSkillLevel(), this);
+        return PacketCreator.SpawnMist(
+            getObjectId(),
+            mob.getId(),
+            skill.getSkillId(),
+            skill.getSkillLevel(),
+            this
+        );
     }
 
     @Override

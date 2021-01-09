@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
 					   Matthias Butz <matze@odinms.de>
 					   Jan Christian Meyer <vimes@odinms.de>
 
@@ -30,26 +30,30 @@
 var status;
 
 function start() {
-	status = -1;
-	action(1,0,0);
+    status = -1;
+    action(1, 0, 0);
 }
 
-function action(mode,type,selection) {
-	if (mode == -1) {
-		cm.dispose();
-	} else {
-		if (status == -1) {
-			status = 0;
-			cm.sendNext("A half-written letter... maybe it's important! Should I take a look?");
-		} else if (status == 0) {
-			if (cm.haveItem(4031839)) {
-				cm.sendOk("I've already picked one up. I don't think I'll need to pick up another one.");
-				cm.dispose();
-			} else {
-				cm.gainItem(4031839,1);
-				cm.sendOk("I can barely make this out... but it reads Kyrin.");
-				cm.dispose();
-			}
-		}
-	}
+function action(mode, type, selection) {
+    if (mode == -1) {
+        cm.dispose();
+    } else {
+        if (status == -1) {
+            status = 0;
+            cm.sendNext(
+                "A half-written letter... maybe it's important! Should I take a look?"
+            );
+        } else if (status == 0) {
+            if (cm.haveItem(4031839)) {
+                cm.sendOk(
+                    "I've already picked one up. I don't think I'll need to pick up another one."
+                );
+                cm.dispose();
+            } else {
+                cm.gainItem(4031839, 1);
+                cm.sendOk("I can barely make this out... but it reads Kyrin.");
+                cm.dispose();
+            }
+        }
+    }
 }

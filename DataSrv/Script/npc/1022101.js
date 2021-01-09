@@ -25,22 +25,25 @@
 var status = 0;
 
 function start() {
-        if(cm.getMapId() == 100000000) {
-        cm.sendYesNo("Você está curioso(a) sobre as aventuras que Vila Feliz reservou para você? Vamos!");
-       } else if (cm.getMapId() == 200000000) {
-        cm.sendYesNo("Você está curioso(a) sobre as aventuras que Vila Feliz reservou para você? Vamos!");   
-       } else {
-           cm.sendYesNo("Aguarde!");
-       }
+    if (cm.getMapId() == 100000000) {
+        cm.sendYesNo(
+            "Are you curious about the adventures Vila Feliz has in store for you? We will!"
+        );
+    } else if (cm.getMapId() == 200000000) {
+        cm.sendYesNo(
+            "Are you curious about the adventures Vila Feliz has in store for you? We will!"
+        );
+    } else {
+        cm.sendYesNo("Wait!");
+    }
 }
 
 function action(mode, type, selection) {
-    if(mode != 1)
-        cm.dispose();
+    if (mode != 1) cm.dispose();
     else {
         status++;
-        if(status == 1) {
-            cm.setPlayerVariable("HV_map", cm.getMapId()+"");
+        if (status == 1) {
+            cm.setPlayerVariable("HV_map", cm.getMapId() + "");
             cm.warp(209000000, 0);
             cm.dispose();
         }

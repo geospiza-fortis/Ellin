@@ -14,13 +14,13 @@ import server.maps.Field;
  */
 public class Hak {
 
-public int returnTo[] = {200000141, 250000100};
-public int rideTo[] = {250000100, 200000141};
-public int birdRide[] = {200090300, 200090310};
-public Field myRide, returnMap, map, docked, onRide;
-public long timeOnRide = 60; 
+    public int returnTo[] = { 200000141, 250000100 };
+    public int rideTo[] = { 250000100, 200000141 };
+    public int birdRide[] = { 200090300, 200090310 };
+    public Field myRide, returnMap, map, docked, onRide;
+    public long timeOnRide = 60;
 
-        public Hak () {
-           // No animation to finish :(
-      }
-}  
+    public Hak() {
+        // No animation to finish :(
+    }
+}

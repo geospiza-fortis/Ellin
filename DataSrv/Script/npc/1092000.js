@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
 					   Matthias Butz <matze@odinms.de>
 					   Jan Christian Meyer <vimes@odinms.de>
 
@@ -30,8 +30,10 @@
 var status;
 
 function start() {
-	cm.sendOk("The stable us off-limits to everyone else, and I'm afraid I can't let you go there as well.");
-	cm.dispose();
+    cm.sendOk(
+        "The stable us off-limits to everyone else, and I'm afraid I can't let you go there as well."
+    );
+    cm.dispose();
 }
 /*
 function action(mode,type,selection) {

@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
 					   Matthias Butz <matze@odinms.de>
 					   Jan Christian Meyer <vimes@odinms.de>
 
@@ -21,11 +21,11 @@
 */
 
 /* @Author Lerk
- * 
+ *
  * 2111000.js: Zakum Party Quest Chest - summons 3 "Mimics"
-*/
+ */
 
-function act(){
+function act() {
     rm.playerMessage(5, "Oh noes! Monsters in the chest!");
-    rm.spawnMonster(9300004,3);
+    rm.spawnMonster(9300004, 3);
 }

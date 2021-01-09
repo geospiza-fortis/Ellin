@@ -7,20 +7,19 @@
 package server.maps;
 
 /**
- * 
+ *
  * @author GabrielSin
  */
 
 public enum SavedLocationType {
-    
     FREE_MARKET,
-    WORLDTOUR, 
+    WORLDTOUR,
     FLORINA,
-    MONSTER_CARNIVAL, 
+    MONSTER_CARNIVAL,
     ARIANT_PQ,
     EVENT;
-    
+
     public static SavedLocationType fromString(String Str) {
         return valueOf(Str);
-    }    
+    }
 }

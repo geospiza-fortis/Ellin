@@ -35,33 +35,47 @@ function action(mode, type, selection) {
         cm.dispose();
     } else {
         if (mode == 0) {
-            mcParty.getLeader().dropMessage("The opposing party has declined your invitation.");
-            cm.getPlayer().dropMessage("You have denied a '" + mcParty.getLeaderName() + "' request.");
+            mcParty
+                .getLeader()
+                .dropMessage(
+                    "The opposing party has declined your invitation."
+                );
+            cm.getPlayer().dropMessage(
+                "You have denied a '" + mcParty.getLeaderName() + "' request."
+            );
             cm.getPlayer().setChallenged(false);
             cm.dispose();
             return;
         }
     }
-    if (mode == -1) 
-        cm.dispose();
+    if (mode == -1) cm.dispose();
     else {
-        if (mode == 1)
-            status++;
-        else 
-            status--;
+        if (mode == 1) status++;
+        else status--;
         if (status == 0) {
             if (cm.getParty().getMembers().size() == party.size()) {
                 var snd = "";
                 cm.getPlayer().setChallenged(true);
                 for (var i = 0; i < party.size(); i++) {
-                    snd += "#b" + party.get(i).getName() + " / Level " + party.get(i).getLevel() + " / " + party.get(i).getJobNameById(party.get(i).getJobId()) + "#k\r\n\r\nWould you like to batlle this party at the Monster Carnival?";
+                    snd +=
+                        "#b" +
+                        party.get(i).getName() +
+                        " / Level " +
+                        party.get(i).getLevel() +
+                        " / " +
+                        party.get(i).getJobNameById(party.get(i).getJobId()) +
+                        "#k\r\n\r\nWould you like to batlle this party at the Monster Carnival?";
                 }
                 cm.sendAcceptDecline(snd);
-           } 
+            }
         } else if (status == 1) {
-	    var code = cm.getPlayer().getMCPQField().acceptRequest(mcParty); 
+            var code = cm.getPlayer().getMCPQField().acceptRequest(mcParty);
             if (code == 1) {
-                cm.getPlayer().dropMessage("You accepted the '" + mcParty.getLeaderName() + "' fight request.");
+                cm.getPlayer().dropMessage(
+                    "You accepted the '" +
+                        mcParty.getLeaderName() +
+                        "' fight request."
+                );
                 cm.getPlayer().setChallenged(false);
             } else {
                 cm.sendOk("An unknown error occurred.");

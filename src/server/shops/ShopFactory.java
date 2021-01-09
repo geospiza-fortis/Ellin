@@ -1,6 +1,6 @@
 /*
     This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -22,10 +22,11 @@ package server.shops;
 
 import java.util.HashMap;
 import java.util.Map;
+
 public class ShopFactory {
-    
-    private Map<Integer,Shop> shops = new HashMap<>();
-    private Map<Integer,Shop> npcShops = new HashMap<>();
+
+    private Map<Integer, Shop> shops = new HashMap<>();
+    private Map<Integer, Shop> npcShops = new HashMap<>();
     private static ShopFactory instance = new ShopFactory();
 
     public static ShopFactory getInstance() {
@@ -41,13 +42,13 @@ public class ShopFactory {
         Shop ret = Shop.createFromDB(id, isShopId);
         if (ret != null) {
             shops.put(ret.getId(), ret);
-            npcShops.put(ret.getNpcId(), ret);			
+            npcShops.put(ret.getNpcId(), ret);
         } else if (isShopId) {
             shops.put(id, null);
         } else {
             npcShops.put(id, null);
         }
-      return ret;
+        return ret;
     }
 
     public Shop getShop(int shopId) {

@@ -1,6 +1,6 @@
 /*
     This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -25,11 +25,11 @@ import client.Client;
 import constants.NPCConstants;
 import packet.creators.PacketCreator;
 import server.life.AbstractLoadedMapleLife;
-import server.shops.ShopFactory;
 import server.maps.object.FieldObjectType;
+import server.shops.ShopFactory;
 
 public class MapleNPC extends AbstractLoadedMapleLife {
-    
+
     private final MapleNPCStats stats;
 
     public MapleNPC(final int id, MapleNPCStats stats) {
@@ -48,19 +48,20 @@ public class MapleNPC extends AbstractLoadedMapleLife {
     @Override
     public void sendSpawnData(Client client) {
         if (NPCConstants.DISABLE_MAPLETV) {
-            for (int t = 0; t < NPCConstants.MAPLE_TV.length; t++ ){
-                if (getId() == NPCConstants.MAPLE_TV[t]){
+            for (int t = 0; t < NPCConstants.MAPLE_TV.length; t++) {
+                if (getId() == NPCConstants.MAPLE_TV[t]) {
                     return;
                 }
             }
         }
         client.getSession().write(PacketCreator.SpawnNPC(this, true));
-        client.getSession().write(PacketCreator.SpawnNPCRequestController(this, true));
+        client
+            .getSession()
+            .write(PacketCreator.SpawnNPCRequestController(this, true));
     }
-	
+
     @Override
-    public void sendDestroyData(Client client) {
-    }
+    public void sendDestroyData(Client client) {}
 
     @Override
     public FieldObjectType getType() {
@@ -70,7 +71,7 @@ public class MapleNPC extends AbstractLoadedMapleLife {
     public String getName() {
         return stats.getName();
     }
-    
+
     public MapleNPCStats getStats() {
         return stats;
     }

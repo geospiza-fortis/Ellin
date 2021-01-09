@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -36,35 +36,37 @@ var status = 0;
 var selectedMap = -1;
 
 function start() {
-	action(1, 0, 0);
+    action(1, 0, 0);
 }
 
 function action(mode, type, selection) {
-	if (cm.getPlayer().getMapId() == 251000000) {
-		maps = maps2;
-		mapNames = mapNames2;
-	}
+    if (cm.getPlayer().getMapId() == 251000000) {
+        maps = maps2;
+        mapNames = mapNames2;
+    }
 
-	if (status == 0) {
-		var where = "Onde voce quer ir hoje?";
-		for (var i = 0; i < maps.length; i++) {
-			where += "\r\n#L" + i + "# " + mapNames[i] + "#l";
-		}
-		cm.sendSimple(where);
-		status++;
-	} else {
-		if ((status == 1 && type == 1 && selection == -1 && mode == 0) || mode == -1) {
-			cm.dispose();
-		} else {
-			if (status == 1) {
-					cm.sendNext ("Tudo bem, vejo voce na proxima vez.");
-					selectedMap = selection;
-					status++
-			} else if (status == 2) {
-					cm.warp(maps[selectedMap], 0);
-					cm.dispose();
-			}
-		}
-	}
+    if (status == 0) {
+        var where = "Where do you want to go today?";
+        for (var i = 0; i < maps.length; i++) {
+            where += "\r\n#L" + i + "# " + mapNames[i] + "#l";
+        }
+        cm.sendSimple(where);
+        status++;
+    } else {
+        if (
+            (status == 1 && type == 1 && selection == -1 && mode == 0) ||
+            mode == -1
+        ) {
+            cm.dispose();
+        } else {
+            if (status == 1) {
+                cm.sendNext("Okay, see you next time.");
+                selectedMap = selection;
+                status++;
+            } else if (status == 2) {
+                cm.warp(maps[selectedMap], 0);
+                cm.dispose();
+            }
+        }
+    }
 }
-

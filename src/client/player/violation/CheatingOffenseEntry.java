@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -24,7 +24,7 @@ package client.player.violation;
 import client.player.Player;
 
 public class CheatingOffenseEntry {
-    
+
     private int dbid = -1;
     private int count = 0;
     private long lastOffense;
@@ -58,7 +58,10 @@ public class CheatingOffenseEntry {
     }
 
     public boolean isExpired() {
-        return lastOffense < (System.currentTimeMillis() - offense.getValidityDuration());
+        return (
+            lastOffense <
+            (System.currentTimeMillis() - offense.getValidityDuration())
+        );
     }
 
     public int getPoints() {
@@ -97,23 +100,16 @@ public class CheatingOffenseEntry {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
         final CheatingOffenseEntry other = (CheatingOffenseEntry) obj;
         if (chrfor == null) {
-            if (other.chrfor != null)
-                return false;
-        } else if (chrfor.getId() != other.chrfor.getId())
-            return false;
+            if (other.chrfor != null) return false;
+        } else if (chrfor.getId() != other.chrfor.getId()) return false;
         if (offense == null) {
-            if (other.offense != null)
-                return false;
-        } else if (!offense.equals(other.offense))
-            return false;
+            if (other.offense != null) return false;
+        } else if (!offense.equals(other.offense)) return false;
         return other.firstOffense == firstOffense;
     }
 }

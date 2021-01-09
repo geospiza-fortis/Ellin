@@ -20,7 +20,7 @@
 /**
  * @Author Ronan
  * 3rd Job Event - Warrior
-**/
+ **/
 importPackage(Packages.packet.creators);
 
 var entryMap = 108010300;
@@ -34,20 +34,23 @@ var eventTime = 20; //20 minutes
 var lobbyRange = [0, 0];
 
 function setLobbyRange() {
-        return lobbyRange;
+    return lobbyRange;
 }
 
 function init() {
-    em.setProperty("noEntry","false");
+    em.setProperty("noEntry", "false");
 }
 
 function playerEntry(eim, player) {
     eim.getInstanceMap(maxMapId).resetPQ(1);
-    
+
     player.changeMap(entryMap, 0);
-    em.setProperty("noEntry","true");
-    
-    player.getClient().getSession().write(PacketCreator.GetClockTimer(eventTime * 60));
+    em.setProperty("noEntry", "true");
+
+    player
+        .getClient()
+        .getSession()
+        .write(PacketCreator.GetClockTimer(eventTime * 60));
     eim.startEventTimer(eventTime * 60000);
 }
 
@@ -56,7 +59,7 @@ function playerUnregistered(eim, player) {}
 function playerExit(eim, player) {
     eim.unregisterPlayer(player);
     eim.dispose();
-    em.setProperty("noEntry","false");
+    em.setProperty("noEntry", "false");
 }
 
 function scheduledTimeout(eim) {
@@ -73,19 +76,19 @@ function clear(eim) {
     var player = eim.getPlayers().get(0);
     eim.unregisterPlayer(player);
     player.changeMap(exitMap);
-    
+
     eim.dispose();
-    em.setProperty("noEntry","false");
+    em.setProperty("noEntry", "false");
 }
 
 function changedMap(eim, chr, mapid) {
-    if(mapid < minMapId || mapid > maxMapId) playerExit(eim, chr);
+    if (mapid < minMapId || mapid > maxMapId) playerExit(eim, chr);
 }
 
 function monsterKilled(mob, eim) {}
 
 function monsterValue(eim, mobId) {
-        return 1;
+    return 1;
 }
 
 function allMonstersDead(eim) {}

@@ -32,6 +32,7 @@ import server.quest.MapleQuestRequirementType;
  * @author Tyler (Twdtwd)
  */
 public final class MaxLevelRequirement extends MapleQuestRequirement {
+
     private int maxLevel;
 
     public MaxLevelRequirement(MapleQuest quest, MapleData data) {
@@ -40,8 +41,8 @@ public final class MaxLevelRequirement extends MapleQuestRequirement {
     }
 
     /**
-     * 
-     * @param data 
+     *
+     * @param data
      */
     @Override
     public void processData(MapleData data) {

@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -27,7 +27,6 @@ import constants.ItemConstants;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-
 
 public class Item implements Comparable<Item> {
 
@@ -75,7 +74,7 @@ public class Item implements Comparable<Item> {
 
     public void setPosition(final short position) {
         this.position = position;
-         if (pet != null) {
+        if (pet != null) {
             pet.setInventoryPosition(position);
         }
     }
@@ -83,11 +82,11 @@ public class Item implements Comparable<Item> {
     public void setQuantity(short quantity) {
         this.quantity = quantity;
     }
-    
+
     public int getItemId() {
         return id;
     }
-    
+
     public short getPosition() {
         return position;
     }
@@ -117,13 +116,12 @@ public class Item implements Comparable<Item> {
         return Collections.unmodifiableList(log);
     }
 
-    public void log(String msg, boolean fromDB) {
-    }
+    public void log(String msg, boolean fromDB) {}
 
     public long getExpiration() {
         return expiration;
     }
-    
+
     public void setExpiration(long expire) {
         this.expiration = expire;
     }
@@ -131,15 +129,15 @@ public class Item implements Comparable<Item> {
     public int getSN() {
         return sn;
     }
-    
+
     public int getUniqueId() {
         return uniqueid;
     }
-    
+
     public void setUniqueId(int ui) {
-	this.uniqueid = ui;
+        this.uniqueid = ui;
     }
-     
+
     public String getGiftFrom() {
         return giftFrom;
     }
@@ -147,25 +145,25 @@ public class Item implements Comparable<Item> {
     public void setGiftFrom(String giftFrom) {
         this.giftFrom = giftFrom;
     }
-    
+
     public final ItemPet getPet() {
         return pet;
     }
-    
+
     public final void setPet(final ItemPet pet) {
         this.pet = pet;
     }
-    
+
     public void setSN(int sn) {
         this.sn = sn;
     }
-    
+
     public boolean disappearsAtLogout() {
-    	return this.disappearsAtLogout;
+        return this.disappearsAtLogout;
     }
-    
+
     public void setDisappearsAtLogout(boolean toggle) {
-    	this.disappearsAtLogout = toggle;
+        this.disappearsAtLogout = toggle;
     }
 
     @Override
@@ -175,9 +173,9 @@ public class Item implements Comparable<Item> {
         } else if (this.id > other.getItemId()) {
             return 1;
         }
-         return 0;
+        return 0;
     }
-    
+
     public void setRing(ItemRing ring) {
         this.ring = ring;
     }
@@ -196,7 +194,7 @@ public class Item implements Comparable<Item> {
         return ItemConstants.getInventoryType(id);
     }
 
-    public byte getItemType() { 
+    public byte getItemType() {
         if (getPet() != null) {
             return 3;
         }

@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -25,59 +25,60 @@ import java.io.Serializable;
 
 /**
  * Represents a pair of values.
- * 
+ *
  * @author Frz
  * @since Revision 333
  * @version 1.0
- * 
+ *
  * @param <E> The type of the left value.
  * @param <F> The type of the right value.
  */
 public class Pair<E, F> implements Serializable {
-	static final long serialVersionUID = 9179541993413738569L;
-	public E left;
-	public F right;
 
-	/**
-	 * Class constructor - pairs two objects together.
-	 * 
-	 * @param left The left object.
-	 * @param right The right object.
-	 */
-	public Pair(E left, F right) {
-		this.left = left;
-		this.right = right;
-	}
+    static final long serialVersionUID = 9179541993413738569L;
+    public E left;
+    public F right;
 
-	/**
-	 * Gets the left value.
-	 * 
-	 * @return The left value.
-	 */
-	public E getLeft() {
-		return left;
-	}
+    /**
+     * Class constructor - pairs two objects together.
+     *
+     * @param left The left object.
+     * @param right The right object.
+     */
+    public Pair(E left, F right) {
+        this.left = left;
+        this.right = right;
+    }
 
-	/**
-	 * Gets the right value.
-	 * 
-	 * @return The right value.
-	 */
-	public F getRight() {
-		return right;
-	}
+    /**
+     * Gets the left value.
+     *
+     * @return The left value.
+     */
+    public E getLeft() {
+        return left;
+    }
 
-	/**
-	 * Turns the pair into a string.
-	 * 
-	 * @return Each value of the pair as a string joined by a colon.
-	 */
-	@Override
-	public String toString() {
-		return left.toString() + ":" + right.toString();
-	}
+    /**
+     * Gets the right value.
+     *
+     * @return The right value.
+     */
+    public F getRight() {
+        return right;
+    }
 
-	 /**
+    /**
+     * Turns the pair into a string.
+     *
+     * @return Each value of the pair as a string joined by a colon.
+     */
+    @Override
+    public String toString() {
+        return left.toString() + ":" + right.toString();
+    }
+
+    /**
      * Gets the hash code of this pair.
      */
     @Override
@@ -89,7 +90,7 @@ public class Pair<E, F> implements Serializable {
         return result;
     }
 
-	/**
+    /**
      * Checks to see if two pairs are equal.
      */
     @SuppressWarnings("unchecked")

@@ -10,7 +10,5 @@ package server;
  * @author GABRIEL
  */
 public abstract interface ShutdownServerMBean extends Runnable {
-    
     public abstract void shutdown();
-    
 }

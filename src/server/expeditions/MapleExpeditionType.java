@@ -23,24 +23,29 @@
 package server.expeditions;
 
 /**
-*
-* @author SharpAceX(Alan)
-*/
+ *
+ * @author SharpAceX(Alan)
+ */
 
 public enum MapleExpeditionType {
-    
     BALROG_EASY(3, 30, 50, 255, 5),
     BALROG_NORMAL(6, 30, 50, 255, 5),
     ZAKUM(6, 30, 50, 255, 5),
     HORNTAIL(6, 30, 100, 255, 5);
-    
+
     private int minSize;
     private int maxSize;
     private int minLevel;
     private int maxLevel;
     private int registrationTime;
-        
-    private MapleExpeditionType(int minSize, int maxSize, int minLevel, int maxLevel, int minutes) {
+
+    private MapleExpeditionType(
+        int minSize,
+        int maxSize,
+        int minLevel,
+        int maxLevel,
+        int minutes
+    ) {
         this.minSize = minSize;
         this.maxSize = maxSize;
         this.minLevel = minLevel;
@@ -49,22 +54,22 @@ public enum MapleExpeditionType {
     }
 
     public int getMinSize() {
-    	return minSize;
+        return minSize;
     }
-    
+
     public int getMaxSize() {
         return maxSize;
     }
-    
+
     public int getMinLevel() {
-    	return minLevel;
+        return minLevel;
     }
-    
+
     public int getMaxLevel() {
-    	return maxLevel;
+        return maxLevel;
     }
-    
-    public int getRegistrationTime(){
-    	return registrationTime;
+
+    public int getRegistrationTime() {
+        return registrationTime;
     }
 }

@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -52,7 +52,7 @@ public enum PlayerStat {
         return i;
     }
 
-    public static PlayerStat getByValue (int value) {
+    public static PlayerStat getByValue(int value) {
         for (PlayerStat stat : PlayerStat.values()) {
             if (stat.getValue() == value) {
                 return stat;
@@ -60,7 +60,7 @@ public enum PlayerStat {
         }
         return null;
     }
-        
+
     public static PlayerStat getBy5ByteEncoding(int encoded) {
         switch (encoded) {
             case 0x40:

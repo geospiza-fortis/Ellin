@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -33,31 +33,33 @@
 var status = 0;
 
 function start() {
-	status = -1;
-	action(1, 0, 0);
+    status = -1;
+    action(1, 0, 0);
 }
 
 function action(mode, type, selection) {
-	if (mode == -1) {
-		cm.dispose();
-	} else {
-		if (mode == 1)
-			status++;
-		else
-			status--;
-		if (status == 0) {
-			if (cm.haveItem(4031013,30)) {
-				cm.removeAll(4031013);
-				cm.completeQuest(100007);
-				cm.startQuest(100008);
-				cm.sendOk("You're a true hero! Take this and Grendel the Really Old will acknowledge you.");
-			} else {
-				cm.sendOk("You will have to collect me #b30 #t4031013##k. Good luck.")
-				cm.dispose();
-			}
-		} else if (status == 1) {
-			cm.warp(101020000, 0);
-			cm.dispose();
-		}
-	}
-}	
+    if (mode == -1) {
+        cm.dispose();
+    } else {
+        if (mode == 1) status++;
+        else status--;
+        if (status == 0) {
+            if (cm.haveItem(4031013, 30)) {
+                cm.removeAll(4031013);
+                cm.completeQuest(100007);
+                cm.startQuest(100008);
+                cm.sendOk(
+                    "You're a true hero! Take this and Grendel the Really Old will acknowledge you."
+                );
+            } else {
+                cm.sendOk(
+                    "You will have to collect me #b30 #t4031013##k. Good luck."
+                );
+                cm.dispose();
+            }
+        } else if (status == 1) {
+            cm.warp(101020000, 0);
+            cm.dispose();
+        }
+    }
+}

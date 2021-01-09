@@ -1,7 +1,6 @@
 package client.player;
 
 public enum PlayerEffects {
-    
     LEVEL_UP(0x0),
     SKILL_USE(0x01),
     SKILL_AFFECTED(0x02),
@@ -16,14 +15,14 @@ public enum PlayerEffects {
     BUFF_ITEM_EFFECT(0x0B),
     MONSTERBOOK_CARD_GET(0x0D),
     ITEM_LEVEL_UP(0x0F);
-    
+
     private final int effect;
-	
+
     private PlayerEffects(int effect) {
         this.effect = effect;
     }
 
     public int getEffect() {
         return effect;
-    }  
+    }
 }

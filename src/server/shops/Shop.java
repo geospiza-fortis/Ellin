@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -22,6 +22,11 @@
 package server.shops;
 
 import client.Client;
+import client.player.inventory.Item;
+import client.player.inventory.types.InventoryType;
+import client.player.violation.AutobanManager;
+import constants.ItemConstants;
+import database.DatabaseConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -31,12 +36,6 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-
-import client.player.inventory.types.InventoryType;
-import client.player.inventory.Item;
-import client.player.violation.AutobanManager;
-import constants.ItemConstants;
-import database.DatabaseConnection;
 import packet.creators.PacketCreator;
 import server.itens.InventoryManipulator;
 import server.itens.ItemInformationProvider;
@@ -51,7 +50,7 @@ public class Shop {
     static {
         for (int itemId = 2070000; itemId <= 2070018; itemId++) {
             if (itemId != 2070014 && itemId != 2070017) {
-                rechargeableItems.add(itemId);  
+                rechargeableItems.add(itemId);
             }
         }
         for (int itemId = 2330000; itemId <= 2330006; itemId++) {
@@ -78,32 +77,70 @@ public class Shop {
 
     public void buy(Client c, int itemId, short quantity, int price) {
         if (quantity < 0) {
-            AutobanManager.getInstance().autoban(c, "Tried to buy negative quantity from NPC shop");
+            AutobanManager
+                .getInstance()
+                .autoban(c, "Tried to buy negative quantity from NPC shop");
             return;
         }
         ShopItem item = findById(itemId);
-        if (item == null || item.getItemId() != itemId || item.getPrice() != price) {
-            AutobanManager.getInstance().autoban(c, "Tried to buy nonexistent item from NPC shop");
+        if (
+            item == null ||
+            item.getItemId() != itemId ||
+            item.getPrice() != price
+        ) {
+            AutobanManager
+                .getInstance()
+                .autoban(c, "Tried to buy nonexistent item from NPC shop");
             return;
         }
 
         ItemInformationProvider ii = ItemInformationProvider.getInstance();
-        if (item.getPrice() > 0 && c.getPlayer().getMeso() >= item.getPrice() * quantity) {
+        if (
+            item.getPrice() > 0 &&
+            c.getPlayer().getMeso() >= item.getPrice() * quantity
+        ) {
             if (InventoryManipulator.checkSpace(c, itemId, quantity, "")) {
                 if (ii.isRechargable(itemId)) {
                     short rechquantity = ii.getSlotMax(c, item.getItemId());
-                    InventoryManipulator.addById(c, itemId, rechquantity, "Rechargable item purchased.", null, null);
+                    InventoryManipulator.addById(
+                        c,
+                        itemId,
+                        rechquantity,
+                        "Rechargable item purchased.",
+                        null,
+                        null
+                    );
                 } else {
-                    InventoryManipulator.addById(c, itemId, quantity, c.getPlayer().getName() + " bought " + quantity + " for " + item.getPrice() * quantity + " from shop " + id, null, null);
+                    InventoryManipulator.addById(
+                        c,
+                        itemId,
+                        quantity,
+                        c.getPlayer().getName() +
+                        " bought " +
+                        quantity +
+                        " for " +
+                        item.getPrice() *
+                        quantity +
+                        " from shop " +
+                        id,
+                        null,
+                        null
+                    );
                 }
                 c.getPlayer().gainMeso(-(item.getPrice() * quantity), false);
-                c.getSession().write(PacketCreator.ConfirmShopTransaction((byte) 0));
+                c
+                    .getSession()
+                    .write(PacketCreator.ConfirmShopTransaction((byte) 0));
             } else {
-                c.getSession().write(PacketCreator.ConfirmShopTransaction((byte) 3));
+                c
+                    .getSession()
+                    .write(PacketCreator.ConfirmShopTransaction((byte) 3));
             }
         } else {
-            c.getSession().write(PacketCreator.ConfirmShopTransaction((byte) 2));
-        } 
+            c
+                .getSession()
+                .write(PacketCreator.ConfirmShopTransaction((byte) 2));
+        }
     }
 
     public void sell(Client c, InventoryType type, short slot, short quantity) {
@@ -113,10 +150,14 @@ public class Shop {
         ItemInformationProvider ii = ItemInformationProvider.getInstance();
         Item item = c.getPlayer().getInventory(type).getItem(slot);
         if (item == null || type == InventoryType.CASH) {
-            AutobanManager.getInstance().autoban(c, "Tried to sell nonexistent items to NPC shop");
+            AutobanManager
+                .getInstance()
+                .autoban(c, "Tried to sell nonexistent items to NPC shop");
             return;
         }
-        if (ii.isThrowingStar(item.getItemId()) || ii.isBullet(item.getItemId())) {
+        if (
+            ii.isThrowingStar(item.getItemId()) || ii.isBullet(item.getItemId())
+        ) {
             quantity = item.getQuantity();
         }
         if (quantity < 0) {
@@ -129,8 +170,13 @@ public class Shop {
         if (quantity <= iQuant && iQuant > 0) {
             InventoryManipulator.removeFromSlot(c, type, slot, quantity, false);
             double price;
-            if (ii.isThrowingStar(item.getItemId()) || ii.isBullet(item.getItemId())) {
-                price = ii.getWholePrice(item.getItemId()) / (double) ii.getSlotMax(c, item.getItemId());
+            if (
+                ii.isThrowingStar(item.getItemId()) ||
+                ii.isBullet(item.getItemId())
+            ) {
+                price =
+                    ii.getWholePrice(item.getItemId()) /
+                    (double) ii.getSlotMax(c, item.getItemId());
             } else {
                 price = ii.getPrice(item.getItemId());
             }
@@ -138,15 +184,25 @@ public class Shop {
             if (price != -1 && recvMesos > 0) {
                 c.getPlayer().gainMeso(recvMesos, false);
             }
-            c.getSession().write(PacketCreator.ConfirmShopTransaction((byte) 0x8));
+            c
+                .getSession()
+                .write(PacketCreator.ConfirmShopTransaction((byte) 0x8));
         }
     }
 
     public void recharge(Client c, byte slot) {
         ItemInformationProvider ii = ItemInformationProvider.getInstance();
         Item item = c.getPlayer().getInventory(InventoryType.USE).getItem(slot);
-        if (item == null || (!ItemConstants.isThrowingStar(item.getItemId()) && !ItemConstants.isBullet(item.getItemId()))) {
-            AutobanManager.getInstance().autoban(c, "Tried to buy nonexistent item from NPC shop");
+        if (
+            item == null ||
+            (
+                !ItemConstants.isThrowingStar(item.getItemId()) &&
+                !ItemConstants.isBullet(item.getItemId())
+            )
+        ) {
+            AutobanManager
+                .getInstance()
+                .autoban(c, "Tried to buy nonexistent item from NPC shop");
             return;
         }
         short slotMax = ii.getSlotMax(c, item.getItemId());
@@ -155,12 +211,23 @@ public class Shop {
             return;
         }
         if (item.getQuantity() < slotMax) {
-            int price = (int) Math.round(ii.getPrice(item.getItemId()) * (slotMax - item.getQuantity()));
+            int price = (int) Math.round(
+                ii.getPrice(item.getItemId()) * (slotMax - item.getQuantity())
+            );
             if (c.getPlayer().getMeso() >= price) {
                 item.setQuantity(slotMax);
-                c.getSession().write(PacketCreator.UpdateInventorySlot(InventoryType.USE, (Item) item));
+                c
+                    .getSession()
+                    .write(
+                        PacketCreator.UpdateInventorySlot(
+                            InventoryType.USE,
+                            (Item) item
+                        )
+                    );
                 c.getPlayer().gainMeso(-price, false, true, false);
-                c.getSession().write(PacketCreator.ConfirmShopTransaction((byte) 0x8));
+                c
+                    .getSession()
+                    .write(PacketCreator.ConfirmShopTransaction((byte) 0x8));
             }
         }
     }
@@ -180,7 +247,11 @@ public class Shop {
         int shopId;
         try {
             Connection con = DatabaseConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(isShopId ? "SELECT * FROM shops WHERE shopid = ?" : "SELECT * FROM shops WHERE npcid = ?");
+            PreparedStatement ps = con.prepareStatement(
+                isShopId
+                    ? "SELECT * FROM shops WHERE shopid = ?"
+                    : "SELECT * FROM shops WHERE npcid = ?"
+            );
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -193,7 +264,10 @@ public class Shop {
                 ps.close();
                 return null;
             }
-            ps = con.prepareStatement("SELECT * FROM shopitems WHERE shopid = ? ORDER BY position ASC");
+            ps =
+                con.prepareStatement(
+                    "SELECT * FROM shopitems WHERE shopid = ? ORDER BY position ASC"
+                );
             ps.setInt(1, shopId);
             rs = ps.executeQuery();
             List<Integer> recharges = new ArrayList<>(rechargeableItems);
@@ -201,14 +275,27 @@ public class Shop {
                 if (!ii.itemExists(rs.getInt("itemid"))) {
                     continue;
                 }
-                if (ii.isThrowingStar(rs.getInt("itemid")) || ii.isBullet(rs.getInt("itemid"))) {
-                    ShopItem starItem = new ShopItem((short) 1, rs.getInt("itemid"), rs.getInt("price"));
+                if (
+                    ii.isThrowingStar(rs.getInt("itemid")) ||
+                    ii.isBullet(rs.getInt("itemid"))
+                ) {
+                    ShopItem starItem = new ShopItem(
+                        (short) 1,
+                        rs.getInt("itemid"),
+                        rs.getInt("price")
+                    );
                     ret.addItem(starItem);
                     if (rechargeableItems.contains(starItem.getItemId())) {
                         recharges.remove(Integer.valueOf(starItem.getItemId()));
                     }
                 } else {
-                    ret.addItem(new ShopItem((short) 1000, rs.getInt("itemid"), rs.getInt("price")));
+                    ret.addItem(
+                        new ShopItem(
+                            (short) 1000,
+                            rs.getInt("itemid"),
+                            rs.getInt("price")
+                        )
+                    );
                 }
             }
             for (Integer recharge : recharges) {

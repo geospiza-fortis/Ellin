@@ -5,8 +5,8 @@
  */
 package handling.channel.handler;
 
-import client.player.Player;
 import client.Client;
+import client.player.Player;
 import handling.mina.PacketReader;
 import server.partyquest.mcpq.MCField;
 import server.partyquest.mcpq.MCTracker;
@@ -24,12 +24,30 @@ public class MonsterCarnivalHandler {
         Player p = c.getPlayer();
 
         if (MonsterCarnival.DEBUG) {
-            MCTracker.log("[MCHandler] " + p.getName() + " used tab "  + tab + " num " + num);
-            System.out.println("[MCHandler] " + p.getName() + " used tab "  + tab + " num " + num);
+            MCTracker.log(
+                "[MCHandler] " +
+                p.getName() +
+                " used tab " +
+                tab +
+                " num " +
+                num
+            );
+            System.out.println(
+                "[MCHandler] " +
+                p.getName() +
+                " used tab " +
+                tab +
+                " num " +
+                num
+            );
         }
 
         if (p.getMCPQField() == null || p.getMCPQParty() == null) {
-            MCTracker.log("[MCHandler] " + p.getName() + " attempting to use Monster Carnival handler without being in Monster Carnival");
+            MCTracker.log(
+                "[MCHandler] " +
+                p.getName() +
+                " attempting to use Monster Carnival handler without being in Monster Carnival"
+            );
             return;
         }
 

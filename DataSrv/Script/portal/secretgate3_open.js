@@ -1,6 +1,6 @@
-/* 
+/*
  * This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -24,9 +24,11 @@
 */
 
 function enter(pi) {
-    if (pi.getPlayer().getMap().getReactorByName("secretgate3").getState() == 1) {
-        pi.playPortalSound(); 
-        pi.warp(990000641,1);
+    if (
+        pi.getPlayer().getMap().getReactorByName("secretgate3").getState() == 1
+    ) {
+        pi.playPortalSound();
+        pi.warp(990000641, 1);
         return true;
     } else {
         pi.getPlayer().dropMessage(5, "This door is closed.");

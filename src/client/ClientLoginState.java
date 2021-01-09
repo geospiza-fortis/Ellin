@@ -7,7 +7,6 @@ import static client.ClientLoginState.values;
  */
 
 public enum ClientLoginState {
-    
     LOGIN_NOTLOGGEDIN(0),
     LOGIN_SERVER_TRANSITION(1),
     LOGIN_LOGGEDIN(2),

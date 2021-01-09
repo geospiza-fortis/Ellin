@@ -21,15 +21,16 @@
  */
 package server.quest.requirements;
 
+import client.player.Player;
 import provider.MapleData;
 import server.quest.MapleQuestRequirementType;
-import client.player.Player;
 
 /**
  * Base class for a Quest Requirement. Quest system uses it for all requirements.
  * @author Tyler (Twdtwd)
  */
 public abstract class MapleQuestRequirement {
+
     private final MapleQuestRequirementType type;
 
     public MapleQuestRequirement(MapleQuestRequirementType type) {
@@ -51,6 +52,6 @@ public abstract class MapleQuestRequirement {
     public abstract void processData(MapleData data);
 
     public MapleQuestRequirementType getType() {
-    return type;
+        return type;
     }
 }

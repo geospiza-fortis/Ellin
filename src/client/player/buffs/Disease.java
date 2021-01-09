@@ -24,7 +24,6 @@ package client.player.buffs;
 import java.io.Serializable;
 
 public enum Disease implements Serializable {
-
     SLOW(0x1, 2, 126),
     SEDUCE(0x80, 2, 128),
     STUN(0x2000000000000L, 1, 123),
@@ -40,8 +39,8 @@ public enum Disease implements Serializable {
     private boolean first;
     private int disease;
     private int firsta;
-    
-   private Disease(long i) {
+
+    private Disease(long i) {
         this.i = i;
         first = false;
     }
@@ -51,13 +50,13 @@ public enum Disease implements Serializable {
         this.first = first;
         this.disease = disease;
     }
-    
+
     private Disease(long i, int first, int disease) {
         this.i = i;
         this.firsta = first;
         this.disease = disease;
     }
-    
+
     public boolean isFirst() {
         return first;
     }
@@ -65,11 +64,11 @@ public enum Disease implements Serializable {
     public long getValue() {
         return i;
     }
-    
+
     public int getDisease() {
         return disease;
     }
-   
+
     public static Disease getType(int skill) {
         switch (skill) {
             case 120:

@@ -1,6 +1,6 @@
 /*
 This file is part of the OdinMS Maple Story Server
-Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc> 
+Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc>
 Matthias Butz <matze@odinms.de>
 Jan Christian Meyer <vimes@odinms.de>
 
@@ -36,7 +36,15 @@ public class MapleGuildBBS implements java.io.Serializable {
     public int icon;
     public Map<Integer, MapleBBSReply> replies = new HashMap<>();
 
-    public MapleGuildBBS(final int localthreadID, final String name, final String text, final long timestamp, final int guildID, final int ownerID, final int icon) {
+    public MapleGuildBBS(
+        final int localthreadID,
+        final String name,
+        final String text,
+        final long timestamp,
+        final int guildID,
+        final int ownerID,
+        final int icon
+    ) {
         this.localthreadID = localthreadID;
         this.name = name;
         this.text = text;
@@ -60,7 +68,12 @@ public class MapleGuildBBS implements java.io.Serializable {
         public long timestamp;
         public String content;
 
-        public MapleBBSReply(final int replyid, final int ownerID, final String content, final long timestamp) {
+        public MapleBBSReply(
+            final int replyid,
+            final int ownerID,
+            final String content,
+            final long timestamp
+        ) {
             this.ownerID = ownerID;
             this.replyid = replyid;
             this.content = content;
@@ -68,7 +81,8 @@ public class MapleGuildBBS implements java.io.Serializable {
         }
     }
 
-    public static class ThreadComparator implements Comparator<MapleGuildBBS>, java.io.Serializable {
+    public static class ThreadComparator
+        implements Comparator<MapleGuildBBS>, java.io.Serializable {
 
         @Override
         public int compare(MapleGuildBBS o1, MapleGuildBBS o2) {
@@ -77,7 +91,7 @@ public class MapleGuildBBS implements java.io.Serializable {
             } else if (o1.localthreadID == o2.localthreadID) {
                 return 0;
             } else {
-                return -1; 
+                return -1;
             }
         }
     }

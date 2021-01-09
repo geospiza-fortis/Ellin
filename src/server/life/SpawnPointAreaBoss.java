@@ -14,11 +14,11 @@
 //import tools.Randomizer;
 //
 ///**
-// * 
+// *
 // * @author GabrielSin
 // */
 //public class SpawnPointAreaBoss extends Spawns {
-//    
+//
 //    private MapleMonsterStats monster;
 //    private Point pos1;
 //    private Point pos2;
@@ -28,7 +28,7 @@
 //    private String msg;
 //    private boolean denySpawn = false;
 //    private final AtomicBoolean spawned = new AtomicBoolean(false);
-//    
+//
 //    public SpawnPointAreaBoss(final MapleMonster monster, final Point pos1, final Point pos2, final Point pos3, final int mobTime, final String msg, final boolean shouldSpawn) {
 //        if (monster != null) {
 //            this.monster = monster.getStats();
@@ -43,17 +43,17 @@
 //            this.nextPossibleSpawn = System.currentTimeMillis() + (shouldSpawn ? 0 : this.mobTime);
 //        }
 //    }
-//    
+//
 //    @Override
 //    public void setDenySpawn(boolean val) {
 //        denySpawn = val;
 //    }
-//    
+//
 //    @Override
 //    public boolean getDenySpawn() {
 //        return denySpawn;
 //    }
-//    
+//
 //    @Override
 //    public final int getF() {
 //	return f;
@@ -63,12 +63,12 @@
 //    public final int getFh() {
 //	return fh;
 //    }
-//    
+//
 //    @Override
 //    public final MapleMonsterStats getMonster() {
 //        return monster;
 //    }
-//    
+//
 //    @Override
 //    public final boolean shouldSpawn() {
 //        return shouldSpawn(System.currentTimeMillis());
@@ -91,7 +91,7 @@
 //        final int rand = Randomizer.nextInt(3);
 //        return rand == 0 ? pos1 : rand == 1 ? pos2 : pos3;
 //    }
-//    
+//
 //    @Override
 //    public final MapleMonster getMonster(final Field map) {
 //	final Point pos = getPosition();
@@ -99,7 +99,7 @@
 //        mob.setPosition(pos);
 //	mob.setCy(pos.y);
 //	mob.setRx0(pos.x - 50);
-//	mob.setRx1(pos.x + 50); 
+//	mob.setRx1(pos.x + 50);
 //	mob.setFh(fh);
 //	mob.setF(f);
 //        spawned.set(true);
@@ -130,12 +130,12 @@
 //        }
 //        return mob;
 //    }
-//    
+//
 //    @Override
 //    public final int getMonsterId() {
 //        return id;
 //    }
-//    
+//
 //    @Override
 //    public final int getMobTime() {
 //        return mobTime;
@@ -154,7 +154,7 @@
 //    @Override
 //    public void setTemporary(boolean setTemporary) {
 //    }
-//    
+//
 //    @Override
 //    public boolean shouldForceSpawn() {
 //        return false;

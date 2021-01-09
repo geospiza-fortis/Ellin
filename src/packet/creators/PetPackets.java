@@ -5,11 +5,12 @@
  */
 package packet.creators;
 
+import static packet.creators.PacketCreator.GetKoreanTimestamp;
+
 import client.player.Player;
 import client.player.PlayerStat;
 import client.player.inventory.ItemPet;
 import java.util.List;
-import static packet.creators.PacketCreator.GetKoreanTimestamp;
 import packet.opcode.SendPacketOpcode;
 import packet.transfer.write.OutPacket;
 import packet.transfer.write.WritingPacket;
@@ -17,14 +18,15 @@ import server.movement.LifeMovementFragment;
 import tools.HexTool;
 
 public class PetPackets {
-    
-    public static byte 
-        
-        PET_LVL_UP = 4, 
-        INVENTORY_CLEAR_SLOT = 3,
-        INVENTORY_STAT_UPDATE = 0;
 
-    public static void AddPetInfo(final WritingPacket wp, ItemPet pet, boolean showpet) {
+    public static byte PET_LVL_UP = 4, INVENTORY_CLEAR_SLOT =
+        3, INVENTORY_STAT_UPDATE = 0;
+
+    public static void AddPetInfo(
+        final WritingPacket wp,
+        ItemPet pet,
+        boolean showpet
+    ) {
         wp.write(1);
         if (showpet) {
             wp.write(1);
@@ -36,20 +38,20 @@ public class PetPackets {
         wp.write(pet.getStance());
         wp.writeInt(pet.getFoothold());
     }
-    
+
     public static OutPacket updatePet(ItemPet pet, boolean alive) {
         WritingPacket mplew = new WritingPacket();
 
         mplew.writeShort(SendPacketOpcode.MODIFY_INVENTORY_ITEM.getValue());
         mplew.write(0);
         mplew.write(2);
-        
+
         mplew.write(3);
         mplew.write(5);
         mplew.write(pet.getInventoryPosition());
         mplew.writeShort(0);
         mplew.write(5);
-        
+
         mplew.write(pet.getInventoryPosition());
         mplew.write(0);
         mplew.write(3);
@@ -57,7 +59,9 @@ public class PetPackets {
         mplew.write(1);
         mplew.writeInt(pet.getUniqueId());
         mplew.writeInt(0);
-        mplew.write(HexTool.getByteArrayFromHexString("00 40 6f e5 0f e7 17 02"));
+        mplew.write(
+            HexTool.getByteArrayFromHexString("00 40 6f e5 0f e7 17 02")
+        );
         String petname = pet.getName();
         if (petname.length() > 13) {
             petname = petname.substring(0, 13);
@@ -70,22 +74,31 @@ public class PetPackets {
         mplew.writeShort(pet.getCloseness());
         mplew.write(pet.getFullness());
         if (alive) {
-            mplew.writeLong(GetKoreanTimestamp((long) (System.currentTimeMillis() * 1.5)));
+            mplew.writeLong(
+                GetKoreanTimestamp((long) (System.currentTimeMillis() * 1.5))
+            );
             mplew.writeInt(0);
         } else {
             mplew.write(0);
             mplew.write(PacketCreator.ITEM_MAGIC);
-            mplew.write(HexTool.getByteArrayFromHexString("bb 46 e6 17 02 00 00 00 00"));
+            mplew.write(
+                HexTool.getByteArrayFromHexString("bb 46 e6 17 02 00 00 00 00")
+            );
         }
 
         return mplew.getPacket();
     }
-    
+
     public static OutPacket ShowPet(Player chr, ItemPet pet, boolean remove) {
         return ShowPet(chr, pet, remove, false);
     }
 
-    public static OutPacket ShowPet(Player p, ItemPet pet, boolean remove, boolean hunger) {
+    public static OutPacket ShowPet(
+        Player p,
+        ItemPet pet,
+        boolean remove,
+        boolean hunger
+    ) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.SPAWN_PET.getValue());
         wp.writeInt(p.getId());
@@ -94,11 +107,11 @@ public class PetPackets {
             wp.write(0);
             wp.writeBool(hunger);
         } else {
-           AddPetInfo(wp, pet, true);
+            AddPetInfo(wp, pet, true);
         }
         return wp.getPacket();
     }
-    
+
     public static OutPacket RemovePet(int owner, byte slot, byte message) {
         WritingPacket wp = new WritingPacket(9);
         wp.writeShort(SendPacketOpcode.SPAWN_PET.getValue());
@@ -108,8 +121,13 @@ public class PetPackets {
         wp.write(message);
         return wp.getPacket();
     }
-    
-    public static OutPacket MovePet(int cid, int pid, int slot, List<LifeMovementFragment> moves) {
+
+    public static OutPacket MovePet(
+        int cid,
+        int pid,
+        int slot,
+        List<LifeMovementFragment> moves
+    ) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.MOVE_PET.getValue());
         wp.writeInt(cid);
@@ -118,8 +136,15 @@ public class PetPackets {
         HelpPackets.SerializeMovementList(wp, moves);
         return wp.getPacket();
     }
-    
-    public static OutPacket PetChat(int cid, byte nType, byte nAction, String text, int slot, boolean hasRing) {
+
+    public static OutPacket PetChat(
+        int cid,
+        byte nType,
+        byte nAction,
+        String text,
+        int slot,
+        boolean hasRing
+    ) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.PET_CHAT.getValue());
         wp.writeInt(cid);
@@ -130,8 +155,14 @@ public class PetPackets {
         wp.writeBool(hasRing);
         return wp.getPacket();
     }
-    
-    public static OutPacket CommandPetResponse(int cid, byte command, int slot, boolean success, boolean food) {
+
+    public static OutPacket CommandPetResponse(
+        int cid,
+        byte command,
+        int slot,
+        boolean success,
+        boolean food
+    ) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.PET_RESPONSE.getValue());
         wp.writeInt(cid);
@@ -144,8 +175,8 @@ public class PetPackets {
         wp.write(0);
         return wp.getPacket();
     }
-    
-    public static OutPacket ShowOwnPetLevelUp(int petSlot) { 
+
+    public static OutPacket ShowOwnPetLevelUp(int petSlot) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.FIRST_PERSON_VISUAL_EFFECT.getValue());
         wp.write(0x4);
@@ -153,7 +184,7 @@ public class PetPackets {
         wp.write(petSlot);
         return wp.getPacket();
     }
-    
+
     public static OutPacket ShowPetLevelUp(Player p, int petSlot) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.THIRD_PERSON_VISUAL_EFFECT.getValue());
@@ -163,8 +194,13 @@ public class PetPackets {
         wp.write(petSlot);
         return wp.getPacket();
     }
-    
-    public static OutPacket ChangePetName(Player p, String newname, int slot, boolean hasLabelRing) {
+
+    public static OutPacket ChangePetName(
+        Player p,
+        String newname,
+        int slot,
+        boolean hasLabelRing
+    ) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.PET_NAMECHANGE.getValue());
         wp.writeInt(p.getId());
@@ -173,7 +209,7 @@ public class PetPackets {
         wp.writeBool(hasLabelRing);
         return wp.getPacket();
     }
-    
+
     public static OutPacket PetStatUpdate(Player p) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.UPDATE_STATS.getValue());
@@ -193,7 +229,7 @@ public class PetPackets {
         wp.write(0);
         return wp.getPacket();
     }
-    
+
     public static OutPacket AutoHpPot(int itemId) {
         WritingPacket wp = new WritingPacket(6);
         wp.writeShort(SendPacketOpcode.PET_AUTO_HP_POT.getValue());
@@ -207,10 +243,10 @@ public class PetPackets {
         wp.writeInt(itemId);
         return wp.getPacket();
     }
-    
+
     public static final OutPacket EmptyStatUpdate() {
         return PacketCreator.EnableActions();
-    } 
+    }
 
     public static OutPacket PetExceptionListResult(Player p, ItemPet pet) {
         WritingPacket wp = new WritingPacket();

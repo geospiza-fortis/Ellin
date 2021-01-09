@@ -7,10 +7,10 @@ import client.player.PlayerQuery;
 import client.player.inventory.types.InventoryType;
 import client.player.inventory.types.ItemRingType;
 import constants.ItemConstants;
+import database.DatabaseConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import database.DatabaseConnection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collections;
@@ -31,19 +31,25 @@ public class ItemRing implements Comparable<ItemRing> {
     private final int partnerId;
     private final int itemId;
     private final String partnerName;
-    
+
     private List<ItemRing> crushRings = new LinkedList<>();
     private List<ItemRing> friendshipRings = new LinkedList<>();
     private List<ItemRing> weddingRings = new LinkedList<>();
 
-    private ItemRing(int id, int id2, int partnerId, int itemid, String partnername) {
+    private ItemRing(
+        int id,
+        int id2,
+        int partnerId,
+        int itemid,
+        String partnername
+    ) {
         this.ringId = id;
         this.partnerDatabaseId = id2;
         this.partnerId = partnerId;
         this.itemId = itemid;
         this.partnerName = partnername;
     }
-    
+
     public int getRingDatabaseId() {
         return ringId;
     }
@@ -64,18 +70,26 @@ public class ItemRing implements Comparable<ItemRing> {
         return partnerName;
     }
 
-   public static ItemRing loadingRing(int ringId) {
+    public static ItemRing loadingRing(int ringId) {
         try {
             ItemRing ret;
-            try (PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement("SELECT * FROM rings WHERE id = ?")) {
+            try (
+                PreparedStatement ps = DatabaseConnection
+                    .getConnection()
+                    .prepareStatement("SELECT * FROM rings WHERE id = ?")
+            ) {
                 ps.setInt(1, ringId);
                 try (ResultSet rs = ps.executeQuery()) {
                     ret = null;
                     if (rs.next()) {
-                        ret = new ItemRing(ringId, rs.getInt("partnerRingId"), 
-                        rs.getInt("partnerChrId"),
-                        rs.getInt("itemid"),
-                        rs.getString("partnerName"));
+                        ret =
+                            new ItemRing(
+                                ringId,
+                                rs.getInt("partnerRingId"),
+                                rs.getInt("partnerChrId"),
+                                rs.getInt("itemid"),
+                                rs.getString("partnerName")
+                            );
                     }
                 }
             }
@@ -86,7 +100,13 @@ public class ItemRing implements Comparable<ItemRing> {
         }
     }
 
-    public static boolean createRing(int itemid, final Player sender, final int receiverId, String message, int serialNumber) {
+    public static boolean createRing(
+        int itemid,
+        final Player sender,
+        final int receiverId,
+        String message,
+        int serialNumber
+    ) {
         if (verifyExistRing(sender.getId()) || verifyExistRing(receiverId)) {
             return false;
         } else {
@@ -94,15 +114,28 @@ public class ItemRing implements Comparable<ItemRing> {
             return true;
         }
     }
-    
-    public static void addRingDatabase(int itemId, final Player sender, final int receiverId, String message, int serialNumber) {
+
+    public static void addRingDatabase(
+        int itemId,
+        final Player sender,
+        final int receiverId,
+        String message,
+        int serialNumber
+    ) {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
-        int[] uniqueId = {InventoryIdentifier.getInstance(), InventoryIdentifier.getInstance()};
+        int[] uniqueId = {
+            InventoryIdentifier.getInstance(),
+            InventoryIdentifier.getInstance(),
+        };
         try {
             con = DatabaseConnection.getConnection();
-            ps = con.prepareStatement("INSERT INTO `rings` (`itemid`, `partnerChrId`, `partnername`) VALUES (?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+            ps =
+                con.prepareStatement(
+                    "INSERT INTO `rings` (`itemid`, `partnerChrId`, `partnername`) VALUES (?, ?, ?)",
+                    Statement.RETURN_GENERATED_KEYS
+                );
             ps.setInt(1, itemId);
             ps.setInt(2, receiverId);
             ps.setString(3, PlayerQuery.getNameById(receiverId));
@@ -113,7 +146,11 @@ public class ItemRing implements Comparable<ItemRing> {
             rs.close();
             ps.close();
 
-            ps = con.prepareStatement("INSERT INTO `rings` (`itemid`, `partnerRingId`, `partnerChrId`, `partnername`) VALUES (?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+            ps =
+                con.prepareStatement(
+                    "INSERT INTO `rings` (`itemid`, `partnerRingId`, `partnerChrId`, `partnername`) VALUES (?, ?, ?, ?)",
+                    Statement.RETURN_GENERATED_KEYS
+                );
             ps.setInt(1, itemId);
             ps.setInt(2, uniqueId[0]);
             ps.setInt(3, sender.getId());
@@ -125,12 +162,22 @@ public class ItemRing implements Comparable<ItemRing> {
             rs.close();
             ps.close();
 
-            ps = con.prepareStatement("UPDATE `rings` SET `partnerRingId` = ? WHERE id = ?");
+            ps =
+                con.prepareStatement(
+                    "UPDATE `rings` SET `partnerRingId` = ? WHERE id = ?"
+                );
             ps.setInt(1, uniqueId[1]);
             ps.setInt(2, uniqueId[0]);
             ps.executeUpdate();
             ps.close();
-            sendRingCashInventory(sender, receiverId, message, serialNumber, uniqueId[0], uniqueId[1]);
+            sendRingCashInventory(
+                sender,
+                receiverId,
+                message,
+                serialNumber,
+                uniqueId[0],
+                uniqueId[1]
+            );
         } catch (SQLException ex) {
             System.out.println("[-] addRingDB error");
             FileLogger.printError("addRingDB.txt", ex);
@@ -147,25 +194,46 @@ public class ItemRing implements Comparable<ItemRing> {
             }
         }
     }
-    
-    private static void sendRingCashInventory(final Player sender, final int receiverId, String message, int serialNumber, int uniqueIdSender, int uniqueIdReceiver) {
+
+    private static void sendRingCashInventory(
+        final Player sender,
+        final int receiverId,
+        String message,
+        int serialNumber,
+        int uniqueIdSender,
+        int uniqueIdReceiver
+    ) {
         try {
-            CashItem itemRing = CashItemFactory.getItem(serialNumber); 
+            CashItem itemRing = CashItemFactory.getItem(serialNumber);
             Item item = itemRing.toItem(itemRing, uniqueIdSender, 0, "");
-            sender.getCashShop().addToInventory(item );
-            sender.announce(CashShopPackets.ShowCashInventory(sender.getClient()));
-            sender.getCashShop().gift(receiverId, sender.getName(), message, serialNumber, uniqueIdReceiver);
+            sender.getCashShop().addToInventory(item);
+            sender.announce(
+                CashShopPackets.ShowCashInventory(sender.getClient())
+            );
+            sender
+                .getCashShop()
+                .gift(
+                    receiverId,
+                    sender.getName(),
+                    message,
+                    serialNumber,
+                    uniqueIdReceiver
+                );
         } catch (Exception ex) {
             System.out.println("[-] sendRingCashInventory error");
             FileLogger.printError("sendRingCashInventory.txt", ex);
         }
     }
-    
+
     public static boolean verifyExistRing(int id) {
         try {
             Connection con = DatabaseConnection.getConnection();
             boolean has;
-            try (PreparedStatement ps = con.prepareStatement("SELECT id FROM rings WHERE partnerChrId = ?")) {
+            try (
+                PreparedStatement ps = con.prepareStatement(
+                    "SELECT id FROM rings WHERE partnerChrId = ?"
+                )
+            ) {
                 ps.setInt(1, id);
                 try (ResultSet rs = ps.executeQuery()) {
                     has = rs.next();
@@ -176,7 +244,7 @@ public class ItemRing implements Comparable<ItemRing> {
             return true;
         }
     }
-    
+
     public List<ItemRing> getCrushRings() {
         Collections.sort(crushRings);
         return crushRings;
@@ -191,7 +259,7 @@ public class ItemRing implements Comparable<ItemRing> {
         Collections.sort(weddingRings);
         return weddingRings;
     }
-    
+
     public void addRingToCache(int ringId) {
         ItemRing ring = loadingRing(ringId);
         if (ring != null) {
@@ -204,26 +272,35 @@ public class ItemRing implements Comparable<ItemRing> {
             }
         }
     }
-    
+
     public int getEquippedRing(Player p, int type) {
         for (Item item : p.getInventory(InventoryType.EQUIPPED)) {
             Equip equip = (Equip) item;
             if (equip.getRing() != null) {
                 int itemId = equip.getItemId();
-                if (ItemConstants.isCrushRing(itemId) && type == ItemRingType.CRUSH_RING.getType()) {
+                if (
+                    ItemConstants.isCrushRing(itemId) &&
+                    type == ItemRingType.CRUSH_RING.getType()
+                ) {
                     return equip.getRing().getRingDatabaseId();
                 }
-                if (ItemConstants.isFriendshipRing(itemId) && type == ItemRingType.FRIENDSHIP_RING.getType()) {
+                if (
+                    ItemConstants.isFriendshipRing(itemId) &&
+                    type == ItemRingType.FRIENDSHIP_RING.getType()
+                ) {
                     return equip.getRing().getRingDatabaseId();
                 }
-                if (ItemConstants.isWeddingRing(itemId) && type == ItemRingType.WEDDING_RING.getType()) {
+                if (
+                    ItemConstants.isWeddingRing(itemId) &&
+                    type == ItemRingType.WEDDING_RING.getType()
+                ) {
                     return equip.getRing().getRingDatabaseId();
                 }
             }
         }
         return 0;
     }
-    
+
     public boolean isRingEquipped(Player p, int ringId) {
         for (Item item : p.getInventory(InventoryType.EQUIPPED)) {
             Equip equip = (Equip) item;
@@ -233,7 +310,7 @@ public class ItemRing implements Comparable<ItemRing> {
         }
         return false;
     }
-   
+
     @Override
     public boolean equals(Object o) {
         if (o instanceof ItemRing) {

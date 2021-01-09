@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
 					   Matthias Butz <matze@odinms.de>
 					   Jan Christian Meyer <vimes@odinms.de>
 
@@ -21,16 +21,13 @@
 */
 
 /* @Author Lerk
- * 
+ *
  * 2302001.js: Deep Aqua Road Reactor - Treasure Chest - Drops white pots, meso, air bubbles
- * 
-*/
+ *
+ */
 
+function act() {
+    //rm.dropItems(true, 2, 105, 140);
 
-function act(){
-
-	//rm.dropItems(true, 2, 105, 140);
-
-	rm.dropItems();
-
+    rm.dropItems();
 }

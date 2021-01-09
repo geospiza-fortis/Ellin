@@ -6,6 +6,8 @@
 
 package server.partyquest.mcpq;
 
+import client.player.Player;
+import client.player.buffs.Disease;
 import community.MapleParty;
 import handling.channel.ChannelServer;
 import java.util.ArrayList;
@@ -15,8 +17,6 @@ import java.util.Random;
 import packet.creators.CarnivalPackets;
 import packet.creators.PacketCreator;
 import packet.transfer.write.OutPacket;
-import client.player.Player;
-import client.player.buffs.Disease;
 import server.life.MobSkill;
 import server.life.MobSkillFactory;
 import server.maps.Field;
@@ -43,9 +43,22 @@ public class MCParty {
         this.party = party;
         this.leader = party.getLeader().getPlayer();
         this.leaderName = party.getLeader().getName();
-        party.getMembers().stream().filter((chr) -> !(!chr.isOnline())).map((chr) -> ChannelServer.getInstance(chr.getChannel()).getPlayerStorage().getCharacterById(chr.getId())).forEachOrdered((c) -> {
-            characters.add(c);
-        });
+        party
+            .getMembers()
+            .stream()
+            .filter(chr -> !(!chr.isOnline()))
+            .map(
+                chr ->
+                    ChannelServer
+                        .getInstance(chr.getChannel())
+                        .getPlayerStorage()
+                        .getCharacterById(chr.getId())
+            )
+            .forEachOrdered(
+                c -> {
+                    characters.add(c);
+                }
+            );
     }
 
     public int getSize() {
@@ -57,17 +70,21 @@ public class MCParty {
      * That is, if there were no players who left the party.
      *
      * [MENTION=850422]return[/MENTION] True if the underlying MapleParty still exists in its original format.
-     * @return 
+     * @return
      */
     public boolean exists() {
         Collection<Player> members = getMembers();
-        return members.stream().noneMatch((chr) -> (chr.getParty() == null || chr.getParty() != this.party));
+        return members
+            .stream()
+            .noneMatch(
+                chr -> (chr.getParty() == null || chr.getParty() != this.party)
+            );
     }
-    
+
     public Player getLeader() {
         return this.leader;
     }
-    
+
     public String getLeaderName() {
         return this.leaderName;
     }
@@ -85,66 +102,103 @@ public class MCParty {
         if (MonsterCarnival.DEBUG) {
             return true;
         }
-        return getMembers().stream().map((chr) -> chr.getLevel()).noneMatch((lv) -> (lv < MonsterCarnival.MIN_LEVEL || lv > MonsterCarnival.MAX_LEVEL));
+        return getMembers()
+            .stream()
+            .map(chr -> chr.getLevel())
+            .noneMatch(
+                lv ->
+                    (
+                        lv < MonsterCarnival.MIN_LEVEL ||
+                        lv > MonsterCarnival.MAX_LEVEL
+                    )
+            );
     }
 
     public boolean checkChannels() {
         if (MonsterCarnival.DEBUG) {
             return true;
         }
-        return getMembers().stream().noneMatch((chr) -> (chr.getClient().getChannel() != party.getLeader().getChannel()));
+        return getMembers()
+            .stream()
+            .noneMatch(
+                chr ->
+                    (
+                        chr.getClient().getChannel() !=
+                        party.getLeader().getChannel()
+                    )
+            );
     }
 
     public boolean checkMaps() {
         if (MonsterCarnival.DEBUG) {
             return true;
         }
-        return getMembers().stream().noneMatch((chr) -> (chr.getMapId() != MonsterCarnival.MAP_LOBBY));
+        return getMembers()
+            .stream()
+            .noneMatch(chr -> (chr.getMapId() != MonsterCarnival.MAP_LOBBY));
     }
 
     public void warp(int map) {
-        getMembers().forEach((chr) -> {
-            chr.changeMap(map);
-        });
+        getMembers()
+            .forEach(
+                chr -> {
+                    chr.changeMap(map);
+                }
+            );
     }
 
     public void warp(Field map) {
-        getMembers().forEach((chr) -> {
-            chr.changeMap(map, map.getPortal(0));
-        });
+        getMembers()
+            .forEach(
+                chr -> {
+                    chr.changeMap(map, map.getPortal(0));
+                }
+            );
     }
 
     public void warp(Field map, String portal) {
-        getMembers().forEach((chr) -> {
-            chr.changeMap(map, map.getPortal(portal));
-        });
+        getMembers()
+            .forEach(
+                chr -> {
+                    chr.changeMap(map, map.getPortal(portal));
+                }
+            );
     }
 
     public void warp(MCField.MCMaps type) {
         Field m = this.field.getMap(type);
-        getMembers().forEach((chr) -> {
-            chr.changeMap(m, m.getPortal(0));
-        });
+        getMembers()
+            .forEach(
+                chr -> {
+                    chr.changeMap(m, m.getPortal(0));
+                }
+            );
     }
 
     public void clock(int secs) {
-        getMembers().forEach((chr) -> {
-            chr.getClient().announce(PacketCreator.GetClockTimer(secs));
-        });
+        getMembers()
+            .forEach(
+                chr -> {
+                    chr.getClient().announce(PacketCreator.GetClockTimer(secs));
+                }
+            );
     }
 
     public void notice(String msg) {
         broadcast(PacketCreator.ServerNotice(6, msg));
     }
-    
+
     public void notice2(String msg) {
         broadcast(PacketCreator.ServerNotice(5, msg));
     }
 
     public void broadcast(OutPacket pkt) {
-        getMembers().forEach((chr) -> {
-            chr.getClient().announce(pkt);
-        });
+        getMembers()
+            .forEach(
+                chr -> {
+                    chr.getClient().announce(pkt);
+                }
+            );
     }
 
     /**
@@ -163,9 +217,12 @@ public class MCParty {
      * Unlike deregisterPlayers, this method does NOT warp players to the lobby map.
      */
     public void updatePlayers() {
-        getMembers().forEach((chr) -> {
-            this.updatePlayer(chr);
-        });
+        getMembers()
+            .forEach(
+                chr -> {
+                    this.updatePlayer(chr);
+                }
+            );
     }
 
     /**
@@ -180,7 +237,6 @@ public class MCParty {
             p.setMCPQField(null);
             p.setChallenged(false);
 
-
             p.setAvailableCP(0);
             p.setTotalCP(0);
         }
@@ -191,12 +247,19 @@ public class MCParty {
      * Unlike updatePlayers, this method DOES warp players to the lobby map.
      */
     public void deregisterPlayers() {
-        getMembers().stream().map((chr) -> {
-            MCParty.deregisterPlayer(chr);
-            return chr;
-        }).forEachOrdered((chr) -> {
-            chr.changeMap(MonsterCarnival.MAP_EXIT);
-        });
+        getMembers()
+            .stream()
+            .map(
+                chr -> {
+                    MCParty.deregisterPlayer(chr);
+                    return chr;
+                }
+            )
+            .forEachOrdered(
+                chr -> {
+                    chr.changeMap(MonsterCarnival.MAP_EXIT);
+                }
+            );
     }
 
     public void removePlayer(Player chr) {
@@ -205,9 +268,14 @@ public class MCParty {
     }
 
     public void startBattle() {
-        characters.forEach((chr) -> {
-            chr.getClient().getSession().write(CarnivalPackets.StartMonsterCarnival(chr));
-        });
+        characters.forEach(
+            chr -> {
+                chr
+                    .getClient()
+                    .getSession()
+                    .write(CarnivalPackets.StartMonsterCarnival(chr));
+            }
+        );
     }
 
     /**
@@ -243,10 +311,13 @@ public class MCParty {
      * [MENTION=2000183830]para[/MENTION]m skill Skill to apply.
      * [MENTION=850422]return[/MENTION] True if skill was applied, false otherwise.
      * @param skill
-     * @return 
+     * @return
      */
     public boolean applyMCSkill(MCSkill skill) {
-        MobSkill s = MobSkillFactory.getMobSkill(skill.getMobSkillID(), skill.getLevel());
+        MobSkill s = MobSkillFactory.getMobSkill(
+            skill.getMobSkillID(),
+            skill.getLevel()
+        );
         Disease disease = Disease.getType(skill.getMobSkillID());
         if (disease == null) {
             disease = Disease.DARKNESS;
@@ -265,7 +336,8 @@ public class MCParty {
             return true;
         } else {
             if (getRandomMember() != null) {
-                getRandomMember().giveDebuff(disease, 1, 30000L, disease.getDisease(), 1);
+                getRandomMember()
+                    .giveDebuff(disease, 1, 30000L, disease.getDisease(), 1);
                 return true;
             } else {
                 return false;
@@ -288,7 +360,7 @@ public class MCParty {
     /**
      * Returns a collection of online members in the party.
      * [MENTION=850422]return[/MENTION] Online MCParty members.
-     * @return 
+     * @return
      */
     public Collection<Player> getMembers() {
         return this.characters;
@@ -296,9 +368,13 @@ public class MCParty {
 
     public Player getRandomMember() {
         List<Player> chrsOnMap = new ArrayList<>();
-        this.characters.stream().filter((chr) -> (MonsterCarnival.isBattlefieldMap(chr.getMapId()))).forEachOrdered((chr) -> {
-            chrsOnMap.add(chr);
-        });
+        this.characters.stream()
+            .filter(chr -> (MonsterCarnival.isBattlefieldMap(chr.getMapId())))
+            .forEachOrdered(
+                chr -> {
+                    chrsOnMap.add(chr);
+                }
+            );
         if (chrsOnMap.isEmpty()) {
             return null;
         }
@@ -312,4 +388,4 @@ public class MCParty {
     public int getTotalCP() {
         return totalCP;
     }
-}  
+}

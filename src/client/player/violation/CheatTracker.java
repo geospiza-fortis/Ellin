@@ -11,7 +11,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -50,12 +49,19 @@ public class CheatTracker {
     private ScheduledFuture<?> invalidationTask;
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private final Lock rL = lock.readLock(), wL = lock.writeLock();
-    private Map<CheatingOffense, CheatingOffenseEntry> offenses = Collections.synchronizedMap(new LinkedHashMap<>());
+    private Map<CheatingOffense, CheatingOffenseEntry> offenses = Collections.synchronizedMap(
+        new LinkedHashMap<>()
+    );
 
     public CheatTracker(Player p) {
         this.p = new WeakReference<>(p);
-        invalidationTask = CheatTrackerTimer.getInstance().register(new InvalidationTask(), 60000);
-        takingDamageSince = attackingSince = regenMPSince = regenHPSince = System.currentTimeMillis();
+        invalidationTask =
+            CheatTrackerTimer
+                .getInstance()
+                .register(new InvalidationTask(), 60000);
+        takingDamageSince =
+            attackingSince =
+                regenMPSince = regenHPSince = System.currentTimeMillis();
     }
 
     /**
@@ -87,15 +93,22 @@ public class CheatTracker {
         }
         return true;
     }
-    
+
     public final void checkDrop(final boolean dc) {
         if ((System.currentTimeMillis() - lastDropTime) < 1000) {
             dropsPerSecond++;
-            if (dropsPerSecond >= (dc ? 32 : 16) && p.get() != null  && !p.get().isGameMaster()) {
+            if (
+                dropsPerSecond >= (dc ? 32 : 16) &&
+                p.get() != null &&
+                !p.get().isGameMaster()
+            ) {
                 if (dc) {
                     p.get().getClient().getSession().close();
                 } else {
-                    FileLogger.print(FileLogger.EXPLOITS, "" + p.get().getName() + "Check Drop method hack");
+                    FileLogger.print(
+                        FileLogger.EXPLOITS,
+                        "" + p.get().getName() + "Check Drop method hack"
+                    );
                 }
             }
         } else {
@@ -103,7 +116,7 @@ public class CheatTracker {
         }
         lastDropTime = System.currentTimeMillis();
     }
-    
+
     public final void checkMoveMonster(final Point pos) {
         if (pos == lastMonsterMove) {
             monsterMoveCount++;
@@ -135,12 +148,13 @@ public class CheatTracker {
             numSequentialDamage = 0;
         }
     }
-    
-    
+
     public final void checkTakeDamage(final int damage) {
         numSequentialDamage++;
         lastDamageTakenTime = System.currentTimeMillis();
-        if (lastDamageTakenTime - takingDamageSince / 500 < numSequentialDamage) {
+        if (
+            lastDamageTakenTime - takingDamageSince / 500 < numSequentialDamage
+        ) {
             registerOffense(CheatingOffense.FAST_TAKE_DAMAGE);
         }
         if (lastDamageTakenTime - takingDamageSince > 4500) {
@@ -149,7 +163,7 @@ public class CheatTracker {
         }
         if (damage == 0) {
             numZeroDamageTaken++;
-            if (numZeroDamageTaken >= 35) { 
+            if (numZeroDamageTaken >= 35) {
                 numZeroDamageTaken = 0;
                 registerOffense(CheatingOffense.HIGH_AVOID);
             }
@@ -157,14 +171,17 @@ public class CheatTracker {
             numZeroDamageTaken = 0;
         }
     }
-    
+
     public final void checkSameDamage(final int dmg) {
         if (dmg > 2000 && lastDamage == dmg) {
             numSameDamage++;
 
             if (numSameDamage > 5) {
                 numSameDamage = 0;
-                registerOffense(CheatingOffense.SAME_DAMAGE, numSameDamage + " times: " + dmg);
+                registerOffense(
+                    CheatingOffense.SAME_DAMAGE,
+                    numSameDamage + " times: " + dmg
+                );
             }
         } else {
             lastDamage = dmg;
@@ -191,14 +208,14 @@ public class CheatTracker {
      * Type 5 - Change map.
      * Type 6 - N/A.
      * Type 7 - Commands.
-     * 
+     *
      * @param limit
      * @param type
      * @return
      */
     public synchronized boolean Spam(int limit, int type) {
         if (type < 0 || lastTime.length < type) {
-            type = 1;  
+            type = 1;
         }
         if (System.currentTimeMillis() < limit + lastTime[type]) {
             return true;
@@ -254,7 +271,8 @@ public class CheatTracker {
             return true;
         }
         numMPRegens++;
-        long allowedRegens = (System.currentTimeMillis() - regenMPSince) / 10000;
+        long allowedRegens =
+            (System.currentTimeMillis() - regenMPSince) / 10000;
         if (allowedRegens < numMPRegens) {
             registerOffense(CheatingOffense.FAST_MP_REGEN);
             return false;
@@ -267,15 +285,18 @@ public class CheatTracker {
         numSequentialSummonAttack = 0;
     }
 
-   public final boolean checkSummonAttack() {
+    public final boolean checkSummonAttack() {
         numSequentialSummonAttack++;
-        if ((System.currentTimeMillis() - summonSummonTime) / (2000 + 1) < numSequentialSummonAttack) {
+        if (
+            (System.currentTimeMillis() - summonSummonTime) /
+            (2000 + 1) <
+            numSequentialSummonAttack
+        ) {
             registerOffense(CheatingOffense.FAST_SUMMON_ATTACK);
             return false;
         }
         return true;
     }
-
 
     public void checkPickupAgain() {
         synchronized (pickupComplete) {
@@ -300,7 +321,7 @@ public class CheatTracker {
     public void setAttacksWithoutHit(int attacksWithoutHit) {
         this.attacksWithoutHit = attacksWithoutHit;
     }
-    
+
     public int getNumGotMissed() {
         return numGotMissed;
     }
@@ -319,7 +340,11 @@ public class CheatTracker {
 
     public void registerOffense(CheatingOffense offense, String param) {
         Player chrhardref = p.get();
-        if (chrhardref == null || !offense.isEnabled() || chrhardref.isGameMaster()) {
+        if (
+            chrhardref == null ||
+            !offense.isEnabled() ||
+            chrhardref.isGameMaster()
+        ) {
             return;
         }
 
@@ -342,7 +367,12 @@ public class CheatTracker {
         }
         entry.incrementCount();
         if (offense.shouldAutoban(entry.getCount())) {
-            AutobanManager.getInstance().autoban(chrhardref.getClient(), StringUtil.makeEnumHumanReadable(offense.name()));
+            AutobanManager
+                .getInstance()
+                .autoban(
+                    chrhardref.getClient(),
+                    StringUtil.makeEnumHumanReadable(offense.name())
+                );
         }
         wL.lock();
         try {
@@ -356,7 +386,18 @@ public class CheatTracker {
             case SAME_DAMAGE:
                 gmMessage--;
                 if (gmMessage == 0) {
-                    BroadcastService.broadcastGMMessage(PacketCreator.ServerNotice(6, "[GM Message] " + PlayerStringUtil.makeMapleReadable(chrhardref.getName()) + " suspected of hacking! " + StringUtil.makeEnumHumanReadable(offense.name()) + (param == null ? "" : (" - " + param))));
+                    BroadcastService.broadcastGMMessage(
+                        PacketCreator.ServerNotice(
+                            6,
+                            "[GM Message] " +
+                            PlayerStringUtil.makeMapleReadable(
+                                chrhardref.getName()
+                            ) +
+                            " suspected of hacking! " +
+                            StringUtil.makeEnumHumanReadable(offense.name()) +
+                            (param == null ? "" : (" - " + param))
+                        )
+                    );
                     gmMessage = 100;
                 }
                 break;
@@ -378,7 +419,10 @@ public class CheatTracker {
         CheatingOffenseEntry[] offenses_copy;
         rL.lock();
         try {
-            offenses_copy = offenses.values().toArray(new CheatingOffenseEntry[offenses.size()]);
+            offenses_copy =
+                offenses
+                    .values()
+                    .toArray(new CheatingOffenseEntry[offenses.size()]);
         } finally {
             rL.unlock();
         }
@@ -409,14 +453,23 @@ public class CheatTracker {
         } finally {
             rL.unlock();
         }
-        Collections.sort(offenseList, (final CheatingOffenseEntry o1, final CheatingOffenseEntry o2) -> {
-            final int thisVal = o1.getPoints();
-            final int anotherVal = o2.getPoints();
-            return (thisVal < anotherVal ? 1 : (thisVal == anotherVal ? 0 : -1));
-        });
+        Collections.sort(
+            offenseList,
+            (final CheatingOffenseEntry o1, final CheatingOffenseEntry o2) -> {
+                final int thisVal = o1.getPoints();
+                final int anotherVal = o2.getPoints();
+                return (
+                    thisVal < anotherVal ? 1 : (thisVal == anotherVal ? 0 : -1)
+                );
+            }
+        );
         final int to = Math.min(offenseList.size(), 4);
         for (int x = 0; x < to; x++) {
-            ret.append(StringUtil.makeEnumHumanReadable(offenseList.get(x).getOffense().name()));
+            ret.append(
+                StringUtil.makeEnumHumanReadable(
+                    offenseList.get(x).getOffense().name()
+                )
+            );
             ret.append(": ");
             ret.append(offenseList.get(x).getCount());
             if (x != to - 1) {
@@ -440,7 +493,10 @@ public class CheatTracker {
             CheatingOffenseEntry[] offensesCopy;
             rL.lock();
             try {
-                offensesCopy = offenses.values().toArray(new CheatingOffenseEntry[offenses.size()]);
+                offensesCopy =
+                    offenses
+                        .values()
+                        .toArray(new CheatingOffenseEntry[offenses.size()]);
             } finally {
                 rL.unlock();
             }

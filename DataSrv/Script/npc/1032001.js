@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -35,8 +35,8 @@ var job;
 var pnpc = -1;
 
 function start() {
-	status = -1;
-	action(1, 0, 0);
+    status = -1;
+    action(1, 0, 0);
 }
 
 function action(mode, type, selection) {
@@ -58,11 +58,18 @@ function action(mode, type, selection) {
                 if (cm.getLevel() > 7) {
                     cm.sendNext("So you decided to become a #rMagician#k?");
                 } else {
-                    cm.sendOk("Train a bit more and I can show you the way of the #rMagician#k.")
+                    cm.sendOk(
+                        "Train a bit more and I can show you the way of the #rMagician#k."
+                    );
                     cm.dispose();
                 }
-            } else if (cm.getPlayer().getLevel() >= 200 && cm.getPlayer().getJob().isA(PlayerJob.MAGICIAN)) {
-                cm.sendYesNo("Uau, voce ja atingiu o moximo de seu potencial. Voce gostaria de ter um NPC jogador representar o seu poder?");
+            } else if (
+                cm.getPlayer().getLevel() >= 200 &&
+                cm.getPlayer().getJob().isA(PlayerJob.MAGICIAN)
+            ) {
+                cm.sendYesNo(
+                    "Uau, voce ja atingiu o moximo de seu potencial. Voce gostaria de ter um NPC jogador representar o seu poder?"
+                );
                 pnpc = 1;
             } else {
                 if (cm.getLevel() >= 30 && cm.getJobId() == 200) {
@@ -70,21 +77,29 @@ function action(mode, type, selection) {
                         cm.completeQuest(100008);
                         if (cm.isQuestCompleted(100008)) {
                             status = 20;
-                            cm.sendNext("I see you have done well. I will allow you to take the next step on your long road.");
+                            cm.sendNext(
+                                "I see you have done well. I will allow you to take the next step on your long road."
+                            );
                         } else {
-                            cm.sendOk("Go and see the #rJob Instructor#k.")
+                            cm.sendOk("Go and see the #rJob Instructor#k.");
                             cm.dispose();
                         }
                     } else {
                         status = 10;
-                        cm.sendNext("The progress you have made is astonishing.");
+                        cm.sendNext(
+                            "The progress you have made is astonishing."
+                        );
                     }
                 } else if (cm.isQuestStarted(100100)) {
                     cm.completeQuest(100101);
                     if (cm.isQuestCompleted(100101)) {
                         cm.sendOk("Alright, now take this to #bRobeira#k.");
                     } else {
-                        cm.sendOk("Hey, " + cm.getPlayer().getName() + "! I need a #bBlack Charm#k. Go and find the Door of Dimension.");
+                        cm.sendOk(
+                            "Hey, " +
+                                cm.getPlayer().getName() +
+                                "! I need a #bBlack Charm#k. Go and find the Door of Dimension."
+                        );
                         cm.startQuest(100101);
                     }
                     cm.dispose();
@@ -97,51 +112,64 @@ function action(mode, type, selection) {
             if (pnpc == 1) {
                 var success = cm.createPlayerNPC();
                 if (success) {
-                    cm.sendOk("Parabens, seu simbolo de poder agora vai ser visto por todos os novos jogadores!");
+                    cm.sendOk(
+                        "Parabens, seu simbolo de poder agora vai ser visto por todos os novos jogadores!"
+                    );
                 } else {
-                    cm.sendOk("Houve um problema ao criar o NPC, ou voce ja tem um ou todos os pontos sao tomados.");
+                    cm.sendOk(
+                        "Houve um problema ao criar o NPC, ou voce ja tem um ou todos os pontos sao tomados."
+                    );
                 }
                 cm.dispose();
             } else {
-                cm.sendNextPrev("It is an important and final choice. You will not be able to turn back.");
+                cm.sendNextPrev(
+                    "It is an important and final choice. You will not be able to turn back."
+                );
             }
         } else if (status == 2) {
             cm.sendYesNo("Do you want to become a #rMagician#k?");
         } else if (status == 3) {
-            if (cm.getJobId() == 0)
-                cm.changeJobById(200);
-                cm.gainItem(1372005, 1);
-                cm.sendOk("So be it! Now go, and go with pride.");
-                cm.dispose();
-            } else if (status == 11) {
-                cm.sendNextPrev("You may be ready to take the next step as a #rFire/Poison Wizard#k, #rIce/Lightning Wizard#k or #rCleric#k.");
-            } else if (status == 12) {
-                cm.sendAcceptDecline("But first I must test your skills. Are you ready?");
-            } else if (status == 13) {
-                if (cm.haveItem(4031009)) {
-                    cm.sendOk("ERROR!");
-                } else {
-                    cm.startQuest(100006);
-                    cm.sendOk("Va ver o instrutor #bInstrutor de Classe#k perto de Ellinia. Ele lhe mostrara o caminho.");
-                }
-            } else if (status == 21) {
-                cm.sendSimple("What do you want to become?#b\r\n#L0#Fire/Poison Wizard#l\r\n#L1#Ice/Lightning Wizard#l\r\n#L2#Cleric#l#k");
-            } else if (status == 22) {
-                var jobName;
-                if (selection == 0) {
-                    jobName = "Fire/Poison Wizard";
-                    job = 210;
-                } else if (selection == 1) {
-                    jobName = "Ice/Lightning Wizard";
-                    job = 220;
-                } else {
-                    jobName = "Cleric";
-                    job = 230;
-                }
-                cm.sendYesNo("Do you want to become a #r" + jobName + "#k?");
-            } else if (status == 23) {
-                cm.changeJobById(job);
-                cm.sendOk("So be it! Now go, and go with pride.");
+            if (cm.getJobId() == 0) cm.changeJobById(200);
+            cm.gainItem(1372005, 1);
+            cm.sendOk("So be it! Now go, and go with pride.");
+            cm.dispose();
+        } else if (status == 11) {
+            cm.sendNextPrev(
+                "You may be ready to take the next step as a #rFire/Poison Wizard#k, #rIce/Lightning Wizard#k or #rCleric#k."
+            );
+        } else if (status == 12) {
+            cm.sendAcceptDecline(
+                "But first I must test your skills. Are you ready?"
+            );
+        } else if (status == 13) {
+            if (cm.haveItem(4031009)) {
+                cm.sendOk("ERROR!");
+            } else {
+                cm.startQuest(100006);
+                cm.sendOk(
+                    "Va ver o instrutor #bInstrutor de Classe#k perto de Ellinia. Ele lhe mostrara o caminho."
+                );
             }
+        } else if (status == 21) {
+            cm.sendSimple(
+                "What do you want to become?#b\r\n#L0#Fire/Poison Wizard#l\r\n#L1#Ice/Lightning Wizard#l\r\n#L2#Cleric#l#k"
+            );
+        } else if (status == 22) {
+            var jobName;
+            if (selection == 0) {
+                jobName = "Fire/Poison Wizard";
+                job = 210;
+            } else if (selection == 1) {
+                jobName = "Ice/Lightning Wizard";
+                job = 220;
+            } else {
+                jobName = "Cleric";
+                job = 230;
+            }
+            cm.sendYesNo("Do you want to become a #r" + jobName + "#k?");
+        } else if (status == 23) {
+            cm.changeJobById(job);
+            cm.sendOk("So be it! Now go, and go with pride.");
+        }
     }
-}	
+}

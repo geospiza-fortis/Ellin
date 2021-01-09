@@ -1,6 +1,6 @@
 /*
 This file is part of the OdinMS Maple Story Server
-Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc> 
+Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc>
 Matthias Butz <matze@odinms.de>
 Jan Christian Meyer <vimes@odinms.de>
 
@@ -25,7 +25,7 @@ import provider.wzxml.XMLWZFile;
 
 public class MapleDataProviderFactory {
 
-    private final static String wzPath = System.getProperty("wzpath");
+    private static final String wzPath = System.getProperty("wzpath");
 
     private static MapleDataProvider getWZ(Object in, boolean provideImages) {
         if (in instanceof File) {
@@ -33,7 +33,9 @@ public class MapleDataProviderFactory {
 
             return new XMLWZFile(fileIn);
         }
-        throw new IllegalArgumentException("Can't create data provider for input " + in);
+        throw new IllegalArgumentException(
+            "Can't create data provider for input " + in
+        );
     }
 
     public static MapleDataProvider getDataProvider(Object in) {

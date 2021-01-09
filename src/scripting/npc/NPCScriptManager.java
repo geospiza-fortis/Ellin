@@ -1,16 +1,16 @@
 package scripting.npc;
 
-import java.util.List;
-import java.util.Map;
-import javax.script.Invocable;
 import client.Client;
 import client.player.Player;
 import client.player.violation.CheatingOffense;
-import java.lang.reflect.UndeclaredThrowableException;
-import java.util.WeakHashMap;
 import community.MaplePartyCharacter;
+import java.lang.reflect.UndeclaredThrowableException;
+import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import javax.script.Invocable;
 import packet.creators.PacketCreator;
 import scripting.AbstractScriptManager;
 import server.partyquest.mcpq.MCParty;
@@ -28,27 +28,38 @@ public class NPCScriptManager extends AbstractScriptManager {
     private static final NPCScriptManager instance = new NPCScriptManager();
 
     public static final NPCScriptManager getInstance() {
-	return instance;
+        return instance;
     }
-    
+
     public final void start(final Client c, final int npc) {
         start(c, npc, null, null);
     }
 
-    public void start(String filename, Client c, int npc, List<MaplePartyCharacter> chrs, MCParty pty) {
+    public void start(
+        String filename,
+        Client c,
+        int npc,
+        List<MaplePartyCharacter> chrs,
+        MCParty pty
+    ) {
         npcLock.lock();
         try {
-            NPCConversationManager cm = new NPCConversationManager(c, npc, chrs, pty);
+            NPCConversationManager cm = new NPCConversationManager(
+                c,
+                npc,
+                chrs,
+                pty
+            );
             cm.dispose();
             if (cms.containsKey(c)) {
                 return;
             }
             if (c.canClickNPC()) {
                 cms.put(c, cm);
-                Invocable iv = null;   
+                Invocable iv = null;
                 if (filename != null) {
                     iv = getInvocable("npc/" + filename + ".js", c);
-                }    
+                }
                 NPCScriptManager npcsm = NPCScriptManager.getInstance();
                 if (iv == null || NPCScriptManager.getInstance() == null) {
                     cm.dispose();
@@ -72,9 +83,9 @@ public class NPCScriptManager extends AbstractScriptManager {
             cms.remove(c);
         } finally {
             npcLock.unlock();
-        }		
+        }
     }
-  
+
     public void start(Client c, int npc, String filename, Player chr) {
         npcLock.lock();
         try {
@@ -131,18 +142,24 @@ public class NPCScriptManager extends AbstractScriptManager {
             npcLock.lock();
             try {
                 if (selection < -1) {
-                    CheatingOffense.PACKET_EDIT.cheatingSuspicious(c.getPlayer(), "The player is trying to send a negative selectiom hack to an npc. Please monitor this person, and let a developer know.");
+                    CheatingOffense.PACKET_EDIT.cheatingSuspicious(
+                        c.getPlayer(),
+                        "The player is trying to send a negative selectiom hack to an npc. Please monitor this person, and let a developer know."
+                    );
                     return;
                 }
                 c.setClickedNPC();
                 ns.action(mode, type, selection);
             } catch (Exception e) {
-                FileLogger.printError(FileLogger.NPC + getCM(c).getNpc() + ".txt", e);
+                FileLogger.printError(
+                    FileLogger.NPC + getCM(c).getNpc() + ".txt",
+                    e
+                );
                 notice(c, getCM(c).getNpc());
                 dispose(c);
             } finally {
                 npcLock.unlock();
-            } 
+            }
         }
     }
 
@@ -159,10 +176,17 @@ public class NPCScriptManager extends AbstractScriptManager {
             dispose(cms.get(c));
         }
     }
-     
+
     private void notice(Client c, int id) {
         if (c != null) {
-            c.getPlayer().dropMessage(1, "An error occurred while running this NPC, reporting to administrators. (ID: " + id + ")");
+            c
+                .getPlayer()
+                .dropMessage(
+                    1,
+                    "An error occurred while running this NPC, reporting to administrators. (ID: " +
+                    id +
+                    ")"
+                );
         }
     }
 

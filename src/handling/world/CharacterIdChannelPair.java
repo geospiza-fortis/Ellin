@@ -5,13 +5,13 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-public class CharacterIdChannelPair implements Externalizable, Comparable<CharacterIdChannelPair> {
-    
+public class CharacterIdChannelPair
+    implements Externalizable, Comparable<CharacterIdChannelPair> {
+
     private int charid = 0;
     private int channel = 1;
 
-    public CharacterIdChannelPair() {
-    }
+    public CharacterIdChannelPair() {}
 
     public CharacterIdChannelPair(int charid, int channel) {
         super();
@@ -28,7 +28,8 @@ public class CharacterIdChannelPair implements Externalizable, Comparable<Charac
     }
 
     @Override
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+    public void readExternal(ObjectInput in)
+        throws IOException, ClassNotFoundException {
         charid = in.readInt();
         channel = in.readByte();
     }
@@ -38,7 +39,7 @@ public class CharacterIdChannelPair implements Externalizable, Comparable<Charac
         out.writeInt(charid);
         out.writeByte(channel);
     }
-    
+
     @Override
     public int compareTo(CharacterIdChannelPair o) {
         return channel - o.channel;

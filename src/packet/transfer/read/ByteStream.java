@@ -1,7 +1,7 @@
 package packet.transfer.read;
 
-import tools.HexTool;
 import java.io.IOException;
+import tools.HexTool;
 
 public class ByteStream {
 
@@ -10,33 +10,37 @@ public class ByteStream {
     private final byte[] arr;
 
     public ByteStream(byte[] arr) {
-	this.arr = arr;
+        this.arr = arr;
     }
+
     public long getPosition() {
-	return pos;
+        return pos;
     }
+
     public void seek(long offset) throws IOException {
-	pos = (int) offset;
+        pos = (int) offset;
     }
+
     public long getBytesRead() {
-	return bytesRead;
+        return bytesRead;
     }
+
     public int readByte() {
-	bytesRead++;
-	return ((int) arr[pos++]) & 0xFF;
+        bytesRead++;
+        return ((int) arr[pos++]) & 0xFF;
     }
-    
+
     @Override
     public String toString() {
-	String nows = "";
-	if (arr.length - pos > 0) {
-	    byte[] now = new byte[arr.length - pos];
-	    System.arraycopy(arr, pos, now, 0, arr.length - pos);
-	    nows = HexTool.toString(now);
-	}
-	return "??? ??? : " + nows;
+        String nows = "";
+        if (arr.length - pos > 0) {
+            byte[] now = new byte[arr.length - pos];
+            System.arraycopy(arr, pos, now, 0, arr.length - pos);
+            nows = HexTool.toString(now);
+        }
+        return "??? ??? : " + nows;
     }
-    
+
     public String toString(final boolean b) {
         String nows = "";
         if (arr.length - pos > 0) {
@@ -46,8 +50,8 @@ public class ByteStream {
         }
         return "All: " + HexTool.toString(arr) + "\nNow: " + nows;
     }
-    
+
     public long available() {
-	return arr.length - pos;
+        return arr.length - pos;
     }
 }

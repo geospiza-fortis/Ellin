@@ -25,7 +25,7 @@ public class TamingMob implements Serializable {
         this.exp = 0;
         this.owner = new WeakReference<>(owner);
     }
-    
+
     public int getItemId() {
         return itemid;
     }
@@ -94,9 +94,9 @@ public class TamingMob implements Serializable {
     public void setSkillId(int skillid) {
         this.skillid = skillid;
     }
-    
+
     public final boolean canTire(long now) {
-        return lastFatigue > 0 && (lastFatigue + 30000 < now); 
+        return lastFatigue > 0 && (lastFatigue + 30000 < now);
     }
 
     public void startSchedule() {
@@ -106,7 +106,7 @@ public class TamingMob implements Serializable {
     public void cancelSchedule() {
         this.lastFatigue = 0;
     }
-    
+
     public void increaseExp() {
         int e;
         if (level >= 1 && level <= 7) {
@@ -120,7 +120,7 @@ public class TamingMob implements Serializable {
         }
         setExp(exp + e);
     }
-    
+
     public void update() {
         final Player p = owner.get();
         if (p != null) {

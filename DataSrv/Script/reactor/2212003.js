@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
 					   Matthias Butz <matze@odinms.de>
 					   Jan Christian Meyer <vimes@odinms.de>
 
@@ -21,11 +21,11 @@
 */
 
 /* @Author Lerk
- * 
+ *
  * 2212003.js: Dogon's HQ reactor - Dogon's Report, Meso
- * 
-*/
+ *
+ */
 
-function act(){
-	rm.dropItems(true, 2, 80, 100);
+function act() {
+    rm.dropItems(true, 2, 80, 100);
 }

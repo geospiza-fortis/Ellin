@@ -7,6 +7,35 @@
 
     <build>
         <sourceDirectory>src</sourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>2.7.0</version>
+                <configuration>
+                    <formats>
+                        <!-- prettier with java-plugin -->
+                        <format>
+                            <includes>
+                                <include>src/**/*.java</include>
+                                <include>DataSrv/Script/**/*.js</include>
+                            </includes>
+                            <trimTrailingWhitespace />
+                            <endWithNewline />
+                            <prettier>
+                                <devDependencies>
+                                    <prettier>2.2.1</prettier>
+                                    <prettier-plugin-java>1.0.1</prettier-plugin-java>
+                                </devDependencies>
+                                <config>
+                                    <tabWidth>4</tabWidth>
+                                </config>
+                            </prettier>
+                        </format>
+                    </formats>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
     <properties>
         <maven.compiler.target>1.8</maven.compiler.target>

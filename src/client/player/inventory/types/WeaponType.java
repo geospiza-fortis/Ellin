@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -22,7 +22,6 @@
 package client.player.inventory.types;
 
 public enum WeaponType {
-    
     NOT_A_WEAPON(0),
     BOW(3.4),
     CLAW(3.6),

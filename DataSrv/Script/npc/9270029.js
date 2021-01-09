@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -22,14 +22,13 @@
 /* 	Johnson
 	Singapore
 	MADE BY Cody and AAron
-	
+
 */
 
-
 function start() {
-	cm.sendOk ("Acheww~~~ I can't believe I got a cold in this warm weather.");
+    cm.sendOk("Acheww~~~ I can't believe I got a cold in this warm weather.");
 }
 
 function action() {
-	cm.dispose()
+    cm.dispose();
 }

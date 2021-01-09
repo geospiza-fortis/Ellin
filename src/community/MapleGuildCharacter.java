@@ -1,8 +1,8 @@
 /*
-This file was written by "StellarAshes" <stellar_dust@hotmail.com> 
+This file was written by "StellarAshes" <stellar_dust@hotmail.com>
 as a part of the Guild package for
 the OdinMS Maple Story Server
-Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
 Matthias Butz <matze@odinms.de>
 Jan Christian Meyer <vimes@odinms.de>
 
@@ -31,7 +31,7 @@ public class MapleGuildCharacter implements java.io.Serializable {
     private final int id;
     private int channel = -1;
     private int jobid;
-    private int guildrank,  guildid;
+    private int guildrank, guildid;
     private int allianceRank;
     private boolean online;
     private final String name;
@@ -48,7 +48,17 @@ public class MapleGuildCharacter implements java.io.Serializable {
         online = true;
     }
 
-    public MapleGuildCharacter(int id, int lv, String name, int channel, int job, int rank, int gid, int allianceRank, boolean on) {
+    public MapleGuildCharacter(
+        int id,
+        int lv,
+        String name,
+        int channel,
+        int job,
+        int rank,
+        int gid,
+        int allianceRank,
+        boolean on
+    ) {
         this.level = lv;
         this.id = id;
         this.name = name;

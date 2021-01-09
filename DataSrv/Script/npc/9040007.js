@@ -1,6 +1,6 @@
-/* 
+/*
  * This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -22,15 +22,15 @@
 /* @Author Lerk
  *
  * Sharen III's Will - Sharenian: Waterway (990000600)
- * 
+ *
  * Guild Quest Stage 4 Info
  */
 
 function start() {
-        cm.sendOk("\"Eu lutei contra o Rubian e eu perdi, e agora eu estou preso no proprio portao que bloqueia o meu caminho, meu corpo profanado. No entanto, a minha roupa velha tem poder sagrado dentro. Se voce pode devolver a roupa para o meu corpo, eu deveria ser capaz de abrir o portao. Por favor, depressa! \r\n- Sharen III \r\n\r\nP.S. Eu sei que isso e bastante exigente de mim, mas voce pode por favor, devolva as roupas para o meu corpo.\"");
-        cm.dispose();
+    cm.sendOk(
+        '"Eu lutei contra o Rubian e eu perdi, e agora eu estou preso no proprio portao que bloqueia o meu caminho, meu corpo profanado. No entanto, a minha roupa velha tem poder sagrado dentro. Se voce pode devolver a roupa para o meu corpo, eu deveria ser capaz de abrir o portao. Por favor, depressa! \r\n- Sharen III \r\n\r\nP.S. Eu sei que isso e bastante exigente de mim, mas voce pode por favor, devolva as roupas para o meu corpo."'
+    );
+    cm.dispose();
 }
 
-function action(mode, type, selection) {
-        
-}
+function action(mode, type, selection) {}

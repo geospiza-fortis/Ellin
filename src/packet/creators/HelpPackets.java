@@ -13,15 +13,22 @@ import tools.HexTool;
 import tools.KoreanDateUtil;
 
 public class HelpPackets {
-    
-    public static void SerializeMovementList(WritingPacket wp, List<LifeMovementFragment> moves) {
+
+    public static void SerializeMovementList(
+        WritingPacket wp,
+        List<LifeMovementFragment> moves
+    ) {
         wp.write(moves.size());
         for (LifeMovementFragment move : moves) {
             move.serialize(wp);
         }
     }
-    
-    public static void AddExpirationTime(WritingPacket wp, long time, boolean showexpirationtime) {
+
+    public static void AddExpirationTime(
+        WritingPacket wp,
+        long time,
+        boolean showexpirationtime
+    ) {
         if (time != 0) {
             wp.writeInt(KoreanDateUtil.getItemTimestamp(time));
         } else {
@@ -29,9 +36,8 @@ public class HelpPackets {
         }
         wp.write(showexpirationtime ? 1 : 2);
     }
-    
+
     public static OutPacket GetPacketFromHexString(String hex) {
         return new OutPacket(HexTool.getByteArrayFromHexString(hex));
     }
-    
 }

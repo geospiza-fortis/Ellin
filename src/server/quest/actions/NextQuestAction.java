@@ -23,17 +23,18 @@ package server.quest.actions;
 
 import client.player.Player;
 import packet.creators.PacketCreator;
-import server.quest.MapleQuestStatus;
 import provider.MapleData;
 import provider.MapleDataTool;
 import server.quest.MapleQuest;
 import server.quest.MapleQuestActionType;
+import server.quest.MapleQuestStatus;
 
 /**
  *
  * @author Tyler (Twdtwd)
  */
 public final class NextQuestAction extends MapleQuestAction {
+
     int nextQuest;
 
     public NextQuestAction(MapleQuest quest, MapleData data) {
@@ -49,6 +50,12 @@ public final class NextQuestAction extends MapleQuestAction {
     @Override
     public void run(Player p, Integer extSelection) {
         MapleQuestStatus status = p.getQuest(MapleQuest.getInstance(questID));
-        p.announce(PacketCreator.UpdateQuestFinish((short) questID, status.getNpc(), (short) nextQuest));
+        p.announce(
+            PacketCreator.UpdateQuestFinish(
+                (short) questID,
+                status.getNpc(),
+                (short) nextQuest
+            )
+        );
     }
-} 
+}

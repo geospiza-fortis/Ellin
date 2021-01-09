@@ -1,10 +1,10 @@
 package cashshop;
 
-import client.player.inventory.types.InventoryType;
-import client.player.inventory.ItemFactory;
-import database.DatabaseConnection;
 import client.Client;
 import client.player.inventory.Item;
+import client.player.inventory.ItemFactory;
+import client.player.inventory.types.InventoryType;
+import database.DatabaseConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -38,7 +38,9 @@ public class CashShop {
         this.characterId = characterId;
 
         Connection con = DatabaseConnection.getConnection();
-        PreparedStatement ps = con.prepareStatement("SELECT `paypalNX`, `mPoints`, `cardNX` FROM `accounts` WHERE `id` = ?");
+        PreparedStatement ps = con.prepareStatement(
+            "SELECT `paypalNX`, `mPoints`, `cardNX` FROM `accounts` WHERE `id` = ?"
+        );
         ps.setInt(1, accountId);
         ResultSet rs = ps.executeQuery();
 
@@ -51,10 +53,15 @@ public class CashShop {
         rs.close();
         ps.close();
 
-        for (Pair<Item, InventoryType> item : factory.loadItems(accountId, false))
-            inventory.add(item.getLeft());
+        for (Pair<Item, InventoryType> item : factory.loadItems(
+            accountId,
+            false
+        )) inventory.add(item.getLeft());
 
-        ps = con.prepareStatement("SELECT `sn` FROM `wishlist` WHERE `characterid` = ?");
+        ps =
+            con.prepareStatement(
+                "SELECT `sn` FROM `wishlist` WHERE `characterid` = ?"
+            );
         ps.setInt(1, characterId);
         rs = ps.executeQuery();
 
@@ -65,53 +72,82 @@ public class CashShop {
         rs.close();
         ps.close();
     }
-    
+
     public void gift(int recipient, String from, String message, int sn) {
         gift(recipient, from, message, sn, -1);
     }
 
-    public void gift(int recipient, String from, String message, int sn, int uniqueid) {
+    public void gift(
+        int recipient,
+        String from,
+        String message,
+        int sn,
+        int uniqueid
+    ) {
         PreparedStatement ps = null;
         try {
-            ps = DatabaseConnection.getConnection().prepareStatement("INSERT INTO `gifts` VALUES (DEFAULT, ?, ?, ?, ?, ?)");
+            ps =
+                DatabaseConnection
+                    .getConnection()
+                    .prepareStatement(
+                        "INSERT INTO `gifts` VALUES (DEFAULT, ?, ?, ?, ?, ?)"
+                    );
             ps.setInt(1, recipient);
             ps.setString(2, from);
             ps.setString(3, message);
             ps.setInt(4, sn);
             ps.setInt(5, uniqueid);
             ps.executeUpdate();
-        } catch (SQLException sqle) {
-        } finally {
+        } catch (SQLException sqle) {} finally {
             try {
                 if (ps != null) ps.close();
-            } catch (SQLException ex) {
-            }
+            } catch (SQLException ex) {}
         }
     }
-    
+
     public List<Pair<Item, String>> loadGifts(Client c) {
         List<Pair<Item, String>> gifts = new ArrayList<>();
         Connection con = DatabaseConnection.getConnection();
 
         try {
-            PreparedStatement ps = con.prepareStatement("SELECT * FROM `gifts` WHERE `to` = ?");
+            PreparedStatement ps = con.prepareStatement(
+                "SELECT * FROM `gifts` WHERE `to` = ?"
+            );
             ps.setInt(1, characterId);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 CashItem cItem = CashItemFactory.getItem(rs.getInt("sn"));
-                Item item = cItem.toItem(cItem, rs.getInt("uniqueid"), cItem.getCount(), rs.getString("from"));
-                item.setGiftFrom(rs.getString("from")); 
+                Item item = cItem.toItem(
+                    cItem,
+                    rs.getInt("uniqueid"),
+                    cItem.getCount(),
+                    rs.getString("from")
+                );
+                item.setGiftFrom(rs.getString("from"));
                 uniqueids.add(item.getUniqueId());
                 gifts.add(new Pair<>(item, rs.getString("message")));
-                if (CashItemFactory.isPackage(cItem.getItemId())) { 
-                    for (Item packageItem : CashItemFactory.getPackage(cItem.getItemId())) {
+                if (CashItemFactory.isPackage(cItem.getItemId())) {
+                    for (Item packageItem : CashItemFactory.getPackage(
+                        cItem.getItemId()
+                    )) {
                         if (packageItem != null) {
                             packageItem.setGiftFrom(rs.getString("from"));
                             addToInventory(packageItem);
                         } else {
-                            FileLogger.printError("loadGifts", "CashPackage {" + cItem.getItemId() + "} contain null item.");
-                            c.getSession().write(CashShopPackets.PlaceError(CashShopPackets.ERROR_UNKNOWN));
+                            FileLogger.printError(
+                                "loadGifts",
+                                "CashPackage {" +
+                                cItem.getItemId() +
+                                "} contain null item."
+                            );
+                            c
+                                .getSession()
+                                .write(
+                                    CashShopPackets.PlaceError(
+                                        CashShopPackets.ERROR_UNKNOWN
+                                    )
+                                );
                         }
                     }
                     isPackage.add(item.getUniqueId());
@@ -131,7 +167,7 @@ public class CashShop {
         }
         return gifts;
     }
-    
+
     public boolean canSendNote(int uniqueid) {
         return uniqueids.contains(uniqueid);
     }
@@ -143,7 +179,7 @@ public class CashShop {
             }
         }
     }
-    
+
     public boolean isPackage(int uniqueid) {
         return isPackage.contains(uniqueid);
     }
@@ -182,7 +218,7 @@ public class CashShop {
                 break;
         }
     }
-    
+
     public int getItemsSize() {
         return inventory.size();
     }
@@ -210,13 +246,13 @@ public class CashShop {
                 return item;
             }
         }
-      return null;
+        return null;
     }
-    
+
     public boolean isFull() {
         return inventory.size() >= 100;
     }
-    
+
     public boolean canFit(int add) {
         return inventory.size() + add <= 100;
     }
@@ -255,7 +291,10 @@ public class CashShop {
         PreparedStatement ps = null;
         try {
             Connection con = DatabaseConnection.getConnection();
-            ps = con.prepareStatement("UPDATE `accounts` SET `paypalNX` = ?, `mPoints` = ?, `cardNX` = ? WHERE `id` = ?");
+            ps =
+                con.prepareStatement(
+                    "UPDATE `accounts` SET `paypalNX` = ?, `mPoints` = ?, `cardNX` = ? WHERE `id` = ?"
+                );
             ps.setInt(1, paypalNX);
             ps.setInt(2, mPoints);
             ps.setInt(3, cardNX);
@@ -264,15 +303,30 @@ public class CashShop {
             ps.close();
             List<Pair<Item, InventoryType>> itemsWithType = new ArrayList<>();
 
-            inventory.forEach((item) -> {
-                itemsWithType.add(new Pair<>(item, ItemInformationProvider.getInstance().getInventoryType(item.getItemId())));
-            });
+            inventory.forEach(
+                item -> {
+                    itemsWithType.add(
+                        new Pair<>(
+                            item,
+                            ItemInformationProvider
+                                .getInstance()
+                                .getInventoryType(item.getItemId())
+                        )
+                    );
+                }
+            );
 
             factory.saveItems(itemsWithType, accountId);
-            ps = con.prepareStatement("DELETE FROM `wishlist` WHERE `characterid` = ?");
+            ps =
+                con.prepareStatement(
+                    "DELETE FROM `wishlist` WHERE `characterid` = ?"
+                );
             ps.setInt(1, characterId);
             ps.executeUpdate();
-            ps = con.prepareStatement("INSERT INTO `wishlist` VALUES (DEFAULT, ?, ?)");
+            ps =
+                con.prepareStatement(
+                    "INSERT INTO `wishlist` VALUES (DEFAULT, ?, ?)"
+                );
             ps.setInt(1, characterId);
 
             for (int sn : wishList) {
@@ -280,7 +334,7 @@ public class CashShop {
                 ps.executeUpdate();
             }
             ps.close();
-        } catch(SQLException ee) {
+        } catch (SQLException ee) {
             System.out.println("[DB-CASH] Teve Rolling Back com a DB: " + ee);
         } finally {
             try {
@@ -288,7 +342,9 @@ public class CashShop {
                     ps.close();
                 }
             } catch (SQLException e) {
-                System.out.println("[DB-CASH] Teve Rolling Back com a DB: " + e);
+                System.out.println(
+                    "[DB-CASH] Teve Rolling Back com a DB: " + e
+                );
             }
         }
     }

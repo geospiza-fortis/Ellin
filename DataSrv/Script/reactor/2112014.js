@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
 					   Matthias Butz <matze@odinms.de>
 					   Jan Christian Meyer <vimes@odinms.de>
 
@@ -21,10 +21,10 @@
 */
 
 /* @Author Lerk
- * 
+ *
  * 2112014.js: Zakum Party Quest Giant Chest - drops a Fire Ore when 7 Keys are dropped in front of it
-*/
+ */
 
 function act() {
-	rm.dropItems();
+    rm.dropItems();
 }

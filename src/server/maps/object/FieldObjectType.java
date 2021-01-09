@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -22,9 +22,16 @@
 package server.maps.object;
 
 public enum FieldObjectType {
-    
-    NPC, MONSTER, ITEM, PLAYER,
-    DOOR, SUMMON, SHOP, MINI_GAME,
-    MIST, REACTOR, HIRED_MERCHANT,
-    PLAYER_NPC_MERCHANT;
+    NPC,
+    MONSTER,
+    ITEM,
+    PLAYER,
+    DOOR,
+    SUMMON,
+    SHOP,
+    MINI_GAME,
+    MIST,
+    REACTOR,
+    HIRED_MERCHANT,
+    PLAYER_NPC_MERCHANT,
 }

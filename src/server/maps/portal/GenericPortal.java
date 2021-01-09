@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -21,17 +21,17 @@
 
 package server.maps.portal;
 
-import java.awt.Point;
-
-import client.player.Player;
 import client.Client;
+import client.player.Player;
 import client.player.violation.CheatingOffense;
 import constants.MapConstants;
+import java.awt.Point;
 import packet.creators.PacketCreator;
 import scripting.portal.PortalScriptManager;
 import server.maps.Field;
 
 public class GenericPortal implements Portal {
+
     private String name;
     private String target;
     private Point position;
@@ -62,7 +62,7 @@ public class GenericPortal implements Portal {
     }
 
     public void setId(int id) {
-        this.id  = id;
+        this.id = id;
     }
 
     @Override
@@ -119,8 +119,12 @@ public class GenericPortal implements Portal {
     @Override
     public void enterPortal(Client c) {
         Player player = c.getPlayer();
-        if (player.getMap().getPortalDisable() && !c.getPlayer().isGameMaster()) {
-            c.getSession().write(PacketCreator.ServerNotice(5, "Portals are disabled."));
+        if (
+            player.getMap().getPortalDisable() && !c.getPlayer().isGameMaster()
+        ) {
+            c
+                .getSession()
+                .write(PacketCreator.ServerNotice(5, "Portals are disabled."));
             c.getSession().write(PacketCreator.EnableActions());
             return;
         }
@@ -131,22 +135,35 @@ public class GenericPortal implements Portal {
         player.setLastPortalEntry(System.currentTimeMillis());
         double distanceSq = getPosition().distanceSq(player.getPosition());
         if (distanceSq > 22500) {
-            player.getCheatTracker().registerOffense(CheatingOffense.USING_FARAWAY_PORTAL, "Tried to use faraway portal - " + Math.sqrt(distanceSq));
+            player
+                .getCheatTracker()
+                .registerOffense(
+                    CheatingOffense.USING_FARAWAY_PORTAL,
+                    "Tried to use faraway portal - " + Math.sqrt(distanceSq)
+                );
         }
         boolean changed = false;
         if (getScriptName() != null) {
             try {
-                changed = PortalScriptManager.getInstance().executePortalScript(this, c);
-            } catch(NullPointerException npe) {
+                changed =
+                    PortalScriptManager
+                        .getInstance()
+                        .executePortalScript(this, c);
+            } catch (NullPointerException npe) {
                 npe.printStackTrace();
             }
         } else if (getTargetMapId() != MapConstants.NULL_MAP) {
-            Field to = c.getPlayer().getEventInstance() == null ? c.getChannelServer().getMapFactory().getMap(getTargetMapId()) : c.getPlayer().getEventInstance().getMapInstance(getTargetMapId());
+            Field to = c.getPlayer().getEventInstance() == null
+                ? c.getChannelServer().getMapFactory().getMap(getTargetMapId())
+                : c
+                    .getPlayer()
+                    .getEventInstance()
+                    .getMapInstance(getTargetMapId());
             Portal pto = to.getPortal(getTarget());
             if (pto == null) {
                 pto = to.getPortal(0);
             }
-            c.getPlayer().changeMap(to, pto); 
+            c.getPlayer().changeMap(to, pto);
             changed = true;
         }
         if (!changed) {

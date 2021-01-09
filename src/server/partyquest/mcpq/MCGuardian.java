@@ -13,6 +13,7 @@ package server.partyquest.mcpq;
  */
 
 public class MCGuardian {
+
     private final int type, spendCP, mobSkillID, level;
     private String name, desc;
 
@@ -54,4 +55,4 @@ public class MCGuardian {
     public void setDesc(String desc) {
         this.desc = desc;
     }
-}  
+}

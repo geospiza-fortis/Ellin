@@ -15,7 +15,7 @@ function enter(pi) {
         var theWay = eim.getProperty("theWay");
         var target;
         if (theWay != null) {
-            if (theWay = "light") {
+            if ((theWay = "light")) {
                 target = eim.getMapInstance(240050300); //light
             } else {
                 target = eim.getMapInstance(240050310); //dark
@@ -31,7 +31,10 @@ function enter(pi) {
         }
         return true;
     } else {
-        pi.playerMessage(6, "You are not the party leader. Only the party leader may proceed through this portal.");
+        pi.playerMessage(
+            6,
+            "You are not the party leader. Only the party leader may proceed through this portal."
+        );
         return false;
     }
 }

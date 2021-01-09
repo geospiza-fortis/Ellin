@@ -1,17 +1,17 @@
 package server.maps;
 
-import server.maps.object.FieldObjectType;
-import server.maps.object.FieldObject;
-import server.maps.object.AbstractMapleFieldObject;
 import client.Client;
 import client.player.Player;
 import client.player.inventory.Item;
 import java.awt.Point;
 import java.util.concurrent.locks.ReentrantLock;
 import packet.creators.PacketCreator;
+import server.maps.object.AbstractMapleFieldObject;
+import server.maps.object.FieldObject;
+import server.maps.object.FieldObjectType;
 
 public class FieldItem extends AbstractMapleFieldObject {
-    
+
     protected Item item;
     protected byte type;
     protected int charOwnerId, meso = 0, questid = -1;
@@ -21,7 +21,14 @@ public class FieldItem extends AbstractMapleFieldObject {
     protected FieldObject dropper;
     private ReentrantLock itemLock = new ReentrantLock();
 
-    public FieldItem(Item item, Point position, FieldObject dropper, Player owner, byte type, boolean playerDrop) {
+    public FieldItem(
+        Item item,
+        Point position,
+        FieldObject dropper,
+        Player owner,
+        byte type,
+        boolean playerDrop
+    ) {
         setPosition(position);
         this.item = item;
         this.dropper = dropper;
@@ -31,7 +38,15 @@ public class FieldItem extends AbstractMapleFieldObject {
         this.playerDrop = playerDrop;
     }
 
-    public FieldItem(Item item, Point position, FieldObject dropper, Player owner, byte type, boolean playerDrop, int questid) {
+    public FieldItem(
+        Item item,
+        Point position,
+        FieldObject dropper,
+        Player owner,
+        byte type,
+        boolean playerDrop,
+        int questid
+    ) {
         setPosition(position);
         this.item = item;
         this.dropper = dropper;
@@ -41,7 +56,14 @@ public class FieldItem extends AbstractMapleFieldObject {
         this.questid = questid;
     }
 
-    public FieldItem(int meso, Point position, FieldObject dropper, Player owner, byte type, boolean playerDrop) {
+    public FieldItem(
+        int meso,
+        Point position,
+        FieldObject dropper,
+        Player owner,
+        byte type,
+        boolean playerDrop
+    ) {
         setPosition(position);
         this.item = null;
         this.dropper = dropper;
@@ -62,7 +84,7 @@ public class FieldItem extends AbstractMapleFieldObject {
     public Item getItem() {
         return item;
     }
-    
+
     public Client getOwnerClient() {
         return ownerClient;
     }
@@ -70,12 +92,12 @@ public class FieldItem extends AbstractMapleFieldObject {
     public FieldObject getDropper() {
         return dropper;
     }
-    
+
     public final int getItemId() {
-	if (getMeso() > 0) {
-	    return meso;
-	}
-	return item.getItemId();
+        if (getMeso() > 0) {
+            return meso;
+        }
+        return item.getItemId();
     }
 
     public final int getOwnerId() {
@@ -85,7 +107,7 @@ public class FieldItem extends AbstractMapleFieldObject {
     public int getMeso() {
         return meso;
     }
-    
+
     public final boolean isPlayerDrop() {
         return playerDrop;
     }
@@ -97,7 +119,7 @@ public class FieldItem extends AbstractMapleFieldObject {
     public void setPickedUp(boolean pickedUp) {
         this.pickedUp = pickedUp;
     }
-    
+
     public byte getDropType() {
         return type;
     }
@@ -109,7 +131,7 @@ public class FieldItem extends AbstractMapleFieldObject {
     public void lockItem() {
         itemLock.lock();
     }
-    
+
     public void unlockItem() {
         itemLock.unlock();
     }
@@ -118,38 +140,66 @@ public class FieldItem extends AbstractMapleFieldObject {
     public FieldObjectType getType() {
         return FieldObjectType.ITEM;
     }
-    
+
     @Override
     public void sendSpawnData(final Client client) {
-        if (questid <= 0 || (client.getPlayer().getQuestStatus(questid) == 1 && client.getPlayer().needQuestItem(questid, item.getItemId()))) {
-            client.getSession().write(PacketCreator.DropItemFromMapObject(this, null, getPosition(), (byte) 2));
+        if (
+            questid <= 0 ||
+            (
+                client.getPlayer().getQuestStatus(questid) == 1 &&
+                client.getPlayer().needQuestItem(questid, item.getItemId())
+            )
+        ) {
+            client
+                .getSession()
+                .write(
+                    PacketCreator.DropItemFromMapObject(
+                        this,
+                        null,
+                        getPosition(),
+                        (byte) 2
+                    )
+                );
         }
     }
-    
+
     @Override
     public void sendDestroyData(Client client) {
-        client.getSession().write(PacketCreator.RemoveItemFromMap(getObjectId(), 1, 0));
+        client
+            .getSession()
+            .write(PacketCreator.RemoveItemFromMap(getObjectId(), 1, 0));
     }
 
     public void registerExpire(final long time) {
-	nextExpiry = System.currentTimeMillis() + time;
+        nextExpiry = System.currentTimeMillis() + time;
     }
 
     public void registerFFA(final long time) {
-	nextFFA = System.currentTimeMillis() + time;
+        nextFFA = System.currentTimeMillis() + time;
     }
 
     public boolean shouldExpire() {
-	return !pickedUp && nextExpiry > 0 && nextExpiry < System.currentTimeMillis();
+        return (
+            !pickedUp &&
+            nextExpiry > 0 &&
+            nextExpiry < System.currentTimeMillis()
+        );
     }
 
     public boolean shouldFFA() {
-	return !pickedUp && type < 2 && nextFFA > 0 && nextFFA < System.currentTimeMillis();
+        return (
+            !pickedUp &&
+            type < 2 &&
+            nextFFA > 0 &&
+            nextFFA < System.currentTimeMillis()
+        );
     }
 
     public void expire(final Field map) {
-	pickedUp = true;
-	map.broadcastMessage(PacketCreator.RemoveItemFromMap(getObjectId(), 0, 0));
-	map.removeMapObject(this);
+        pickedUp = true;
+        map.broadcastMessage(
+            PacketCreator.RemoveItemFromMap(getObjectId(), 0, 0)
+        );
+        map.removeMapObject(this);
     }
 }

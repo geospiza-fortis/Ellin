@@ -27,9 +27,9 @@ public class OutPacket implements Cloneable {
     public String toString() {
         return HexTool.toString(data);
     }
-    
+
     @Override
-    public OutPacket clone() throws CloneNotSupportedException{    
-      return (OutPacket) super.clone();  
-    }   
+    public OutPacket clone() throws CloneNotSupportedException {
+        return (OutPacket) super.clone();
+    }
 }

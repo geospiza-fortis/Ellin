@@ -5,12 +5,15 @@ importPackage(Packages.packet.creators);
 function enter(pi) {
     if (pi.getPlayer().getMapId() == 240060000) {
         var nextMap = 240060100;
-        var eim = pi.getPlayer().getEventInstance()
+        var eim = pi.getPlayer().getEventInstance();
         var target = eim.getMapInstance(nextMap);
         var targetPortal = target.getPortal("sp");
         var avail = eim.getProperty("head1");
         if (avail != "yes") {
-            pi.getPlayer().getClient().getSession().write(PacketCreator.ServerNotice(6, "The portal is blocked."));
+            pi.getPlayer()
+                .getClient()
+                .getSession()
+                .write(PacketCreator.ServerNotice(6, "The portal is blocked."));
             return false;
         } else {
             pi.getPlayer().changeMap(target, targetPortal);
@@ -22,17 +25,20 @@ function enter(pi) {
         }
     } else if (pi.getPlayer().getMapId() == 240060100) {
         var nextMap = 240060200;
-        var eim = pi.getPlayer().getEventInstance()
+        var eim = pi.getPlayer().getEventInstance();
         var target = eim.getMapInstance(nextMap);
         var targetPortal = target.getPortal("sp");
         var avail = eim.getProperty("head2");
         if (avail != "yes") {
-            pi.getPlayer().getClient().getSession().write(PacketCreator.ServerNotice(6, "The portal is blocked."));
+            pi.getPlayer()
+                .getClient()
+                .getSession()
+                .write(PacketCreator.ServerNotice(6, "The portal is blocked."));
             return false;
         } else {
             pi.getPlayer().changeMap(target, targetPortal);
             return true;
         }
     }
-    return true;	
+    return true;
 }

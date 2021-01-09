@@ -12,6 +12,7 @@ package server.partyquest.mcpq;
  * @author s4nta
  */
 public class MCSkill {
+
     private final int id, target, mobSkillID, level, spendCP;
     private String name, desc;
 

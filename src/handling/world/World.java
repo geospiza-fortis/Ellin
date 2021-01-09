@@ -22,7 +22,7 @@ import tools.CollectionUtil;
 import tools.TimerTools.WorldTimer;
 
 public class World {
-    
+
     public static final int channelPerThread = 3;
 
     public static void init() {
@@ -31,7 +31,7 @@ public class World {
         MessengerService.getMessenger(0);
         PartyService.getParty(0);
     }
-    
+
     public static String getStatus() throws RemoteException {
         StringBuilder ret = new StringBuilder();
         int totalUsers = 0;
@@ -49,7 +49,7 @@ public class World {
         ret.append("\n");
         return ret.toString();
     }
-    
+
     public static Map<Integer, Integer> getConnected() {
         Map<Integer, Integer> ret = new HashMap<>();
         int total = 0;
@@ -61,11 +61,11 @@ public class World {
         ret.put(0, total);
         return ret;
     }
-    
+
     public static boolean isConnected(String charName) {
         return FindService.findChannel(charName) > 0;
     }
-    
+
     public static boolean isCharacterListConnected(List<String> charName) {
         for (ChannelServer cs : ChannelServer.getAllInstances()) {
             for (final String c : charName) {
@@ -76,7 +76,7 @@ public class World {
         }
         return false;
     }
-    
+
     public static PlayerStorage getStorage(int channel) {
         return ChannelServer.getInstance(channel).getPlayerStorage();
     }

@@ -29,7 +29,7 @@ function act() {
     var now = eim.getIntProperty("openedBoxes");
     var nextNum = now + 1;
     eim.setIntProperty("openedBoxes", nextNum);
-    
+
     rm.spawnMonster(9300109, 3);
     rm.spawnMonster(9300110, 5);
 }

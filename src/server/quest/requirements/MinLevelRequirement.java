@@ -32,8 +32,9 @@ import server.quest.MapleQuestRequirementType;
  * @author Tyler (Twdtwd)
  */
 public final class MinLevelRequirement extends MapleQuestRequirement {
+
     private int minLevel;
-    
+
     public MinLevelRequirement(MapleQuest quest, MapleData data) {
         super(MapleQuestRequirementType.MIN_LEVEL);
         processData(data);

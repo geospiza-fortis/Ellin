@@ -4,7 +4,7 @@ importPackage(Packages.client);
 
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -26,7 +26,7 @@ importPackage(Packages.client);
 /* Ali
  * Adobis's Mission I: The Room of Tragedy (280090000)
  * Zakum Quest NPC Exit
-*/
+ */
 
 function start() {
     cm.warp(211042300);
@@ -37,4 +37,4 @@ function start() {
     cm.dispose();
 }
 
-function action(mode, type, selection) {}	
+function action(mode, type, selection) {}

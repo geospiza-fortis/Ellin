@@ -1,10 +1,10 @@
 package client.player;
 
 import client.player.inventory.Inventory;
-import client.player.inventory.types.InventoryType;
 import client.player.inventory.Item;
 import client.player.inventory.ItemFactory;
 import client.player.inventory.ItemPet;
+import client.player.inventory.types.InventoryType;
 import client.player.skills.PlayerSkill;
 import client.player.skills.PlayerSkillEntry;
 import client.player.skills.PlayerSkillMacro;
@@ -30,9 +30,8 @@ import tools.Pair;
  */
 
 public class PlayerSaveFactory {
-    
+
     public enum DeleteType {
-        
         CHARACTER("characters", "id"),
         SKILL("skills", "characterid"),
         BUDDY("buddies", "characterid"),
@@ -48,31 +47,47 @@ public class PlayerSaveFactory {
         REG_LOCATIONS("regrocklocations", "characterid"),
         INVENTORY_ITEMS("inventoryitems", "characterid"),
         TROCK_LOCATIONS("trocklocations", "characterid");
-        
+
         String type, field;
-        
-        private DeleteType (String type, String field) {
+
+        private DeleteType(String type, String field) {
             this.type = type;
             this.field = field;
         }
-        
-        public void removeFromType(Connection con, int typeInt) throws SQLException {
+
+        public void removeFromType(Connection con, int typeInt)
+            throws SQLException {
             try {
-                String sql = "DELETE FROM " + this.type + " WHERE " + this.field + " = ?";
+                String sql =
+                    "DELETE FROM " +
+                    this.type +
+                    " WHERE " +
+                    this.field +
+                    " = ?";
                 try (PreparedStatement ps = con.prepareStatement(sql)) {
                     ps.setInt(1, typeInt);
                     ps.executeUpdate();
-                }       
+                }
             } catch (SQLException e) {
-                e.printStackTrace();    
-            } 
+                e.printStackTrace();
+            }
         }
     }
-    
-    public static void savingCharacterStats(Player ret, PreparedStatement ps, Connection con) {
+
+    public static void savingCharacterStats(
+        Player ret,
+        PreparedStatement ps,
+        Connection con
+    ) {
         try {
             /*                                                 1          2        3        4        5         6              7        8       9       10         11        12      13           14        15             16         17       18         19       20            21          22           23              24            25             26               27            28            29                   30                31                32               33               34                35                 36                  37            38            39          40           41             42           43              44              45             46             47            48           49      */
-            ps = con.prepareStatement("UPDATE characters SET level = ?, fame = ?, str = ?, dex = ?, luk = ?, `int` = ?, " + "exp = ?, hp = ?, mp = ?, maxhp = ?, maxmp = ?, sp = ?, ap = ?, " + "gm = ?, skincolor = ?, gender = ?, job = ?, hair = ?, face = ?, map = ?, " + "meso = ?, hpApUsed = ?, mpApUsed = ?, spawnpoint = ?, party = ?, buddyCapacity = ?, mountlevel = ?, mountexp = ?, mounttiredness = ?, alliancerank = ?, ariantPoints = ?, hpMpUsed = ?, matchcardwins = ?, matchcardlosses = ?, matchcardties = ?, omokwins = ?, omoklosses = ?, omokties = ?, pets = ?, autoHpPot = ?, autoMpPot = ?, equipslots = ?, useslots = ?, setupslots = ?, etcslots = ?, spouseId = ?,  playtime = ?, dataString = ? WHERE id = ?");
+            ps =
+                con.prepareStatement(
+                    "UPDATE characters SET level = ?, fame = ?, str = ?, dex = ?, luk = ?, `int` = ?, " +
+                    "exp = ?, hp = ?, mp = ?, maxhp = ?, maxmp = ?, sp = ?, ap = ?, " +
+                    "gm = ?, skincolor = ?, gender = ?, job = ?, hair = ?, face = ?, map = ?, " +
+                    "meso = ?, hpApUsed = ?, mpApUsed = ?, spawnpoint = ?, party = ?, buddyCapacity = ?, mountlevel = ?, mountexp = ?, mounttiredness = ?, alliancerank = ?, ariantPoints = ?, hpMpUsed = ?, matchcardwins = ?, matchcardlosses = ?, matchcardties = ?, omokwins = ?, omoklosses = ?, omokties = ?, pets = ?, autoHpPot = ?, autoMpPot = ?, equipslots = ?, useslots = ?, setupslots = ?, etcslots = ?, spouseId = ?,  playtime = ?, dataString = ? WHERE id = ?"
+                );
             ps.setInt(1, ret.level);
             ps.setInt(2, ret.pop);
             ps.setInt(3, ret.stats.str);
@@ -98,7 +113,12 @@ public class PlayerSaveFactory {
                 if (ret.field.getForcedReturnId() != MapConstants.NULL_MAP) {
                     ps.setInt(20, ret.field.getForcedReturnId());
                 } else {
-                    ps.setInt(20, ret.stats.getHp() < 1 ? ret.field.getReturnMapId() : ret.field.getId());
+                    ps.setInt(
+                        20,
+                        ret.stats.getHp() < 1
+                            ? ret.field.getReturnMapId()
+                            : ret.field.getId()
+                    );
                 }
             }
             ps.setInt(21, ret.meso.get());
@@ -107,13 +127,15 @@ public class PlayerSaveFactory {
             if (ret.field == null) {
                 ps.setInt(24, 0);
             } else {
-                Portal closest = ret.field.findClosestPlayerSpawnpoint(ret.getPosition());
+                Portal closest = ret.field.findClosestPlayerSpawnpoint(
+                    ret.getPosition()
+                );
                 ps.setInt(24, closest != null ? closest.getId() : 0);
             }
-            
+
             ps.setInt(25, ret.party != null ? ret.party.getId() : -1);
             ps.setInt(26, ret.buddyList.getCapacity());
-            
+
             if (ret.tamingMob != null) {
                 ps.setInt(27, ret.tamingMob.getLevel());
                 ps.setInt(28, ret.tamingMob.getExp());
@@ -123,7 +145,7 @@ public class PlayerSaveFactory {
                 ps.setInt(28, 0);
                 ps.setInt(29, 0);
             }
-            
+
             ps.setInt(30, ret.allianceRank);
             ps.setInt(31, ret.ariantPoints);
             ps.setInt(32, ret.stats.hpMpApUsed);
@@ -133,7 +155,7 @@ public class PlayerSaveFactory {
             ps.setInt(36, ret.omokWins);
             ps.setInt(37, ret.omokLosses);
             ps.setInt(38, ret.omokTies);
-            
+
             final StringBuilder petz = new StringBuilder();
             int petLength = 0;
             for (final ItemPet pet : ret.pets) {
@@ -150,41 +172,104 @@ public class PlayerSaveFactory {
             }
             final String petstring = petz.toString();
             ps.setString(39, petstring.substring(0, petstring.length() - 1));
-            
-            ps.setInt(40, ret.petAutoHP != 0 && ret.getItemQuantity(ret.petAutoHP) >= 1 ? ret.petAutoHP : 0);
-            ps.setInt(41, ret.petAutoMP != 0 && ret.getItemQuantity(ret.petAutoMP) >= 1 ? ret.petAutoMP : 0);
-            
-            ps.setInt(42, ret.getInventory(InventoryType.getByType((byte) InventoryType.EQUIP.getType())).getSlotLimit());
-            ps.setInt(43, ret.getInventory(InventoryType.getByType((byte) InventoryType.USE.getType())).getSlotLimit());
-            ps.setInt(44, ret.getInventory(InventoryType.getByType((byte) InventoryType.SETUP.getType())).getSlotLimit());
-            ps.setInt(45, ret.getInventory(InventoryType.getByType((byte) InventoryType.ETC.getType())).getSlotLimit());
-            
+
+            ps.setInt(
+                40,
+                ret.petAutoHP != 0 && ret.getItemQuantity(ret.petAutoHP) >= 1
+                    ? ret.petAutoHP
+                    : 0
+            );
+            ps.setInt(
+                41,
+                ret.petAutoMP != 0 && ret.getItemQuantity(ret.petAutoMP) >= 1
+                    ? ret.petAutoMP
+                    : 0
+            );
+
+            ps.setInt(
+                42,
+                ret
+                    .getInventory(
+                        InventoryType.getByType(
+                            (byte) InventoryType.EQUIP.getType()
+                        )
+                    )
+                    .getSlotLimit()
+            );
+            ps.setInt(
+                43,
+                ret
+                    .getInventory(
+                        InventoryType.getByType(
+                            (byte) InventoryType.USE.getType()
+                        )
+                    )
+                    .getSlotLimit()
+            );
+            ps.setInt(
+                44,
+                ret
+                    .getInventory(
+                        InventoryType.getByType(
+                            (byte) InventoryType.SETUP.getType()
+                        )
+                    )
+                    .getSlotLimit()
+            );
+            ps.setInt(
+                45,
+                ret
+                    .getInventory(
+                        InventoryType.getByType(
+                            (byte) InventoryType.ETC.getType()
+                        )
+                    )
+                    .getSlotLimit()
+            );
+
             ps.setInt(46, ret.partner);
-            
+
             ps.setLong(47, ret.getPlaytime());
-            
+
             ps.setString(48, ret.dataString);
-            
+
             ps.setInt(49, ret.id);
-            
+
             if (ps.executeUpdate() < 1) {
                 ps.close();
-                throw new DatabaseException("Character not in database (" + ret.id + ")");
+                throw new DatabaseException(
+                    "Character not in database (" + ret.id + ")"
+                );
             }
             ps.close();
-        } catch(SQLException ex) {
-            ex.printStackTrace(); 
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
     }
-    
-    public static PreparedStatement savingCharacterSkillMacros(Player ret, PreparedStatement ps, Connection con) {
+
+    public static PreparedStatement savingCharacterSkillMacros(
+        Player ret,
+        PreparedStatement ps,
+        Connection con
+    ) {
         try {
             DeleteType.SKILL_MACRO.removeFromType(con, ret.id);
-            ps = con.prepareStatement("INSERT INTO `skillmacros` " + "(`characterid`,`position`,`name`,`silent`,`skill1`,`skill2`,`skill3`) " + "VALUES (?,?,?,?,?,?,?)");
+            ps =
+                con.prepareStatement(
+                    "INSERT INTO `skillmacros` " +
+                    "(`characterid`,`position`,`name`,`silent`,`skill1`,`skill2`,`skill3`) " +
+                    "VALUES (?,?,?,?,?,?,?)"
+                );
             ps.setInt(1, ret.id);
             for (byte pos = 0; pos < ret.skillMacros.length; pos++) {
                 PlayerSkillMacro macro = ret.skillMacros[pos];
-                if (macro.getName().isEmpty() && !macro.isSilent() && macro.getFirstSkill() == 0 && macro.getSecondSkill() == 0 && macro.getThirdSkill() == 0) {
+                if (
+                    macro.getName().isEmpty() &&
+                    !macro.isSilent() &&
+                    macro.getFirstSkill() == 0 &&
+                    macro.getSecondSkill() == 0 &&
+                    macro.getThirdSkill() == 0
+                ) {
                     continue;
                 }
                 ps.setByte(2, pos);
@@ -197,19 +282,31 @@ public class PlayerSaveFactory {
             }
             ps.executeBatch();
             ps.close();
-            
+
             ret.setChangedSkillMacros(false);
-        } catch(SQLException ex) {
-            ex.printStackTrace();  
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
         return null;
     }
-    
-    public static void savingCharacterQuests(Player ret, PreparedStatement ps, Connection con) {
+
+    public static void savingCharacterQuests(
+        Player ret,
+        PreparedStatement ps,
+        Connection con
+    ) {
         try {
             DeleteType.QUEST.removeFromType(con, ret.id);
-            ps = con.prepareStatement("INSERT INTO `queststatus` (`queststatusid`, `characterid`, `quest`, `status`, `time`, `forfeited`) VALUES (DEFAULT, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
-            try (PreparedStatement psee = con.prepareStatement("INSERT INTO questprogress VALUES (DEFAULT, ?, ?, ?)")) {
+            ps =
+                con.prepareStatement(
+                    "INSERT INTO `queststatus` (`queststatusid`, `characterid`, `quest`, `status`, `time`, `forfeited`) VALUES (DEFAULT, ?, ?, ?, ?, ?)",
+                    Statement.RETURN_GENERATED_KEYS
+                );
+            try (
+                PreparedStatement psee = con.prepareStatement(
+                    "INSERT INTO questprogress VALUES (DEFAULT, ?, ?, ?)"
+                )
+            ) {
                 ps.setInt(1, ret.id);
                 for (MapleQuestStatus q : ret.quests.values()) {
                     ps.setInt(2, q.getQuest().getId());
@@ -231,15 +328,22 @@ public class PlayerSaveFactory {
                 }
                 ps.close();
             }
-        } catch(SQLException ex) {
-            ex.printStackTrace(); 
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
     }
-    
-    public static void savingCharacterSkills(Player ret, PreparedStatement ps, Connection con) {
+
+    public static void savingCharacterSkills(
+        Player ret,
+        PreparedStatement ps,
+        Connection con
+    ) {
         try {
             DeleteType.SKILL.removeFromType(con, ret.id);
-            ps = con.prepareStatement("INSERT INTO `skills` (`characterid`, `skillid`, `skilllevel`, `masterlevel`) VALUES (?, ?, ?, ?)");
+            ps =
+                con.prepareStatement(
+                    "INSERT INTO `skills` (`characterid`, `skillid`, `skilllevel`, `masterlevel`) VALUES (?, ?, ?, ?)"
+                );
             ps.setInt(1, ret.id);
             for (Entry<PlayerSkill, PlayerSkillEntry> skill : ret.skills.entrySet()) {
                 ps.setInt(2, skill.getKey().getId());
@@ -248,16 +352,23 @@ public class PlayerSaveFactory {
                 ps.executeUpdate();
             }
             ps.close();
-        } catch(SQLException ex) {
-            ex.printStackTrace(); 
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
     }
-    
-    public static void savingCharacterSkillCoolDown(Player ret, PreparedStatement ps, Connection con) {
+
+    public static void savingCharacterSkillCoolDown(
+        Player ret,
+        PreparedStatement ps,
+        Connection con
+    ) {
         try {
             List<PlayerCoolDownValueHolder> cd = ret.getAllCooldowns();
             if (cd.size() > 0) {
-                ps = con.prepareStatement("INSERT INTO `cooldowns` (`charid`, `skillid`, `starttime`, `length`) VALUES (?, ?, ?, ?)");
+                ps =
+                    con.prepareStatement(
+                        "INSERT INTO `cooldowns` (`charid`, `skillid`, `starttime`, `length`) VALUES (?, ?, ?, ?)"
+                    );
                 ps.setInt(1, ret.id);
                 for (final PlayerCoolDownValueHolder cooling : cd) {
                     ps.setInt(2, cooling.skillId);
@@ -268,14 +379,21 @@ public class PlayerSaveFactory {
                 ps.close();
             }
         } catch (SQLException ex) {
-            ex.printStackTrace(); 
+            ex.printStackTrace();
         }
     }
-    
-    public static void savingCharacterKeymap(Player ret, PreparedStatement ps, Connection con) {
+
+    public static void savingCharacterKeymap(
+        Player ret,
+        PreparedStatement ps,
+        Connection con
+    ) {
         try {
             DeleteType.KEYMAP.removeFromType(con, ret.id);
-            ps = con.prepareStatement("INSERT INTO `keymap` (`characterid`, `key`, `type`, `action`) VALUES (?, ?, ?, ?)");
+            ps =
+                con.prepareStatement(
+                    "INSERT INTO `keymap` (`characterid`, `key`, `type`, `action`) VALUES (?, ?, ?, ?)"
+                );
             ps.setInt(1, ret.id);
             for (Entry<Integer, PlayerKeyBinding> keybinding : ret.keymap.entrySet()) {
                 ps.setInt(2, keybinding.getKey().intValue());
@@ -285,33 +403,50 @@ public class PlayerSaveFactory {
             }
             ps.close();
         } catch (SQLException ex) {
-            ex.printStackTrace(); 
+            ex.printStackTrace();
         }
     }
-    
-    public static void savingCharacterSavedLocations(Player ret, PreparedStatement ps, Connection con) {
+
+    public static void savingCharacterSavedLocations(
+        Player ret,
+        PreparedStatement ps,
+        Connection con
+    ) {
         try {
             DeleteType.SAVED_LOCATION.removeFromType(con, ret.id);
-            ps = con.prepareStatement("INSERT INTO `savedlocations` (`characterid`, `locationtype`, `map`) VALUES (?, ?, ?)");
+            ps =
+                con.prepareStatement(
+                    "INSERT INTO `savedlocations` (`characterid`, `locationtype`, `map`) VALUES (?, ?, ?)"
+                );
             ps.setInt(1, ret.id);
             for (SavedLocationType savedLocationType : SavedLocationType.values()) {
                 if (ret.savedLocations[savedLocationType.ordinal()] != -1) {
                     ps.setString(2, savedLocationType.name());
-                    ps.setInt(3, ret.savedLocations[savedLocationType.ordinal()]);
+                    ps.setInt(
+                        3,
+                        ret.savedLocations[savedLocationType.ordinal()]
+                    );
                     ps.executeUpdate();
                 }
             }
             ps.close();
             ret.setChangedSavedLocations(false);
         } catch (SQLException ex) {
-            ex.printStackTrace(); 
+            ex.printStackTrace();
         }
     }
-    
-    public static void savingCharacterBuddy(Player ret, PreparedStatement ps, Connection con) {
+
+    public static void savingCharacterBuddy(
+        Player ret,
+        PreparedStatement ps,
+        Connection con
+    ) {
         try {
             DeleteType.BUDDY_ENTRIES.removeFromType(con, ret.id);
-            ps = con.prepareStatement("INSERT INTO `buddyentries` (owner, `buddyid`) VALUES (?, ?)");
+            ps =
+                con.prepareStatement(
+                    "INSERT INTO `buddyentries` (owner, `buddyid`) VALUES (?, ?)"
+                );
             ps.setInt(1, ret.id);
             for (MapleBuddyListEntry entry : ret.buddyList.getBuddies()) {
                 ps.setInt(2, entry.getCharacterId());
@@ -319,16 +454,23 @@ public class PlayerSaveFactory {
             }
             ps.close();
         } catch (SQLException ex) {
-            ex.printStackTrace(); 
+            ex.printStackTrace();
         }
     }
-    
-    public static void savingCharacterTrockLocations(Player ret, PreparedStatement ps, Connection con) {
+
+    public static void savingCharacterTrockLocations(
+        Player ret,
+        PreparedStatement ps,
+        Connection con
+    ) {
         try {
             DeleteType.TROCK_LOCATIONS.removeFromType(con, ret.id);
             for (int i = 0; i < ret.rocks.length; i++) {
                 if (ret.rocks[i] != MapConstants.NULL_MAP) {
-                    ps = con.prepareStatement("INSERT INTO `trocklocations` (`characterid`, `mapid`) VALUES(?, ?) ");
+                    ps =
+                        con.prepareStatement(
+                            "INSERT INTO `trocklocations` (`characterid`, `mapid`) VALUES(?, ?) "
+                        );
                     ps.setInt(1, ret.id);
                     ps.setInt(2, ret.rocks[i]);
                     ps.execute();
@@ -337,16 +479,23 @@ public class PlayerSaveFactory {
             }
             ret.setChangedTrockLocations(false);
         } catch (SQLException ex) {
-            ex.printStackTrace(); 
+            ex.printStackTrace();
         }
     }
-    
-    public static void savingCharacterRegRockLocations(Player ret, PreparedStatement ps, Connection con) {
+
+    public static void savingCharacterRegRockLocations(
+        Player ret,
+        PreparedStatement ps,
+        Connection con
+    ) {
         try {
             DeleteType.REG_LOCATIONS.removeFromType(con, ret.id);
             for (int i = 0; i < ret.regrocks.length; i++) {
                 if (ret.regrocks[i] != MapConstants.NULL_MAP) {
-                    ps = con.prepareStatement("INSERT INTO `regrocklocations` (`characterid`, `mapid`) VALUES(?, ?) ");
+                    ps =
+                        con.prepareStatement(
+                            "INSERT INTO `regrocklocations` (`characterid`, `mapid`) VALUES(?, ?) "
+                        );
                     ps.setInt(1, ret.id);
                     ps.setInt(2, ret.regrocks[i]);
                     ps.execute();
@@ -355,10 +504,10 @@ public class PlayerSaveFactory {
             }
             ret.setChangedRegrockLocations(false);
         } catch (SQLException ex) {
-            ex.printStackTrace(); 
+            ex.printStackTrace();
         }
     }
-    
+
     public static void savingCharacterInventory(Player ret) {
         try {
             List<Pair<Item, InventoryType>> itemsWithType = new ArrayList<>();
@@ -369,7 +518,7 @@ public class PlayerSaveFactory {
             }
             ItemFactory.INVENTORY.saveItems(itemsWithType, ret.id);
         } catch (SQLException ex) {
-            ex.printStackTrace(); 
+            ex.printStackTrace();
         }
     }
 }

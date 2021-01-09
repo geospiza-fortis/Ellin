@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
 					   Matthias Butz <matze@odinms.de>
 					   Jan Christian Meyer <vimes@odinms.de>
 
@@ -21,12 +21,12 @@
 */
 
 /* @Author Lerk
- * 
+ *
  * 2221002.js: KFT Reactor - Green King Goblin
- * 
-*/
+ *
+ */
 
-function act(){
-	rm.spawnMonster(7130402, -340, 100);
-	rm.mapMessage(5, "Ai vem o Verde Rei dos Duendes!");
+function act() {
+    rm.spawnMonster(7130402, -340, 100);
+    rm.mapMessage(5, "Ai vem o Verde Rei dos Duendes!");
 }

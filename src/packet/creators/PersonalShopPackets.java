@@ -17,8 +17,12 @@ import server.minirooms.PlayerShopItem;
 import server.minirooms.components.SoldItem;
 
 public class PersonalShopPackets {
-    
-    public static void AddAnnounceBox(WritingPacket wp, PlayerShop shop, int availability) {
+
+    public static void AddAnnounceBox(
+        WritingPacket wp,
+        PlayerShop shop,
+        int availability
+    ) {
         wp.write(4);
         wp.writeInt(shop.getObjectId());
         wp.writeMapleAsciiString(shop.getDescription());
@@ -28,7 +32,7 @@ public class PersonalShopPackets {
         wp.write(availability);
         wp.writeBool(false);
     }
-    
+
     public static OutPacket AddCharBox(Player c, int type) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.UPDATE_CHAR_BOX.getValue());
@@ -36,7 +40,7 @@ public class PersonalShopPackets {
         AddAnnounceBox(wp, c.getPlayerShop(), type);
         return wp.getPacket();
     }
-    
+
     public static OutPacket RemoveCharBox(Player p) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.UPDATE_CHAR_BOX.getValue());
@@ -44,7 +48,7 @@ public class PersonalShopPackets {
         wp.write(0);
         return wp.getPacket();
     }
-    
+
     public static OutPacket GetPlayerShopRemoveVisitor(int slot) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
@@ -54,7 +58,7 @@ public class PersonalShopPackets {
         }
         return wp.getPacket();
     }
-    
+
     public static OutPacket ShopErrorMessage(int error, int type) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
@@ -63,7 +67,7 @@ public class PersonalShopPackets {
         wp.write(error);
         return wp.getPacket();
     }
-    
+
     public static OutPacket ShopChat(String message, int slot) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
@@ -73,7 +77,7 @@ public class PersonalShopPackets {
         wp.writeMapleAsciiString(message);
         return wp.getPacket();
     }
-    
+
     public static OutPacket GetPlayerShopNewVisitor(Player c, int slot) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
@@ -83,7 +87,7 @@ public class PersonalShopPackets {
         wp.writeMapleAsciiString(c.getName());
         return wp.getPacket();
     }
-    
+
     public static OutPacket GetPlayerShop(PlayerShop shop, boolean owner) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
@@ -91,8 +95,8 @@ public class PersonalShopPackets {
         wp.write(4);
         wp.write(4);
         wp.write(owner ? 0 : 1);
-        
-         if (owner) {
+
+        if (owner) {
             List<SoldItem> sold = shop.getSold();
             wp.write(sold.size());
             for (SoldItem s : sold) {
@@ -107,16 +111,16 @@ public class PersonalShopPackets {
 
         PacketCreator.AddCharLook(wp, shop.getOwner(), false);
         wp.writeMapleAsciiString(shop.getOwner().getName());
-        
+
         Player visitors[] = shop.getVisitors();
         for (int i = 0; i < 3; i++) {
-            if(visitors[i] != null) {
+            if (visitors[i] != null) {
                 wp.write(i + 1);
                 PacketCreator.AddCharLook(wp, visitors[i], false);
                 wp.writeMapleAsciiString(visitors[i].getName());
             }
         }
-        
+
         wp.write(0xFF);
         wp.writeMapleAsciiString(shop.getDescription());
         List<PlayerShopItem> items = shop.getItems();
@@ -130,7 +134,7 @@ public class PersonalShopPackets {
         }
         return wp.getPacket();
     }
-     
+
     public static OutPacket ShopItemUpdate(PlayerShop shop) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
@@ -145,7 +149,10 @@ public class PersonalShopPackets {
         return wp.getPacket();
     }
 
-    public static OutPacket GetPlayerShopOwnerUpdate(SoldItem item, int position) {
+    public static OutPacket GetPlayerShopOwnerUpdate(
+        SoldItem item,
+        int position
+    ) {
         WritingPacket mplew = new WritingPacket();
         mplew.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
         mplew.write(PlayerInteractionHeaders.ACT_SHOP_ITEM_UPDATE);

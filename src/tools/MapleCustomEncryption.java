@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -23,12 +23,13 @@ package tools;
 
 /**
  * Provides MapleStory's custom encryption routines.
- * 
+ *
  * @author Frz
  * @since Revision 211
  * @version 1.0
  */
 public class MapleCustomEncryption {
+
     private static byte rollLeft(byte in, int count) {
         int tmp = (int) in & 0xFF;
         tmp = tmp << (count % 8);

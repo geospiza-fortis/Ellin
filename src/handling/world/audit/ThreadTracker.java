@@ -39,162 +39,191 @@ import tools.FileLogger;
 import tools.TimerTools.MiscTimer;
 import tools.locks.MonitoredLockType;
 
-
 /**
  *
  * @author RonanLana
- * 
+ *
  * This tool has the main purpose of auditing deadlocks throughout the server and must be used only for debugging. The flag is USE_THREAD_TRACKER.
  */
 public class ThreadTracker {
+
     private static ThreadTracker instance = null;
     private final Lock ttLock = new ReentrantLock(true);
-    
+
     private final Map<Long, List<MonitoredLockType>> threadTracker = new HashMap<>();
     private final Map<Long, Integer> threadUpdate = new HashMap<>();
     private final Map<Long, Thread> threads = new HashMap<>();
-    
+
     private final Map<Long, AtomicInteger> lockCount = new HashMap<>();
     private final Map<Long, MonitoredLockType> lockIds = new HashMap<>();
     private final Map<Long, Long> lockThreads = new HashMap<>();
     private final Map<Long, Byte> lockUpdate = new HashMap<>();
-    
+
     private final Map<MonitoredLockType, Map<Long, Integer>> locks = new HashMap<>();
     ScheduledFuture<?> threadTrackerSchedule;
-    
+
     private String printThreadTrackerState(String dateFormat) {
-        
         Map<MonitoredLockType, List<Integer>> lockValues = new HashMap<>();
         Set<Long> executingThreads = new HashSet<>();
-        
-        for(Map.Entry<Long, AtomicInteger> lc : lockCount.entrySet()) {
-            if(lc.getValue().get() != 0) {
+
+        for (Map.Entry<Long, AtomicInteger> lc : lockCount.entrySet()) {
+            if (lc.getValue().get() != 0) {
                 executingThreads.add(lockThreads.get(lc.getKey()));
-                
+
                 MonitoredLockType lockId = lockIds.get(lc.getKey());
                 List<Integer> list = lockValues.get(lockId);
-                
-                if(list == null) {
+
+                if (list == null) {
                     list = new ArrayList<>();
                     lockValues.put(lockId, list);
                 }
-                
+
                 list.add(lc.getValue().get());
             }
         }
-        
-        
+
         String s = "----------------------------\r\n" + dateFormat + "\r\n    ";
         s += "Lock-thread usage count:";
-        for(Map.Entry<MonitoredLockType, List<Integer>> lock : lockValues.entrySet()) {
+        for (Map.Entry<MonitoredLockType, List<Integer>> lock : lockValues.entrySet()) {
             s += ("\r\n  " + lock.getKey().name() + ": ");
-            
-            for(Integer i : lock.getValue()) {
+
+            for (Integer i : lock.getValue()) {
                 s += (i + " ");
             }
         }
         s += "\r\n\r\nThread opened lock path:";
-        
-        for(Long tid : executingThreads) {
+
+        for (Long tid : executingThreads) {
             s += "\r\n";
-            for(MonitoredLockType lockid : threadTracker.get(tid)) {
+            for (MonitoredLockType lockid : threadTracker.get(tid)) {
                 s += (lockid.name() + " ");
             }
             s += "|";
         }
-        
+
         s += "\r\n\r\n";
-        
+
         return s;
     }
-    
-    private static String printThreadLog(List<MonitoredLockType> stillLockedPath, String dateFormat) {
+
+    private static String printThreadLog(
+        List<MonitoredLockType> stillLockedPath,
+        String dateFormat
+    ) {
         String s = "----------------------------\r\n" + dateFormat + "\r\n    ";
-        for(MonitoredLockType lock : stillLockedPath) {
+        for (MonitoredLockType lock : stillLockedPath) {
             s += (lock.name() + " ");
         }
         s += "\r\n\r\n";
-        
+
         return s;
     }
-    
-    private static String printThreadStack(StackTraceElement[] list, String dateFormat) {
+
+    private static String printThreadStack(
+        StackTraceElement[] list,
+        String dateFormat
+    ) {
         String s = "----------------------------\r\n" + dateFormat + "\r\n";
-        for(int i = 0; i < list.length; i++) {
+        for (int i = 0; i < list.length; i++) {
             s += ("    " + list[i].toString() + "\r\n");
         }
-        
+
         return s;
     }
-    
-    public void accessThreadTracker(boolean update, boolean lock, MonitoredLockType lockId, long lockOid) {
+
+    public void accessThreadTracker(
+        boolean update,
+        boolean lock,
+        MonitoredLockType lockId,
+        long lockOid
+    ) {
         ttLock.lock();
         try {
-            if(update) {
-                if(!lock) { // update tracker
+            if (update) {
+                if (!lock) { // update tracker
                     List<Long> toRemove = new ArrayList<>();
 
-                    for(Long l : threadUpdate.keySet()) {
+                    for (Long l : threadUpdate.keySet()) {
                         int next = threadUpdate.get(l) + 1;
-                        if(next == 4) {
+                        if (next == 4) {
                             List<MonitoredLockType> tt = threadTracker.get(l);
 
-                            if(tt.isEmpty()) {
+                            if (tt.isEmpty()) {
                                 toRemove.add(l);
                             } else {
-                                DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-                                dateFormat.setTimeZone(TimeZone.getTimeZone(GameConstants.TIMEZONE));
+                                DateFormat dateFormat = new SimpleDateFormat(
+                                    "dd-MM-yyyy HH:mm:ss"
+                                );
+                                dateFormat.setTimeZone(
+                                    TimeZone.getTimeZone(GameConstants.TIMEZONE)
+                                );
                                 String df = dateFormat.format(new Date());
 
-                                FileLogger.print(FileLogger.DEADLOCK_LOCKS, printThreadLog(tt, df));
-                                FileLogger.print(FileLogger.DEADLOCK_STACK, printThreadStack(threads.get(l).getStackTrace(), df));
+                                FileLogger.print(
+                                    FileLogger.DEADLOCK_LOCKS,
+                                    printThreadLog(tt, df)
+                                );
+                                FileLogger.print(
+                                    FileLogger.DEADLOCK_STACK,
+                                    printThreadStack(
+                                        threads.get(l).getStackTrace(),
+                                        df
+                                    )
+                                );
                             }
                         }
 
                         threadUpdate.put(l, next);
                     }
 
-                    for(Long l : toRemove) {
+                    for (Long l : toRemove) {
                         threadTracker.remove(l);
                         threadUpdate.remove(l);
                         threads.remove(l);
 
-                        for(Map<Long, Integer> threadLock : locks.values()) {
+                        for (Map<Long, Integer> threadLock : locks.values()) {
                             threadLock.remove(l);
                         }
                     }
 
                     toRemove.clear();
 
-                    for(Entry<Long, Byte> it : lockUpdate.entrySet()) {
-                        byte val = (byte)(it.getValue() + 1);
+                    for (Entry<Long, Byte> it : lockUpdate.entrySet()) {
+                        byte val = (byte) (it.getValue() + 1);
 
-                        if(val < 60) {
+                        if (val < 60) {
                             lockUpdate.put(it.getKey(), val);
                         } else {
-                            toRemove.add(it.getKey());  // free the structure after 60 silent updates
+                            toRemove.add(it.getKey()); // free the structure after 60 silent updates
                         }
                     }
 
-                    for(Long l : toRemove) {
+                    for (Long l : toRemove) {
                         lockCount.remove(l);
                         lockIds.remove(l);
                         lockThreads.remove(l);
                         lockUpdate.remove(l);
                     }
-                } else {    // print status
-                    DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-                    dateFormat.setTimeZone(TimeZone.getTimeZone(GameConstants.TIMEZONE));
+                } else { // print status
+                    DateFormat dateFormat = new SimpleDateFormat(
+                        "dd-MM-yyyy HH:mm:ss"
+                    );
+                    dateFormat.setTimeZone(
+                        TimeZone.getTimeZone(GameConstants.TIMEZONE)
+                    );
 
-                    FileLogger.printError(FileLogger.DEADLOCK_STATE, printThreadTrackerState(dateFormat.format(new Date())));
+                    FileLogger.printError(
+                        FileLogger.DEADLOCK_STATE,
+                        printThreadTrackerState(dateFormat.format(new Date()))
+                    );
                     //FilePrinter.printError(FilePrinter.DEADLOCK_STATE, "[" + dateFormat.format(new Date()) + "] Presenting current lock path for lockid " + lockId.name() + ".\r\n" + printLockStatus(lockId) + "\r\n-------------------------------\r\n");
                 }
             } else {
                 long tid = Thread.currentThread().getId();
 
-                if(lock) {
+                if (lock) {
                     AtomicInteger c = lockCount.get(lockOid);
-                    if(c == null) {
+                    if (c == null) {
                         c = new AtomicInteger(0);
                         lockCount.put(lockOid, c);
                         lockIds.put(lockOid, lockId);
@@ -204,37 +233,36 @@ public class ThreadTracker {
                     c.incrementAndGet();
 
                     List<MonitoredLockType> list = threadTracker.get(tid);
-                    if(list == null) {
+                    if (list == null) {
                         list = new ArrayList<>(5);
                         threadTracker.put(tid, list);
                         threadUpdate.put(tid, 0);
                         threads.put(tid, Thread.currentThread());
-                    } else if(list.isEmpty()) {
+                    } else if (list.isEmpty()) {
                         threadUpdate.put(tid, 0);
                     }
                     list.add(lockId);
 
                     Map<Long, Integer> threadLock = locks.get(lockId);
-                    if(threadLock == null) {
+                    if (threadLock == null) {
                         threadLock = new HashMap<>(5);
                         locks.put(lockId, threadLock);
                     }
 
                     Integer lc = threadLock.get(tid);
-                    if(lc != null) {
+                    if (lc != null) {
                         threadLock.put(tid, lc + 1);
                     } else {
                         threadLock.put(tid, 1);
                     }
-                }
-                else {
+                } else {
                     AtomicInteger c = lockCount.get(lockOid);
                     c.decrementAndGet();
                     lockUpdate.put(lockOid, (byte) 0);
 
                     List<MonitoredLockType> list = threadTracker.get(tid);
-                    for(int i = list.size() - 1; i >= 0; i--) {
-                        if(lockId.getValue() == list.get(i).getValue()) {
+                    for (int i = list.size() - 1; i >= 0; i--) {
+                        if (lockId.getValue() == list.get(i).getValue()) {
                             list.remove(i);
                             break;
                         }
@@ -248,34 +276,46 @@ public class ThreadTracker {
             ttLock.unlock();
         }
     }
-    
+
     private String printLockStatus(MonitoredLockType lockId) {
         String s = "";
-        
-        for(Long threadid : locks.get(lockId).keySet()) {
-            for(MonitoredLockType lockid : threadTracker.get(threadid)) {
+
+        for (Long threadid : locks.get(lockId).keySet()) {
+            for (MonitoredLockType lockid : threadTracker.get(threadid)) {
                 s += ("  " + lockid.name());
             }
-            
+
             s += " |\r\n";
         }
-        
+
         return s;
     }
-    
+
     public void registerThreadTrackerTask() {
-        threadTrackerSchedule = MiscTimer.getInstance().register(new Runnable() {
-            @Override
-            public void run() {
-                accessThreadTracker(true, false, MonitoredLockType.UNDEFINED, -1);
-            }
-        }, 10000, 10000);
+        threadTrackerSchedule =
+            MiscTimer
+                .getInstance()
+                .register(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            accessThreadTracker(
+                                true,
+                                false,
+                                MonitoredLockType.UNDEFINED,
+                                -1
+                            );
+                        }
+                    },
+                    10000,
+                    10000
+                );
     }
-    
+
     public void cancelThreadTrackerTask() {
         threadTrackerSchedule.cancel(false);
     }
-    
+
     public static ThreadTracker getInstance() {
         if (instance == null) {
             instance = new ThreadTracker();

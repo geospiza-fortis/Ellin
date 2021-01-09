@@ -1,6 +1,6 @@
-/* 
+/*
  * This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -32,7 +32,6 @@ function enter(pi) {
         pi.playPortalSound();
         pi.warp(990000600, 1);
         return true;
-    } else
-        pi.getPlayer().dropMessage(5, "This way forward is not open yet.");
+    } else pi.getPlayer().dropMessage(5, "This way forward is not open yet.");
     return false;
 }

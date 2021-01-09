@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -22,18 +22,17 @@
 package server.maps.portal;
 
 import java.awt.Point;
-
 import provider.MapleData;
 import provider.MapleDataTool;
 
 public class PortalFactory {
-    
+
     private int nextDoorPortal;
 
     public PortalFactory() {
         nextDoorPortal = 0x80;
     }
-	
+
     public Portal makePortal(int type, MapleData portal) {
         GenericPortal ret = null;
         if (type == Portal.MAP_PORTAL) {
@@ -44,12 +43,21 @@ public class PortalFactory {
         loadPortal(ret, portal);
         return ret;
     }
-	
+
     private void loadPortal(GenericPortal myPortal, MapleData portal) {
         myPortal.setName(MapleDataTool.getString(portal.getChildByPath("pn")));
-        myPortal.setTarget(MapleDataTool.getString(portal.getChildByPath("tn")));
-        myPortal.setTargetMapId(MapleDataTool.getInt(portal.getChildByPath("tm")));
-        myPortal.setPosition(new Point(MapleDataTool.getInt(portal.getChildByPath("x")), MapleDataTool.getInt(portal.getChildByPath("y"))));
+        myPortal.setTarget(
+            MapleDataTool.getString(portal.getChildByPath("tn"))
+        );
+        myPortal.setTargetMapId(
+            MapleDataTool.getInt(portal.getChildByPath("tm"))
+        );
+        myPortal.setPosition(
+            new Point(
+                MapleDataTool.getInt(portal.getChildByPath("x")),
+                MapleDataTool.getInt(portal.getChildByPath("y"))
+            )
+        );
         String script = MapleDataTool.getString("script", portal, null);
         if (script != null && script.equals("")) {
             script = null;

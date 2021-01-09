@@ -1,6 +1,6 @@
 /*
 This file is part of the OdinMS Maple Story Server
-Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc> 
+Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc>
 Matthias Butz <matze@odinms.de>
 Jan Christian Meyer <vimes@odinms.de>
 
@@ -30,13 +30,20 @@ import provider.MapleDataEntity;
 import provider.MapleDataEntry;
 import provider.MapleDataFileEntry;
 
-public class WZDirectoryEntry extends WZEntry implements MapleDataDirectoryEntry {
+public class WZDirectoryEntry
+    extends WZEntry
+    implements MapleDataDirectoryEntry {
 
     private List<MapleDataDirectoryEntry> subdirs = new ArrayList<>();
     private List<MapleDataFileEntry> files = new ArrayList<>();
     private Map<String, MapleDataEntry> entries = new HashMap<>();
 
-    public WZDirectoryEntry(String name, int size, int checksum, MapleDataEntity parent) {
+    public WZDirectoryEntry(
+        String name,
+        int size,
+        int checksum,
+        MapleDataEntity parent
+    ) {
         super(name, size, checksum, parent);
     }
 

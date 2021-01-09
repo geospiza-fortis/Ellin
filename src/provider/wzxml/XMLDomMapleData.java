@@ -1,6 +1,6 @@
 /*
 This file is part of the OdinMS Maple Story Server
-Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc> 
+Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc>
 Matthias Butz <matze@odinms.de>
 Jan Christian Meyer <vimes@odinms.de>
 
@@ -28,19 +28,16 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
-import provider.MapleData;
-import provider.MapleDataEntity;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import provider.MapleData;
+import provider.MapleDataEntity;
 import tools.FileLogger;
 
 public class XMLDomMapleData implements MapleData, Serializable {
@@ -58,7 +55,6 @@ public class XMLDomMapleData implements MapleData, Serializable {
             DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
             Document document = documentBuilder.parse(fis);
             this.node = document.getFirstChild();
-
         } catch (ParserConfigurationException | SAXException | IOException e) {
             throw new RuntimeException(e);
         }
@@ -69,7 +65,9 @@ public class XMLDomMapleData implements MapleData, Serializable {
     public MapleData getChildByPath(final String path) {
         final String segments[] = path.split("/");
         if (segments[0].equals("..")) {
-            return ((MapleData) getParent()).getChildByPath(path.substring(path.indexOf("/") + 1));
+            return ((MapleData) getParent()).getChildByPath(
+                    path.substring(path.indexOf("/") + 1)
+                );
         }
 
         Node myNode = node;
@@ -79,7 +77,15 @@ public class XMLDomMapleData implements MapleData, Serializable {
             for (int i = 0; i < childNodes.getLength(); i++) {
                 try {
                     final Node childNode = childNodes.item(i);
-                    if (childNode != null && childNode.getNodeType() == Node.ELEMENT_NODE && childNode.getAttributes().getNamedItem("name").getNodeValue().equals(segment)) {
+                    if (
+                        childNode != null &&
+                        childNode.getNodeType() == Node.ELEMENT_NODE &&
+                        childNode
+                            .getAttributes()
+                            .getNamedItem("name")
+                            .getNodeValue()
+                            .equals(segment)
+                    ) {
                         myNode = childNode;
                         foundChild = true;
                         break;
@@ -93,7 +99,8 @@ public class XMLDomMapleData implements MapleData, Serializable {
             }
         }
         final XMLDomMapleData ret = new XMLDomMapleData(myNode);
-        ret.imageDataDir = new File(imageDataDir, getName() + "/" + path).getParentFile();
+        ret.imageDataDir =
+            new File(imageDataDir, getName() + "/" + path).getParentFile();
         return ret;
     }
 
@@ -103,7 +110,10 @@ public class XMLDomMapleData implements MapleData, Serializable {
         final NodeList childNodes = node.getChildNodes();
         for (int i = 0; i < childNodes.getLength(); i++) {
             final Node childNode = childNodes.item(i);
-            if (childNode != null && childNode.getNodeType() == Node.ELEMENT_NODE) {
+            if (
+                childNode != null &&
+                childNode.getNodeType() == Node.ELEMENT_NODE
+            ) {
                 final XMLDomMapleData child = new XMLDomMapleData(childNode);
                 child.imageDataDir = new File(imageDataDir, getName());
                 ret.add(child);
@@ -117,28 +127,66 @@ public class XMLDomMapleData implements MapleData, Serializable {
         final NamedNodeMap attributes = node.getAttributes();
         final MapleDataType type = getType();
         switch (type) {
-            case DOUBLE: {
-                return Double.valueOf(Double.parseDouble(attributes.getNamedItem("value").getNodeValue()));
-            }
-            case FLOAT: {
-                return Float.valueOf(Float.parseFloat(attributes.getNamedItem("value").getNodeValue()));
-            }
-            case INT: {
-                return Integer.valueOf(Integer.parseInt(attributes.getNamedItem("value").getNodeValue()));
-            }
-            case SHORT: {
-                return Short.valueOf(Short.parseShort(attributes.getNamedItem("value").getNodeValue()));
-            }
+            case DOUBLE:
+                {
+                    return Double.valueOf(
+                        Double.parseDouble(
+                            attributes.getNamedItem("value").getNodeValue()
+                        )
+                    );
+                }
+            case FLOAT:
+                {
+                    return Float.valueOf(
+                        Float.parseFloat(
+                            attributes.getNamedItem("value").getNodeValue()
+                        )
+                    );
+                }
+            case INT:
+                {
+                    return Integer.valueOf(
+                        Integer.parseInt(
+                            attributes.getNamedItem("value").getNodeValue()
+                        )
+                    );
+                }
+            case SHORT:
+                {
+                    return Short.valueOf(
+                        Short.parseShort(
+                            attributes.getNamedItem("value").getNodeValue()
+                        )
+                    );
+                }
             case STRING:
-            case UOL: {
-                return attributes.getNamedItem("value").getNodeValue();
-            }
-            case VECTOR: {
-                return new Point(Integer.parseInt(attributes.getNamedItem("x").getNodeValue()), Integer.parseInt(attributes.getNamedItem("y").getNodeValue()));
-            }
-            case CANVAS: {
-                return new FileStoredPngMapleCanvas(Integer.parseInt(attributes.getNamedItem("width").getNodeValue()), Integer.parseInt(attributes.getNamedItem("height").getNodeValue()), new File(imageDataDir, getName() + ".png"));
-            }
+            case UOL:
+                {
+                    return attributes.getNamedItem("value").getNodeValue();
+                }
+            case VECTOR:
+                {
+                    return new Point(
+                        Integer.parseInt(
+                            attributes.getNamedItem("x").getNodeValue()
+                        ),
+                        Integer.parseInt(
+                            attributes.getNamedItem("y").getNodeValue()
+                        )
+                    );
+                }
+            case CANVAS:
+                {
+                    return new FileStoredPngMapleCanvas(
+                        Integer.parseInt(
+                            attributes.getNamedItem("width").getNodeValue()
+                        ),
+                        Integer.parseInt(
+                            attributes.getNamedItem("height").getNodeValue()
+                        ),
+                        new File(imageDataDir, getName() + ".png")
+                    );
+                }
         }
         return null;
     }

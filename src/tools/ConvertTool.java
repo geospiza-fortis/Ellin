@@ -18,13 +18,17 @@ import javax.script.Bindings;
  * Thanks Stackoverflow (https://stackoverflow.com/questions/22492641/)
  */
 public class ConvertTool {
-    
-    private static org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ConvertTool.class);
-    
-    public static List<MaplePartyCharacter> ConvertFromScriptArray(final Object obj){
+
+    private static org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(
+        ConvertTool.class
+    );
+
+    public static List<MaplePartyCharacter> ConvertFromScriptArray(
+        final Object obj
+    ) {
         List<MaplePartyCharacter> returnList = new ArrayList<>();
 
-        if (obj == null){
+        if (obj == null) {
             returnList.add(null);
             return returnList;
         }
@@ -36,18 +40,24 @@ public class ConvertTool {
 
         if (obj instanceof List<?>) {
             final List<?> list = (List<?>) obj;
-            returnList.addAll(list.stream().map(new Function<Object, MaplePartyCharacter>() {
-
-                @Override
-                public MaplePartyCharacter apply(Object t) {
-                    return (MaplePartyCharacter) t;
-                }
-            }).collect(Collectors.toList()));
+            returnList.addAll(
+                list
+                    .stream()
+                    .map(
+                        new Function<Object, MaplePartyCharacter>() {
+                            @Override
+                            public MaplePartyCharacter apply(Object t) {
+                                return (MaplePartyCharacter) t;
+                            }
+                        }
+                    )
+                    .collect(Collectors.toList())
+            );
             return returnList;
         }
 
-        if (obj.getClass().isArray()){
-            Object[] array = (Object[])obj;
+        if (obj.getClass().isArray()) {
+            Object[] array = (Object[]) obj;
             for (Object anArray : array) {
                 returnList.add((MaplePartyCharacter) anArray);
             }
@@ -58,9 +68,14 @@ public class ConvertTool {
         return returnList;
     }
 
-    private static void FlatArray(List<MaplePartyCharacter> returnList, Object partialArray){
+    private static void FlatArray(
+        List<MaplePartyCharacter> returnList,
+        Object partialArray
+    ) {
         try {
-            final Class<?> cls = Class.forName("jdk.nashorn.api.scripting.ScriptObjectMirror");
+            final Class<?> cls = Class.forName(
+                "jdk.nashorn.api.scripting.ScriptObjectMirror"
+            );
             if (cls.isAssignableFrom(partialArray.getClass())) {
                 final Method isArray = cls.getMethod("isArray");
                 final Object result = isArray.invoke(partialArray);
@@ -69,24 +84,30 @@ public class ConvertTool {
                     final Object vals = values.invoke(partialArray);
                     if (vals instanceof Collection<?>) {
                         final Collection<?> coll = (Collection<?>) vals;
-                        for(Object el : coll) {
+                        for (Object el : coll) {
                             if (cls.isAssignableFrom(el.getClass())) {
                                 FlatArray(returnList, el);
-                            }
-                            else{
+                            } else {
                                 returnList.add((MaplePartyCharacter) el);
                             }
                         }
                     }
                 }
             }
-        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ignored) {}
+        } catch (
+            ClassNotFoundException
+            | NoSuchMethodException
+            | SecurityException
+            | IllegalAccessException
+            | IllegalArgumentException
+            | InvocationTargetException ignored
+        ) {}
     }
-    
-    public static List<Integer> ConvertFromScriptInt(final Object obj){
+
+    public static List<Integer> ConvertFromScriptInt(final Object obj) {
         List<Integer> returnList = new ArrayList<>();
 
-        if (obj == null){
+        if (obj == null) {
             returnList.add(null);
             return returnList;
         }
@@ -98,18 +119,24 @@ public class ConvertTool {
 
         if (obj instanceof List<?>) {
             final List<?> list = (List<?>) obj;
-            returnList.addAll(list.stream().map(new Function<Object, Integer>() {
-
-                @Override
-                public Integer apply(Object t) {
-                  return (Integer) t;
-                }
-            }).collect(Collectors.toList()));
+            returnList.addAll(
+                list
+                    .stream()
+                    .map(
+                        new Function<Object, Integer>() {
+                            @Override
+                            public Integer apply(Object t) {
+                                return (Integer) t;
+                            }
+                        }
+                    )
+                    .collect(Collectors.toList())
+            );
             return returnList;
         }
 
-        if (obj.getClass().isArray()){
-            Object[] array = (Object[])obj;
+        if (obj.getClass().isArray()) {
+            Object[] array = (Object[]) obj;
             for (Object anArray : array) {
                 returnList.add((Integer) anArray);
             }
@@ -119,10 +146,15 @@ public class ConvertTool {
         returnList.add((Integer) obj);
         return returnList;
     }
-    
-     private static void FloatArrayInt(List<Integer> returnList, Object partialArray){
+
+    private static void FloatArrayInt(
+        List<Integer> returnList,
+        Object partialArray
+    ) {
         try {
-            final Class<?> cls = Class.forName("jdk.nashorn.api.scripting.ScriptObjectMirror");
+            final Class<?> cls = Class.forName(
+                "jdk.nashorn.api.scripting.ScriptObjectMirror"
+            );
             if (cls.isAssignableFrom(partialArray.getClass())) {
                 final Method isArray = cls.getMethod("isArray");
                 final Object result = isArray.invoke(partialArray);
@@ -131,17 +163,23 @@ public class ConvertTool {
                     final Object vals = values.invoke(partialArray);
                     if (vals instanceof Collection<?>) {
                         final Collection<?> coll = (Collection<?>) vals;
-                        for(Object el : coll) {
+                        for (Object el : coll) {
                             if (cls.isAssignableFrom(el.getClass())) {
                                 FloatArrayInt(returnList, el);
-                            }
-                            else{
+                            } else {
                                 returnList.add((Integer) el);
                             }
                         }
                     }
                 }
             }
-        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ignored) {}
+        } catch (
+            ClassNotFoundException
+            | NoSuchMethodException
+            | SecurityException
+            | IllegalAccessException
+            | IllegalArgumentException
+            | InvocationTargetException ignored
+        ) {}
     }
 }

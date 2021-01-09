@@ -29,7 +29,7 @@
 var status = 0;
 
 function start() {
-    cm.sendYesNo("Voce deseja ir para deixar o barco?");
+    cm.sendYesNo("Do you want to go to leave the boat?");
 }
 
 function action(mode, type, selection) {
@@ -39,7 +39,7 @@ function action(mode, type, selection) {
         cm.dispose();
     }
     if (status == 1) {
-        cm.sendOk("Tudo bem, vejo voce na proxima vez.");
+        cm.sendOk("Okay, see you next time.");
     } else if (status == 2) {
         if (cm.getPlayer().getMap().getId() == 101000301) {
             cm.warp(101000300, 0);

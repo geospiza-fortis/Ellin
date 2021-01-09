@@ -1,6 +1,6 @@
 /*
 This file is part of the ZeroFusion MapleStory Server
-Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
 Matthias Butz <matze@odinms.de>
 Jan Christian Meyer <vimes@odinms.de>
 ZeroFusion organized by "RMZero213" <RMZero213@hotmail.com>
@@ -39,18 +39,18 @@ import packet.transfer.write.OutPacket;
 public class MapleGuildAlliance implements Serializable {
 
     private static enum GAOp {
-        NONE, 
-        DISBAND, 
-        NEWGUILD 
+        NONE,
+        DISBAND,
+        NEWGUILD,
     }
-    
+
     public static final long serialVersionUID = 24081985245L;
     public static final int CHANGE_CAPACITY_COST = 10000000;
     private final int[] guilds = new int[5];
     private int allianceid;
     private int leaderid;
     private int channel;
-    private int capacity; 
+    private int capacity;
     private String name, notice;
     private String ranks[] = new String[5];
 
@@ -58,7 +58,11 @@ public class MapleGuildAlliance implements Serializable {
         super();
         this.channel = channel;
         try {
-            try (PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement("SELECT * FROM alliances WHERE id = ?")) {
+            try (
+                PreparedStatement ps = DatabaseConnection
+                    .getConnection()
+                    .prepareStatement("SELECT * FROM alliances WHERE id = ?")
+            ) {
                 ps.setInt(1, id);
                 try (ResultSet rs = ps.executeQuery()) {
                     if (!rs.first()) {
@@ -79,7 +83,9 @@ public class MapleGuildAlliance implements Serializable {
                 }
             }
         } catch (SQLException se) {
-            System.err.println("unable to read guild information from sql " + se);
+            System.err.println(
+                "unable to read guild information from sql " + se
+            );
         }
     }
 
@@ -87,8 +93,12 @@ public class MapleGuildAlliance implements Serializable {
         final Collection<MapleGuildAlliance> ret = new ArrayList<>();
         MapleGuildAlliance g;
         try {
-            try (PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement("SELECT id FROM alliances"); 
-                ResultSet rs = ps.executeQuery()) {
+            try (
+                PreparedStatement ps = DatabaseConnection
+                    .getConnection()
+                    .prepareStatement("SELECT id FROM alliances");
+                ResultSet rs = ps.executeQuery()
+            ) {
                 while (rs.next()) {
                     g = new MapleGuildAlliance(rs.getInt("id"), 0);
                     if (g.getId() > 0) {
@@ -97,7 +107,9 @@ public class MapleGuildAlliance implements Serializable {
                 }
             }
         } catch (SQLException se) {
-            System.err.println("unable to read guild information from sql " + se);
+            System.err.println(
+                "unable to read guild information from sql " + se
+            );
         }
         return ret;
     }
@@ -112,13 +124,20 @@ public class MapleGuildAlliance implements Serializable {
         return ret;
     }
 
-    public static final int createToDb(final int leaderId, final String name, final int guild1, final int guild2) {
+    public static final int createToDb(
+        final int leaderId,
+        final String name,
+        final int guild1,
+        final int guild2
+    ) {
         int ret = -1;
         if (name.length() > 12) {
             return ret;
         }
         try {
-            PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement("SELECT id FROM alliances WHERE name = ?");
+            PreparedStatement ps = DatabaseConnection
+                .getConnection()
+                .prepareStatement("SELECT id FROM alliances WHERE name = ?");
             ps.setString(1, name);
             ResultSet rs = ps.executeQuery();
 
@@ -130,7 +149,13 @@ public class MapleGuildAlliance implements Serializable {
             ps.close();
             rs.close();
 
-            ps = DatabaseConnection.getConnection().prepareStatement("insert into alliances (name, guild1, guild2, leaderid) VALUES (?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+            ps =
+                DatabaseConnection
+                    .getConnection()
+                    .prepareStatement(
+                        "insert into alliances (name, guild1, guild2, leaderid) VALUES (?, ?, ?, ?)",
+                        Statement.RETURN_GENERATED_KEYS
+                    );
             ps.setString(1, name);
             ps.setInt(2, guild1);
             ps.setInt(3, guild2);
@@ -153,7 +178,10 @@ public class MapleGuildAlliance implements Serializable {
             Connection con = DatabaseConnection.getConnection();
             PreparedStatement ps;
             for (int i = 0; i < getNoGuilds(); i++) {
-                ps = con.prepareStatement("UPDATE characters SET alliancerank = 5 WHERE guildid = ?");
+                ps =
+                    con.prepareStatement(
+                        "UPDATE characters SET alliancerank = 5 WHERE guildid = ?"
+                    );
                 ps.setInt(1, guilds[i]);
                 ps.execute();
                 ps.close();
@@ -185,18 +213,27 @@ public class MapleGuildAlliance implements Serializable {
      * @param op
      * @param expelled
      */
-    public final void broadcast(final OutPacket packet, final int exceptionId, final GAOp op, final boolean expelled) {
+    public final void broadcast(
+        final OutPacket packet,
+        final int exceptionId,
+        final GAOp op,
+        final boolean expelled
+    ) {
         if (null == op) {
-            AllianceService.sendGuild(packet, exceptionId, allianceid); 
+            AllianceService.sendGuild(packet, exceptionId, allianceid);
         } else switch (op) {
             case DISBAND:
-                AllianceService.setOldAlliance(exceptionId, expelled, allianceid); 
+                AllianceService.setOldAlliance(
+                    exceptionId,
+                    expelled,
+                    allianceid
+                );
                 break;
             case NEWGUILD:
-                AllianceService.setNewAlliance(exceptionId, allianceid); 
+                AllianceService.setNewAlliance(exceptionId, allianceid);
                 break;
             default:
-                AllianceService.sendGuild(packet, exceptionId, allianceid); 
+                AllianceService.sendGuild(packet, exceptionId, allianceid);
                 break;
         }
     }
@@ -211,7 +248,13 @@ public class MapleGuildAlliance implements Serializable {
 
     public final void saveToDb() {
         try {
-            try (PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement("UPDATE alliances set guild1 = ?, guild2 = ?, guild3 = ?, guild4 = ?, guild5 = ?, rank1 = ?, rank2 = ?, rank3 = ?, rank4 = ?, rank5 = ?, capacity = ?, leaderid = ?, notice = ? where id = ?")) {
+            try (
+                PreparedStatement ps = DatabaseConnection
+                    .getConnection()
+                    .prepareStatement(
+                        "UPDATE alliances set guild1 = ?, guild2 = ?, guild3 = ?, guild4 = ?, guild5 = ?, rank1 = ?, rank2 = ?, rank3 = ?, rank4 = ?, rank5 = ?, capacity = ?, leaderid = ?, notice = ? where id = ?"
+                    )
+            ) {
                 for (int i = 0; i < 5; i++) {
                     ps.setInt(i + 1, guilds[i] < 0 ? 0 : guilds[i]);
                     ps.setString(i + 6, ranks[i]);
@@ -229,7 +272,7 @@ public class MapleGuildAlliance implements Serializable {
 
     public void setRank(String[] ranks) {
         this.ranks = ranks;
-      //  broadcast(GuildPackets.GetAllianceUpdate(this));
+        //  broadcast(GuildPackets.GetAllianceUpdate(this));
         saveToDb();
     }
 
@@ -248,7 +291,9 @@ public class MapleGuildAlliance implements Serializable {
     public void setNotice(String newNotice) {
         this.notice = newNotice;
         broadcast(GuildPackets.GetAllianceUpdate(this));
-        broadcast(PacketCreator.ServerNotice(5, "Alliance Notice: " + newNotice));
+        broadcast(
+            PacketCreator.ServerNotice(5, "Alliance Notice: " + newNotice)
+        );
         saveToDb();
     }
 
@@ -304,7 +349,7 @@ public class MapleGuildAlliance implements Serializable {
                 } else {
                     guilds[i] = -1;
                 }
-                if (i == 0) { 
+                if (i == 0) {
                     return disband();
                 } else {
                     broadcast(GuildPackets.GetAllianceUpdate(this));
@@ -332,13 +377,21 @@ public class MapleGuildAlliance implements Serializable {
             if (guild != null) {
                 MapleGuildCharacter newLead = guild.getMGC(c);
                 MapleGuildCharacter oldLead = guild.getMGC(leaderid);
-                if (newLead != null && oldLead != null) { 
+                if (newLead != null && oldLead != null) {
                     return false;
-                } else if (newLead != null && newLead.getGuildRank() == 1 && newLead.getAllianceRank() == 2) {
+                } else if (
+                    newLead != null &&
+                    newLead.getGuildRank() == 1 &&
+                    newLead.getAllianceRank() == 2
+                ) {
                     guild.changeARank(c, 1);
                     g = i;
                     leaderName = newLead.getName();
-                } else if (oldLead != null && oldLead.getGuildRank() == 1 && oldLead.getAllianceRank() == 1) {
+                } else if (
+                    oldLead != null &&
+                    oldLead.getGuildRank() == 1 &&
+                    oldLead.getAllianceRank() == 1
+                ) {
                     guild.changeARank(leaderid, 2);
                 } else if (oldLead != null || newLead != null) {
                     return false;
@@ -352,7 +405,12 @@ public class MapleGuildAlliance implements Serializable {
         guilds[g] = guilds[0];
         guilds[0] = oldGuild;
         if (leaderName != null) {
-            broadcast(PacketCreator.ServerNotice(5, leaderName + " has become the leader of the alliance."));
+            broadcast(
+                PacketCreator.ServerNotice(
+                    5,
+                    leaderName + " has become the leader of the alliance."
+                )
+            );
         }
         broadcast(GuildPackets.ChangeAllianceLeader(allianceid, leaderid, c));
         broadcast(GuildPackets.UpdateAllianceLeader(allianceid, leaderid, c));
@@ -372,10 +430,16 @@ public class MapleGuildAlliance implements Serializable {
             if (guild != null) {
                 MapleGuildCharacter chr = guild.getMGC(cid);
                 if (chr != null && chr.getAllianceRank() > 2) {
-                    if ((change == 0 && chr.getAllianceRank() >= 5) || (change == 1 && chr.getAllianceRank() <= 3)) {
+                    if (
+                        (change == 0 && chr.getAllianceRank() >= 5) ||
+                        (change == 1 && chr.getAllianceRank() <= 3)
+                    ) {
                         return false;
                     }
-                    guild.changeARank(cid, chr.getAllianceRank() + (change == 0 ? 1 : -1));
+                    guild.changeARank(
+                        cid,
+                        chr.getAllianceRank() + (change == 0 ? 1 : -1)
+                    );
                     return true;
                 }
             }
@@ -383,5 +447,3 @@ public class MapleGuildAlliance implements Serializable {
         return false;
     }
 }
-		
-	

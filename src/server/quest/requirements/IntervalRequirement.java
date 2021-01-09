@@ -22,17 +22,18 @@
 package server.quest.requirements;
 
 import client.player.Player;
-import server.quest.MapleQuestStatus;
 import provider.MapleData;
 import provider.MapleDataTool;
 import server.quest.MapleQuest;
 import server.quest.MapleQuestRequirementType;
+import server.quest.MapleQuestStatus;
 
 /**
  *
  * @author Tyler (Twdtwd)
  */
 public final class IntervalRequirement extends MapleQuestRequirement {
+
     private int interval = -1;
     private final int questID;
 
@@ -46,15 +47,21 @@ public final class IntervalRequirement extends MapleQuestRequirement {
     public void processData(MapleData data) {
         interval = MapleDataTool.getInt(data) * 60 * 1000;
     }
-    
+
     public int getInterval() {
         return interval;
     }
 
     @Override
     public boolean check(Player chr, Integer npcid) {
-        boolean check = !chr.getQuest(MapleQuest.getInstance(questID)).getStatus().equals(MapleQuestStatus.Status.COMPLETED);
-        boolean check2 = chr.getQuest(MapleQuest.getInstance(questID)).getCompletionTime() <= System.currentTimeMillis() - interval;
+        boolean check = !chr
+            .getQuest(MapleQuest.getInstance(questID))
+            .getStatus()
+            .equals(MapleQuestStatus.Status.COMPLETED);
+        boolean check2 =
+            chr.getQuest(MapleQuest.getInstance(questID)).getCompletionTime() <=
+            System.currentTimeMillis() -
+            interval;
         return check || check2;
     }
 }

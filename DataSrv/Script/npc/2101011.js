@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -22,14 +22,13 @@
 /* 	Sejan
 	Ariant
 	Created by Cody(shotdownsoul) -
-	
+
 */
 
-
 function start() {
-	cm.sendNext ("A luz ea escuridao sempre coexistem ...");
+    cm.sendNext("A luz ea escuridao sempre coexistem ...");
 }
 
 function action() {
-	cm.dispose()
+    cm.dispose();
 }

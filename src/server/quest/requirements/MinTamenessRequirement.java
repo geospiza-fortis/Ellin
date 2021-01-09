@@ -33,6 +33,7 @@ import server.quest.MapleQuestRequirementType;
  * @author Tyler (Twdtwd)
  */
 public final class MinTamenessRequirement extends MapleQuestRequirement {
+
     private int minTameness;
 
     public MinTamenessRequirement(MapleQuest quest, MapleData data) {
@@ -41,8 +42,8 @@ public final class MinTamenessRequirement extends MapleQuestRequirement {
     }
 
     /**
-     * 
-     * @param data 
+     *
+     * @param data
      */
     @Override
     public void processData(MapleData data) {
@@ -54,9 +55,9 @@ public final class MinTamenessRequirement extends MapleQuestRequirement {
         int curCloseness = 0;
         for (ItemPet pet : p.getPets()) {
             if (pet == null) continue;
-            if (pet.getCloseness() > curCloseness)
-                curCloseness = pet.getCloseness();
+            if (pet.getCloseness() > curCloseness) curCloseness =
+                pet.getCloseness();
         }
-       return curCloseness >= minTameness;
+        return curCloseness >= minTameness;
     }
 }

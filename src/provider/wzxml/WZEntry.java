@@ -1,6 +1,6 @@
 /*
 This file is part of the OdinMS Maple Story Server
-Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc> 
+Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc>
 Matthias Butz <matze@odinms.de>
 Jan Christian Meyer <vimes@odinms.de>
 
@@ -31,7 +31,12 @@ public class WZEntry implements MapleDataEntry {
     private int offset;
     private final MapleDataEntity parent;
 
-    public WZEntry(String name, int size, int checksum, MapleDataEntity parent) {
+    public WZEntry(
+        String name,
+        int size,
+        int checksum,
+        MapleDataEntity parent
+    ) {
         super();
         this.name = name;
         this.size = size;

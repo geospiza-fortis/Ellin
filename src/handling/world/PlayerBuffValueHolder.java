@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -25,12 +25,15 @@ import java.io.Serializable;
 import server.MapleStatEffect;
 
 public class PlayerBuffValueHolder implements Serializable {
-    
+
     private static final long serialVersionUID = 9179541993413738569L;
     public long startTime;
     public MapleStatEffect effect;
 
-    public PlayerBuffValueHolder(final long startTime, final MapleStatEffect effect) {
+    public PlayerBuffValueHolder(
+        final long startTime,
+        final MapleStatEffect effect
+    ) {
         this.startTime = startTime;
         this.effect = effect;
     }

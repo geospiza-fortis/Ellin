@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -28,5 +28,5 @@ public enum MaplePartyOperation {
     DISBAND,
     SILENT_UPDATE,
     LOG_ONOFF,
-    CHANGE_LEADER
+    CHANGE_LEADER,
 }

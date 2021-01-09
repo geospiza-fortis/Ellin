@@ -6,19 +6,18 @@
 
 package server.partyquest.mcpq;
 
+import client.player.Player;
+import client.player.buffs.Disease;
 import community.MapleParty;
+import community.MaplePartyCharacter;
 import handling.channel.ChannelServer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import org.slf4j.LoggerFactory;
-import client.player.Player;
-import client.player.buffs.Disease;
-import community.MaplePartyCharacter;
-
 
 /**
- * 
+ *
  * @author Sammy Guergachi <sguergachi at gmail.com>
  */
 /**
@@ -33,7 +32,9 @@ import community.MaplePartyCharacter;
 public class MonsterCarnival {
 
     // Logger
-    static org.slf4j.Logger log = LoggerFactory.getLogger(MonsterCarnival.class);
+    static org.slf4j.Logger log = LoggerFactory.getLogger(
+        MonsterCarnival.class
+    );
 
     // Map of channel to a MonsterCarnival instance.
     private static final HashMap<Integer, MonsterCarnival> instances = new HashMap<>();
@@ -44,12 +45,14 @@ public class MonsterCarnival {
      *  [MENTION=2000183830]para[/MENTION]m channel Channel to check for.
      *  [MENTION=850422]return[/MENTION] MonsterCarnival instance for a channel.
      * @param channel
-     * @return 
+     * @return
      */
     public static MonsterCarnival getMonsterCarnival(int channel) {
         // TODO: synchronization?
         if (channel < 1 || channel > 20) {
-            log.warn("Attempting to get a Monster Carnival instance for invalid channel.");
+            log.warn(
+                "Attempting to get a Monster Carnival instance for invalid channel."
+            );
             return null;
         }
         if (instances.containsKey(channel)) {
@@ -57,7 +60,9 @@ public class MonsterCarnival {
         }
         ChannelServer cserv = ChannelServer.getInstance(channel);
         if (cserv == null) {
-            log.error("ChannelServer instance for channel " + channel + " is null.");
+            log.error(
+                "ChannelServer instance for channel " + channel + " is null."
+            );
             return null;
         }
         MonsterCarnival inst = new MonsterCarnival(cserv);
@@ -114,8 +119,8 @@ public class MonsterCarnival {
         MCField field = this.getField(room);
         if (field.isFull()) {
             return STATUS_FIELD_FULL;
-        } 
-        
+        }
+
         MCParty party = new MCParty(pty);
         if (!sizeCheck(party.getSize(), room)) {
             return STATUS_PARTY_SIZE;
@@ -168,27 +173,36 @@ public class MonsterCarnival {
         sb.append("#L7# How to play#l");
         return sb.toString();
     }
-    
+
     public String getChallengers(Player challenger) {
         StringBuilder sb = new StringBuilder();
         for (MaplePartyCharacter pc : challenger.getParty().getMembers()) {
             Player c = challenger.getMap().getCharacterById(pc.getId());
             if (c != null) {
-                sb.append("#b").append(c.getName()).append(" / Level ").append(c.getLevel()).append(" / ").append(c.getMPC().getJobNameById(c.getJob().getId())).append("#k\r\n");
+                sb
+                    .append("#b")
+                    .append(c.getName())
+                    .append(" / Level ")
+                    .append(c.getLevel())
+                    .append(" / ")
+                    .append(c.getMPC().getJobNameById(c.getJob().getId()))
+                    .append("#k\r\n");
             }
         }
-        sb.append("\r\n\r\nWould you like to batlle this party at the Monster Carnival?");
+        sb.append(
+            "\r\n\r\nWould you like to batlle this party at the Monster Carnival?"
+        );
         return sb.toString();
     }
-   
+
     // Game Constants
     public static final int CP_LOSS_ON_DEATH = 10;
     public static final int TIME_PREBATTLE = 5;
     public static final int TIME_BATTLE = 600;
     public static final int TIME_LOBBYWAIT = 180;
 
-    public static final int TAB_SPAWNS   = 0;
-    public static final int TAB_DEBUFF   = 1;
+    public static final int TAB_SPAWNS = 0;
+    public static final int TAB_DEBUFF = 1;
     public static final int TAB_GUARDIAN = 2;
 
     /**
@@ -214,11 +228,11 @@ public class MonsterCarnival {
             case 2:
             case 3:
             case 4:
-               // return size >= 2 && size <= 4;
+                // return size >= 2 && size <= 4;
                 return size >= 1 && size <= 4;
             case 5:
             case 6:
-               // return size >= 3 && size <= 6;
+                // return size >= 3 && size <= 6;
                 return size >= 1 && size <= 6;
             default:
                 return false;
@@ -321,54 +335,58 @@ public class MonsterCarnival {
 
     // Error Codes
     // Note: These would be in an enum, but since these will be used in a NPC, they are not.
-    public static final int STATUS_FIELD_FULL    = 0;
-    public static final int STATUS_PARTY_SIZE    = 1;
-    public static final int STATUS_PARTY_LEVEL   = 2;
+    public static final int STATUS_FIELD_FULL = 0;
+    public static final int STATUS_PARTY_SIZE = 1;
+    public static final int STATUS_PARTY_LEVEL = 2;
     public static final int STATUS_PARTY_MISSING = 3;
     public static final int STATUS_FIELD_INVALID = 4;
-    public static final int STATUS_REQUEST       = 98;
-    public static final int STATUS_PROCEED       = 99;
+    public static final int STATUS_REQUEST = 98;
+    public static final int STATUS_PROCEED = 99;
 
     // Maps
     public static final int MAP_LOBBY = 980000000;
-    public static final int MAP_EXIT  = 980000010;
+    public static final int MAP_EXIT = 980000010;
 
     // NPCs
-    public static final int NPC_LOBBY     = 2042000;
-    public static final int NPC_ENTER     = 2042001; // Warp in from outside
-    public static final int NPC_INFO      = 2042002;
-    public static final int NPC_ASST_RED  = 2042003;
+    public static final int NPC_LOBBY = 2042000;
+    public static final int NPC_ENTER = 2042001; // Warp in from outside
+    public static final int NPC_INFO = 2042002;
+    public static final int NPC_ASST_RED = 2042003;
     public static final int NPC_ASST_BLUE = 2042004;
 
     // Items
-    public static final int ITEM_CP_1      = 2022157;
-    public static final int ITEM_CP_2      = 2022158;
-    public static final int ITEM_CP_3      = 2022159;
-    public static final int ITEM_PTY_MANA  = 2022160;
-    public static final int ITEM_PTY_ELIX  = 2022161;
+    public static final int ITEM_CP_1 = 2022157;
+    public static final int ITEM_CP_2 = 2022158;
+    public static final int ITEM_CP_3 = 2022159;
+    public static final int ITEM_PTY_MANA = 2022160;
+    public static final int ITEM_PTY_ELIX = 2022161;
     public static final int ITEM_PTY_PELIX = 2022162;
-    public static final int ITEM_PTY_ALLC  = 2022163;
-    public static final int ITEM_MINICUBE  = 2022164;
-    public static final int ITEM_DARKCUBE  = 2022165;
-    public static final int ITEM_STUNNER   = 2022166;
+    public static final int ITEM_PTY_ALLC = 2022163;
+    public static final int ITEM_MINICUBE = 2022164;
+    public static final int ITEM_DARKCUBE = 2022165;
+    public static final int ITEM_STUNNER = 2022166;
     public static final int ITEM_IND_WHITE = 2022174;
-    public static final int ITEM_IND_ELIX  = 2022175;
+    public static final int ITEM_IND_ELIX = 2022175;
     public static final int ITEM_IND_PELIX = 2022176;
-    public static final int ITEM_IND_MANA  = 2022177;
-    public static final int ITEM_IND_ALLC  = 2022178;
+    public static final int ITEM_IND_MANA = 2022177;
+    public static final int ITEM_IND_ALLC = 2022178;
 
     // Guardians
     public static final int GUARDIAN_RED = 9980000;
     public static final int GUARDIAN_BLUE = 9980001;
 
     // Debuffs
-    public static final Disease[] DEBUFFS = {Disease.STUN, Disease.DARKNESS, Disease.WEAKEN}; // intentionally leave out a few
+    public static final Disease[] DEBUFFS = {
+        Disease.STUN,
+        Disease.DARKNESS,
+        Disease.WEAKEN,
+    }; // intentionally leave out a few
 
     // Miscellaneous
-    public static final int MIN_LEVEL  = 30;
-    public static final int MAX_LEVEL  = 50;
+    public static final int MIN_LEVEL = 30;
+    public static final int MAX_LEVEL = 50;
     public static final int NUM_FIELDS = 6;
 
     // Debug
     public static final boolean DEBUG = true;
-}  
+}

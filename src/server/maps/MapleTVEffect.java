@@ -13,9 +13,9 @@ import tools.TimerTools.MiscTimer;
  * @date   04/06/2018
  */
 public class MapleTVEffect {
-    
+
     private static boolean active;
-	
+
     private List<String> message = new ArrayList<>(5);
     private Player user;
     private int type;
@@ -29,7 +29,7 @@ public class MapleTVEffect {
         broadcastTV(true);
     }
 
-    public static boolean isActive(){
+    public static boolean isActive() {
         return active;
     }
 
@@ -37,16 +37,28 @@ public class MapleTVEffect {
         active = activity;
         if (active) {
             BroadcastService.broadcastMessage(PacketCreator.EnableTV());
-            BroadcastService.broadcastMessage(PacketCreator.SendTV(user, message, type <= 2 ? type : type - 3, partner));
+            BroadcastService.broadcastMessage(
+                PacketCreator.SendTV(
+                    user,
+                    message,
+                    type <= 2 ? type : type - 3,
+                    partner
+                )
+            );
             int delay = 15000;
             if (type == 4) {
                 delay = 30000;
             } else if (type == 5) {
                 delay = 60000;
             }
-            MiscTimer.getInstance().schedule(() -> {
-                broadcastTV(false);
-            }, delay);
+            MiscTimer
+                .getInstance()
+                .schedule(
+                    () -> {
+                        broadcastTV(false);
+                    },
+                    delay
+                );
         } else {
             BroadcastService.broadcastMessage(PacketCreator.RemoveTV());
         }

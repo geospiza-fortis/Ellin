@@ -21,21 +21,19 @@
  */
 package scripting.quest;
 
+import client.Client;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.script.Invocable;
-
+import javax.script.ScriptException;
 import scripting.AbstractScriptManager;
 import server.quest.MapleQuest;
-import tools.FileLogger;
-import client.Client;
-import javax.script.ScriptException;
 import server.quest.MapleQuestStatus;
+import tools.FileLogger;
 
 public class QuestScriptManager extends AbstractScriptManager {
-    
+
     private final Map<Client, QuestActionManager> qms = new HashMap<>();
     private final Map<Client, Invocable> scripts = new HashMap<>();
     private static final QuestScriptManager instance = new QuestScriptManager();
@@ -46,19 +44,33 @@ public class QuestScriptManager extends AbstractScriptManager {
 
     public void start(Client c, short questid, int npc) {
         MapleQuest quest = MapleQuest.getInstance(questid);
-        if (!c.getPlayer().getQuest(quest).getStatus().equals(MapleQuestStatus.Status.NOT_STARTED)) {
+        if (
+            !c
+                .getPlayer()
+                .getQuest(quest)
+                .getStatus()
+                .equals(MapleQuestStatus.Status.NOT_STARTED)
+        ) {
             dispose(c);
             return;
         }
         try {
-            QuestActionManager qm = new QuestActionManager(c, questid, npc, true);
+            QuestActionManager qm = new QuestActionManager(
+                c,
+                questid,
+                npc,
+                true
+            );
             if (qms.containsKey(c)) {
                 return;
             }
             qms.put(c, qm);
             Invocable iv = getInvocable("quest/" + questid + ".js", c);
             if (iv == null) {
-                FileLogger.printError(FileLogger.QUEST_UNCODED, "Quest " + questid + " is uncoded.\r\n");
+                FileLogger.printError(
+                    FileLogger.QUEST_UNCODED,
+                    "Quest " + questid + " is uncoded.\r\n"
+                );
             }
             if (iv == null || QuestScriptManager.getInstance() == null) {
                 qm.dispose();
@@ -71,7 +83,10 @@ public class QuestScriptManager extends AbstractScriptManager {
             FileLogger.printError(FileLogger.QUEST + questid + ".txt", ute);
             dispose(c);
         } catch (final ScriptException | NoSuchMethodException t) {
-            FileLogger.printError(FileLogger.QUEST + getQM(c).getQuest() + ".txt", t);
+            FileLogger.printError(
+                FileLogger.QUEST + getQM(c).getQuest() + ".txt",
+                t
+            );
             dispose(c);
         }
     }
@@ -81,8 +96,15 @@ public class QuestScriptManager extends AbstractScriptManager {
         if (iv != null) {
             try {
                 iv.invokeFunction("start", mode, type, selection);
-            } catch (final UndeclaredThrowableException | ScriptException | NoSuchMethodException ute) {
-                FileLogger.printError(FileLogger.QUEST + getQM(c).getQuest() + ".txt", ute);
+            } catch (
+                final UndeclaredThrowableException
+                | ScriptException
+                | NoSuchMethodException ute
+            ) {
+                FileLogger.printError(
+                    FileLogger.QUEST + getQM(c).getQuest() + ".txt",
+                    ute
+                );
                 dispose(c);
             }
         }
@@ -90,12 +112,24 @@ public class QuestScriptManager extends AbstractScriptManager {
 
     public void end(Client c, short questid, int npc) {
         MapleQuest quest = MapleQuest.getInstance(questid);
-        if (!c.getPlayer().getQuest(quest).getStatus().equals(MapleQuestStatus.Status.STARTED) || !c.getPlayer().getMap().containsNPC(npc)) {
+        if (
+            !c
+                .getPlayer()
+                .getQuest(quest)
+                .getStatus()
+                .equals(MapleQuestStatus.Status.STARTED) ||
+            !c.getPlayer().getMap().containsNPC(npc)
+        ) {
             dispose(c);
             return;
         }
         try {
-            QuestActionManager qm = new QuestActionManager(c, questid, npc, false);
+            QuestActionManager qm = new QuestActionManager(
+                c,
+                questid,
+                npc,
+                false
+            );
             if (qms.containsKey(c)) {
                 return;
             }
@@ -107,14 +141,17 @@ public class QuestScriptManager extends AbstractScriptManager {
             }
             engine.put("qm", qm);
             scripts.put(c, iv);
-            iv.invokeFunction("end", (byte) 1, (byte) 0, 0);                    
+            iv.invokeFunction("end", (byte) 1, (byte) 0, 0);
         } catch (final UndeclaredThrowableException ute) {
             FileLogger.printError(FileLogger.QUEST + questid + ".txt", ute);
             dispose(c);
         } catch (final ScriptException | NoSuchMethodException t) {
-            FileLogger.printError(FileLogger.QUEST + getQM(c).getQuest() + ".txt", t);
+            FileLogger.printError(
+                FileLogger.QUEST + getQM(c).getQuest() + ".txt",
+                t
+            );
             dispose(c);
-	}
+        }
     }
 
     public void end(Client c, byte mode, byte type, int selection) {
@@ -122,8 +159,15 @@ public class QuestScriptManager extends AbstractScriptManager {
         if (iv != null) {
             try {
                 iv.invokeFunction("end", mode, type, selection);
-            } catch (final UndeclaredThrowableException | ScriptException | NoSuchMethodException ute) {
-                FileLogger.printError(FileLogger.QUEST + getQM(c).getQuest() + ".txt", ute);
+            } catch (
+                final UndeclaredThrowableException
+                | ScriptException
+                | NoSuchMethodException ute
+            ) {
+                FileLogger.printError(
+                    FileLogger.QUEST + getQM(c).getQuest() + ".txt",
+                    ute
+                );
                 dispose(c);
             }
         }

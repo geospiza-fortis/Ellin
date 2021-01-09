@@ -27,13 +27,13 @@ import java.util.Map;
 import tools.StringUtil;
 
 public class MapleQuestStatus {
+
     public enum Status {
-        
         UNDEFINED(-1),
         NOT_STARTED(0),
         STARTED(1),
         COMPLETED(2);
-        
+
         final int status;
 
         private Status(int id) {
@@ -53,7 +53,7 @@ public class MapleQuestStatus {
             return null;
         }
     }
-    
+
     private int npc;
     private int forfeited = 0;
     private int completed = 0;
@@ -68,7 +68,7 @@ public class MapleQuestStatus {
         this.completionTime = System.currentTimeMillis();
         this.expirationTime = 0;
         if (status == Status.STARTED) {
-            registerMobs();      
+            registerMobs();
         }
     }
 
@@ -86,7 +86,7 @@ public class MapleQuestStatus {
     public MapleQuest getQuest() {
         return MapleQuest.getInstance(questID);
     }
-	
+
     public short getQuestID() {
         return questID;
     }
@@ -116,7 +116,11 @@ public class MapleQuestStatus {
     public boolean progress(int id) {
         if (progress.get(id) != null) {
             int current = Integer.parseInt(progress.get(id));
-            String str = StringUtil.getLeftPaddedStr(Integer.toString(current + 1), '0', 3);
+            String str = StringUtil.getLeftPaddedStr(
+                Integer.toString(current + 1),
+                '0',
+                3
+            );
             progress.put(id, str);
             return true;
         }
@@ -130,9 +134,13 @@ public class MapleQuestStatus {
     public boolean madeProgress() {
         return progress.size() > 0;
     }
-    
+
     public Integer getAnyProgressKey() {
-        if (!progress.isEmpty()) return progress.entrySet().iterator().next().getKey();
+        if (!progress.isEmpty()) return progress
+            .entrySet()
+            .iterator()
+            .next()
+            .getKey();
         return 0;
     }
 
@@ -144,17 +152,17 @@ public class MapleQuestStatus {
     public Map<Integer, String> getProgress() {
         return Collections.unmodifiableMap(progress);
     }
-    
+
     public void resetProgress(int id) {
         setProgress(id, "000");
     }
-    
+
     public void resetAllProgress() {
         for (Map.Entry<Integer, String> entry : progress.entrySet()) {
             setProgress(entry.getKey(), "000");
         }
     }
-    
+
     public int getCompleted() {
         return completed;
     }
@@ -166,11 +174,11 @@ public class MapleQuestStatus {
     public void setCompletionTime(long completionTime) {
         this.completionTime = completionTime;
     }
-    
+
     public long getExpirationTime() {
         return expirationTime;
     }
-    
+
     public void setExpirationTime(long expirationTime) {
         this.expirationTime = expirationTime;
     }
@@ -178,11 +186,11 @@ public class MapleQuestStatus {
     public int getForfeited() {
         return forfeited;
     }
-    
+
     public String getInfo() {
         return getProgress(0);
     }
-    
+
     public void setInfo(String newInfo) {
         progress.put(0, newInfo);
     }
@@ -191,15 +199,19 @@ public class MapleQuestStatus {
         if (forfeited >= this.forfeited) {
             this.forfeited = forfeited;
         } else {
-            throw new IllegalArgumentException("Can't set forfeits to something lower than before.");
+            throw new IllegalArgumentException(
+                "Can't set forfeits to something lower than before."
+            );
         }
     }
-    
+
     public void setCompleted(int completed) {
         if (completed >= this.completed) {
             this.completed = completed;
         } else {
-            throw new IllegalArgumentException("Can't set completes to something lower than before.");
+            throw new IllegalArgumentException(
+                "Can't set completes to something lower than before."
+            );
         }
     }
 

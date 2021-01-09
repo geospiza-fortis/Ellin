@@ -21,26 +21,23 @@ package handling.coordinator.matchchecker;
 
 import handling.coordinator.matchchecker.listener.MatchCheckerGuildCreation;
 
-
 /**
  *
  * @author Ronan
  */
 public class MatchCheckerListenerFactory {
-    
+
     public enum MatchCheckerType {
-        
         GUILD_CREATION(MatchCheckerGuildCreation.loadListener());
-        
+
         private final AbstractMatchCheckerListener listener;
-        
+
         private MatchCheckerType(AbstractMatchCheckerListener listener) {
             this.listener = listener;
         }
-        
+
         public AbstractMatchCheckerListener getListener() {
             return this.listener;
         }
     }
-    
 }

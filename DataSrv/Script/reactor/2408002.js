@@ -23,7 +23,7 @@
  *2408002.js
  *Key Warp for Horn Tail PQ [HTPQ]
  *@author Jvlaple
-*/
+ */
 
 importPackage(Packages.client.inventory);
 
@@ -37,39 +37,47 @@ function act() {
     eim.showClearEffect(false, vvpMap);
     rm.mapMessage(6, "The key has been teleported somewhere...");
     switch (vvpMap) {
-        case 240050101 : {
+        case 240050101: {
             vvpKey = vvpOrig;
             vvpStage = 1;
             break;
         }
-        case 240050102 : {
+        case 240050102: {
             vvpKey = vvpOrig + 1;
             vvpStage = 2;
             break;
         }
-        case 240050103 : {
+        case 240050103: {
             vvpKey = vvpOrig + 2;
             vvpStage = 3;
             break;
         }
-        case 240050104 : {
+        case 240050104: {
             vvpKey = vvpOrig + 3;
             vvpStage = 4;
             break;
         }
-        default : {
+        default: {
             vvpKey = -1;
             break;
         }
     }
-    
+
     eim.setIntProperty(vvpStage + "stageclear", 1);
-    
+
     var tehWomanfred = new Item(vvpKey, 0, 1);
     var theWomanfred = womanfred.getReactorByName("keyDrop1");
     var dropper = eim.getPlayers().get(0);
-    womanfred.spawnItemDrop(theWomanfred, dropper, tehWomanfred, theWomanfred.getPosition(), true, true);
-    eim.getMapInstance(240050100).dropMessage(6, "A bright flash of light, then a key suddenly appears somewhere in the map.");
+    womanfred.spawnItemDrop(
+        theWomanfred,
+        dropper,
+        tehWomanfred,
+        theWomanfred.getPosition(),
+        true,
+        true
+    );
+    eim.getMapInstance(240050100).dropMessage(
+        6,
+        "A bright flash of light, then a key suddenly appears somewhere in the map."
+    );
 }
-	
-	

@@ -20,5 +20,5 @@ public class InterfaceHandler {
         int mapId = packet.readInt();
         ChannelServer cserv = ChannelServer.getInstance(c.getChannel());
         Field mapStats = cserv.getMapFactory().getMap(mapId);
-    }   
+    }
 }

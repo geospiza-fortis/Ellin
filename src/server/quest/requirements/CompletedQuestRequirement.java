@@ -32,8 +32,8 @@ import server.quest.MapleQuestRequirementType;
  * @author Tyler (Twdtwd)
  */
 public final class CompletedQuestRequirement extends MapleQuestRequirement {
-    private int reqQuest;
 
+    private int reqQuest;
 
     public CompletedQuestRequirement(MapleQuest quest, MapleData data) {
         super(MapleQuestRequirementType.COMPLETED_QUEST);
@@ -44,7 +44,6 @@ public final class CompletedQuestRequirement extends MapleQuestRequirement {
     public void processData(MapleData data) {
         reqQuest = MapleDataTool.getInt(data);
     }
-
 
     @Override
     public boolean check(Player chr, Integer npcid) {

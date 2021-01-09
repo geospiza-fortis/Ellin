@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -26,16 +26,14 @@
 
 package scripting;
 
+import client.Client;
+import constants.ServerProperties;
 import java.io.File;
 import java.io.FileReader;
-
+import java.io.IOException;
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
-
-import client.Client;
-import constants.ServerProperties;
-import java.io.IOException;
 import javax.script.ScriptException;
 import tools.FileLogger;
 
@@ -45,42 +43,48 @@ import tools.FileLogger;
  */
 public abstract class AbstractScriptManager {
 
-	protected ScriptEngine engine;
-	private ScriptEngineManager sem;
-        
-	protected AbstractScriptManager() {
-		sem = new ScriptEngineManager();
-	}
-	
-	protected Invocable getInvocable(String path, Client c) {
-            path = ServerProperties.Misc.DATA_ROOT + "/Script/" + path;
-            engine = null;
+    protected ScriptEngine engine;
+    private ScriptEngineManager sem;
+
+    protected AbstractScriptManager() {
+        sem = new ScriptEngineManager();
+    }
+
+    protected Invocable getInvocable(String path, Client c) {
+        path = ServerProperties.Misc.DATA_ROOT + "/Script/" + path;
+        engine = null;
+        if (c != null) {
+            engine = c.getScriptEngine(path);
+        }
+        if (engine == null) {
+            File scriptFile = new File(path);
+            if (!scriptFile.exists()) {
+                return null;
+            }
+            engine = sem.getEngineByName("javascript");
             if (c != null) {
-                engine = c.getScriptEngine(path);
+                c.setScriptEngine(path, engine);
             }
-            if (engine == null) {
-                File scriptFile = new File(path);
-                if (!scriptFile.exists()) {
-                    return null;
+            try (FileReader fr = new FileReader(scriptFile)) {
+                if (ServerProperties.Misc.USE_JAVA8) {
+                    engine.eval("load('nashorn:mozilla_compat.js');");
                 }
-                engine = sem.getEngineByName("javascript");
-                if (c != null) {
-                    c.setScriptEngine(path, engine);
-                }
-                try (FileReader fr = new FileReader(scriptFile)) {
-                    if (ServerProperties.Misc.USE_JAVA8){
-            		engine.eval("load('nashorn:mozilla_compat.js');");
-                    }
-                    engine.eval(fr);
-                } catch (final ScriptException | IOException t) {
-                    FileLogger.printError(FileLogger.INVOCABLE + path.substring(12, path.length()), t, path);
-                    return null;
-                }
+                engine.eval(fr);
+            } catch (final ScriptException | IOException t) {
+                FileLogger.printError(
+                    FileLogger.INVOCABLE + path.substring(12, path.length()),
+                    t,
+                    path
+                );
+                return null;
             }
-          return (Invocable) engine;
         }
-	 
-        protected void resetContext(String path, Client c) {
-            c.removeScriptEngine(ServerProperties.Misc.DATA_ROOT + "/Script/" + path);
-        }
+        return (Invocable) engine;
+    }
+
+    protected void resetContext(String path, Client c) {
+        c.removeScriptEngine(
+            ServerProperties.Misc.DATA_ROOT + "/Script/" + path
+        );
+    }
 }

@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -29,16 +29,27 @@ importPackage(Packages.packet.creators);
 
 function enter(pi) {
     var nextMap = 240050101;
-    var eim = pi.getPlayer().getEventInstance()
+    var eim = pi.getPlayer().getEventInstance();
     var target = eim.getMapInstance(nextMap);
     var targetPortal = target.getPortal("sp");
     var avail = eim.getProperty("1stageclear");
     if (!pi.haveItem(4001092, 1)) {
-        pi.getPlayer().getClient().getSession().write(PacketCreator.ServerNotice(6, "The portal is blocked."));
+        pi.getPlayer()
+            .getClient()
+            .getSession()
+            .write(PacketCreator.ServerNotice(6, "The portal is blocked."));
         return false;
     } else {
         pi.gainItem(4001092, -1);
-        pi.getPlayer().getClient().getSession().write(PacketCreator.ServerNotice(6, "The key disentegrates as Horntail\'s Seal is broken for a flash..."));
+        pi.getPlayer()
+            .getClient()
+            .getSession()
+            .write(
+                PacketCreator.ServerNotice(
+                    6,
+                    "The key disentegrates as Horntail's Seal is broken for a flash..."
+                )
+            );
         pi.getPlayer().changeMap(target, targetPortal);
         return true;
     }

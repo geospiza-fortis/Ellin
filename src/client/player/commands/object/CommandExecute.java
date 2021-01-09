@@ -21,14 +21,14 @@ public abstract class CommandExecute {
 
     enum ReturnValue {
         DONT_LOG,
-        LOG;
+        LOG,
     }
 
     public CommandType getType() {
         return CommandType.NORMAL;
     }
 
-    public static abstract class TradeExecute extends CommandExecute {
+    public abstract static class TradeExecute extends CommandExecute {
 
         @Override
         public CommandType getType() {

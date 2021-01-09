@@ -8,8 +8,7 @@ import tools.HexTool;
 
 public class LoginCrypto {
 
-    private LoginCrypto() {
-    }
+    private LoginCrypto() {}
 
     private static final char[] iota64 = new char[64];
 
@@ -28,7 +27,6 @@ public class LoginCrypto {
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException("Encoding the string failed", e);
         }
-
     }
 
     public static String hexSha1(String in) {
@@ -43,7 +41,11 @@ public class LoginCrypto {
         return hash.equals(hexSha1(password));
     }
 
-    public static boolean checkSaltedSha512Hash(String hash, String password, String salt) {
+    public static boolean checkSaltedSha512Hash(
+        String hash,
+        String password,
+        String salt
+    ) {
         return hash.equals(makeSaltedSha512Hash(password, salt));
     }
 
@@ -87,7 +89,8 @@ public class LoginCrypto {
         return hash.substring(0, 3).equals("$H$");
     }
 
-    private static String myCrypt(String password, String seed) throws RuntimeException {
+    private static String myCrypt(String password, String seed)
+        throws RuntimeException {
         String out = null;
         int count = 8;
         MessageDigest digester;
@@ -99,17 +102,36 @@ public class LoginCrypto {
         }
         String salt = seed.substring(4, 12);
         if (salt.length() != 8) {
-            throw new RuntimeException("Error hashing password - Invalid seed.");
+            throw new RuntimeException(
+                "Error hashing password - Invalid seed."
+            );
         }
         byte[] sha1Hash = new byte[40];
         try {
             digester = MessageDigest.getInstance("SHA-1");
-            digester.update((salt + password).getBytes("iso-8859-1"), 0, (salt + password).length());
+            digester.update(
+                (salt + password).getBytes("iso-8859-1"),
+                0,
+                (salt + password).length()
+            );
             sha1Hash = digester.digest();
             do {
-                byte[] CombinedBytes = new byte[sha1Hash.length + password.length()];
-                System.arraycopy(sha1Hash, 0, CombinedBytes, 0, sha1Hash.length);
-                System.arraycopy(password.getBytes("iso-8859-1"), 0, CombinedBytes, sha1Hash.length, password.getBytes("iso-8859-1").length);
+                byte[] CombinedBytes = new byte[sha1Hash.length +
+                password.length()];
+                System.arraycopy(
+                    sha1Hash,
+                    0,
+                    CombinedBytes,
+                    0,
+                    sha1Hash.length
+                );
+                System.arraycopy(
+                    password.getBytes("iso-8859-1"),
+                    0,
+                    CombinedBytes,
+                    sha1Hash.length,
+                    password.getBytes("iso-8859-1").length
+                );
                 digester.update(CombinedBytes, 0, CombinedBytes.length);
                 sha1Hash = digester.digest();
             } while (--count > 0);

@@ -1,7 +1,7 @@
 package server.life.components;
 
 public class SelfDestruction {
-    
+
     private final byte action;
     private final int removeAfter;
     private final int hp;

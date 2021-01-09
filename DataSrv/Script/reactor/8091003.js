@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
 					   Matthias Butz <matze@odinms.de>
 					   Jan Christian Meyer <vimes@odinms.de>
 
@@ -31,21 +31,21 @@
 **/
 
 function act() {
-	var rand = (Math.random() * 2) + 1;
-	var q = 0;
-	var q2 = 0;
-	if (rand < 2) {
-		q = 3;
-		q2 = 4;
-	} else {
-		q = 4;
-		q2 = 3;
-	}
-	if (rm.getPlayer().getMapId() == 809050004) {
-		rm.spawnMonster(9400215, q);
-		rm.spawnMonster(9400216, q2);
-	} else if (rm.getPlayer().getMapId() == 809050007) {
-		rm.spawnMonster(9400215, q);
-		rm.spawnMonster(9400216, q2);
-	}
+    var rand = Math.random() * 2 + 1;
+    var q = 0;
+    var q2 = 0;
+    if (rand < 2) {
+        q = 3;
+        q2 = 4;
+    } else {
+        q = 4;
+        q2 = 3;
+    }
+    if (rm.getPlayer().getMapId() == 809050004) {
+        rm.spawnMonster(9400215, q);
+        rm.spawnMonster(9400216, q2);
+    } else if (rm.getPlayer().getMapId() == 809050007) {
+        rm.spawnMonster(9400215, q);
+        rm.spawnMonster(9400216, q2);
+    }
 }

@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * This implementation provides distribution of work and thus improves the stability of the scheduling system as a whole.
  */
 public abstract class TimerTools {
+
     protected String name;
     protected AtomicInteger threadWorkerInc = new AtomicInteger(1);
     protected ScheduledThreadPoolExecutor stpe;
@@ -20,18 +21,23 @@ public abstract class TimerTools {
     /**
      * Private constructor of the abstract base class
      */
-    private TimerTools() {
-    }
+    private TimerTools() {}
 
     /**
      * initializes the thread pool executor, "starts" the instance
      */
     public void start() {
-        if (stpe != null && !stpe.isShutdown() && !stpe.isTerminated() && !stpe.isTerminating()) {
+        if (
+            stpe != null &&
+            !stpe.isShutdown() &&
+            !stpe.isTerminated() &&
+            !stpe.isTerminating()
+        ) {
             return;
         }
         final ThreadFactory t = new ThreadFactory() {
-            @Override public Thread newThread(Runnable r) {
+            @Override
+            public Thread newThread(Runnable r) {
                 final Thread t = new Thread(r);
                 final int inc = threadWorkerInc.getAndIncrement();
                 t.setName(name + "-Worker-" + inc);
@@ -50,6 +56,7 @@ public abstract class TimerTools {
      * By default, no exception handling is implemented.
      */
     private static class LoggingSaveRunnable implements Runnable {
+
         Runnable r;
 
         public LoggingSaveRunnable(Runnable r) {
@@ -60,8 +67,7 @@ public abstract class TimerTools {
         public void run() {
             try {
                 r.run();
-            } catch (Throwable t) {
-            }
+            } catch (Throwable t) {}
         }
     }
 
@@ -81,8 +87,17 @@ public abstract class TimerTools {
      * @param delay Delay in milliseconds before first execution. <br>
      * @return the ScheduledFuture<?> instance holding the scheduled Runnable.
      */
-    public ScheduledFuture<?> register(Runnable r, long repeatTime, long delay) {
-        return stpe.scheduleAtFixedRate(new LoggingSaveRunnable(r), delay, repeatTime, TimeUnit.MILLISECONDS);
+    public ScheduledFuture<?> register(
+        Runnable r,
+        long repeatTime,
+        long delay
+    ) {
+        return stpe.scheduleAtFixedRate(
+            new LoggingSaveRunnable(r),
+            delay,
+            repeatTime,
+            TimeUnit.MILLISECONDS
+        );
     }
 
     /**
@@ -101,7 +116,11 @@ public abstract class TimerTools {
      * @return the ScheduledFuture<?> instance holding the scheduled Runnable.
      */
     public ScheduledFuture<?> schedule(Runnable r, long delay) {
-        return stpe.schedule(new LoggingSaveRunnable(r), delay, TimeUnit.MILLISECONDS);
+        return stpe.schedule(
+            new LoggingSaveRunnable(r),
+            delay,
+            TimeUnit.MILLISECONDS
+        );
     }
 
     /**
@@ -119,7 +138,6 @@ public abstract class TimerTools {
     public ScheduledFuture<?> scheduleAtTimestamp(Runnable r, long timestamp) {
         return schedule(r, timestamp - System.currentTimeMillis());
     }
-
 
     /**
      * Removes the Runnable r that was queued for execution.
@@ -139,9 +157,9 @@ public abstract class TimerTools {
     public void purge() {
         stpe.purge();
     }
-    
-    
+
     public static class WorldTimer extends TimerTools {
+
         private static WorldTimer instance = new WorldTimer();
 
         private WorldTimer() {
@@ -153,12 +171,12 @@ public abstract class TimerTools {
             return instance;
         }
     }
-    
 
     /**
      * A MapleTimer implementation to handle Miscellaneous server activities such as warping, etc.
      */
     public static class MiscTimer extends TimerTools {
+
         private static MiscTimer instance = new MiscTimer();
 
         private MiscTimer() {
@@ -170,11 +188,12 @@ public abstract class TimerTools {
             return instance;
         }
     }
-    
-     /**
+
+    /**
      * A MapleTimer implementation to handle Miscellaneous server activities such as warping, etc.
      */
     public static class ClientTimer extends TimerTools {
+
         private static ClientTimer instance = new ClientTimer();
 
         private ClientTimer() {
@@ -186,11 +205,12 @@ public abstract class TimerTools {
             return instance;
         }
     }
-    
+
     /**
      * A MapleTimer implementation to handle Miscellaneous server activities such as warping, etc.
      */
     public static class MountTimer extends TimerTools {
+
         private static MountTimer instance = new MountTimer();
 
         private MountTimer() {
@@ -207,6 +227,7 @@ public abstract class TimerTools {
      * A MapleTimer implementation to handle monster spawning and all monster-related server activities.
      */
     public static class MonsterTimer extends TimerTools {
+
         private static MonsterTimer instance = new MonsterTimer();
 
         private MonsterTimer() {
@@ -223,6 +244,7 @@ public abstract class TimerTools {
      * A MapleTimer implementation to handle all item-related server activities.
      */
     public static class ItemTimer extends TimerTools {
+
         private static ItemTimer instance = new ItemTimer();
 
         private ItemTimer() {
@@ -234,11 +256,12 @@ public abstract class TimerTools {
             return instance;
         }
     }
-    
-     /**
+
+    /**
      * A MapleTimer implementation to handle all events server activities.
      */
     public static class MapTimer extends TimerTools {
+
         private static MapTimer instance = new MapTimer();
 
         private MapTimer() {
@@ -250,24 +273,26 @@ public abstract class TimerTools {
             return instance;
         }
     }
-    
-    public static class PingTimer extends TimerTools {
-        private static PingTimer instance = new PingTimer();
-	
-	private PingTimer() {
-            super();
-	    name = "Pingtimer";
-	}
 
-	public static PingTimer getInstance() {
-	    return instance;
-	}
+    public static class PingTimer extends TimerTools {
+
+        private static PingTimer instance = new PingTimer();
+
+        private PingTimer() {
+            super();
+            name = "Pingtimer";
+        }
+
+        public static PingTimer getInstance() {
+            return instance;
+        }
     }
-    
+
     /**
      * A MapleTimer implementation to handle all events server activities.
      */
     public static class EventTimer extends TimerTools {
+
         private static EventTimer instance = new EventTimer();
 
         private EventTimer() {
@@ -279,8 +304,9 @@ public abstract class TimerTools {
             return instance;
         }
     }
-    
+
     public static class CheatTrackerTimer extends TimerTools {
+
         private static CheatTrackerTimer instance = new CheatTrackerTimer();
 
         private CheatTrackerTimer() {
@@ -292,11 +318,12 @@ public abstract class TimerTools {
             return instance;
         }
     }
-    
+
     /**
      * A MapleTimer implementation to handle all events server activities.
      */
     public static class AntiCheatTimer extends TimerTools {
+
         private static AntiCheatTimer instance = new AntiCheatTimer();
 
         private AntiCheatTimer() {
@@ -308,11 +335,12 @@ public abstract class TimerTools {
             return instance;
         }
     }
-    
-     /**
+
+    /**
      * A MapleTimer implementation to handle all events server activities.
      */
     public static class NPCTimer extends TimerTools {
+
         private static NPCTimer instance = new NPCTimer();
 
         private NPCTimer() {
@@ -324,11 +352,12 @@ public abstract class TimerTools {
             return instance;
         }
     }
-    
+
     /**
      * A MapleTimer implementation to handle all events server activities.
      */
     public static class CharacterTimer extends TimerTools {
+
         private static CharacterTimer instance = new CharacterTimer();
 
         private CharacterTimer() {
@@ -345,6 +374,7 @@ public abstract class TimerTools {
      * A MapleTimer implementation to handle all skill (buff, summon, etc)-related server activities.
      */
     public static class SkillTimer extends TimerTools {
+
         private static SkillTimer instance = new SkillTimer();
 
         private SkillTimer() {
@@ -356,5 +386,4 @@ public abstract class TimerTools {
             return instance;
         }
     }
-
 }

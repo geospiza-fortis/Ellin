@@ -33,6 +33,7 @@ import server.quest.MapleQuestRequirementType;
  * @author Tyler (Twdtwd)
  */
 public final class EndDateRequirement extends MapleQuestRequirement {
+
     private String timeStr;
 
     public EndDateRequirement(MapleQuest quest, MapleData data) {
@@ -41,8 +42,8 @@ public final class EndDateRequirement extends MapleQuestRequirement {
     }
 
     /**
-     * 
-     * @param data 
+     *
+     * @param data
      */
     @Override
     public void processData(MapleData data) {
@@ -52,7 +53,13 @@ public final class EndDateRequirement extends MapleQuestRequirement {
     @Override
     public boolean check(Player chr, Integer npcid) {
         Calendar cal = Calendar.getInstance();
-        cal.set(Integer.parseInt(timeStr.substring(0, 4)), Integer.parseInt(timeStr.substring(4, 6)), Integer.parseInt(timeStr.substring(6, 8)), Integer.parseInt(timeStr.substring(8, 10)), 0);
+        cal.set(
+            Integer.parseInt(timeStr.substring(0, 4)),
+            Integer.parseInt(timeStr.substring(4, 6)),
+            Integer.parseInt(timeStr.substring(6, 8)),
+            Integer.parseInt(timeStr.substring(8, 10)),
+            0
+        );
         return cal.getTimeInMillis() >= System.currentTimeMillis();
     }
 }

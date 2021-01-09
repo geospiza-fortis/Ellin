@@ -1,6 +1,6 @@
 /*
  * This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -21,20 +21,19 @@
 
 package scripting.reactor;
 
-import java.awt.Point;
-import java.util.List;
-
 import client.Client;
 import client.player.Player;
 import client.player.inventory.Equip;
-import client.player.inventory.types.InventoryType;
 import client.player.inventory.Item;
+import client.player.inventory.types.InventoryType;
 import constants.ItemConstants;
 import database.DatabaseConnection;
+import java.awt.Point;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -53,10 +52,10 @@ import tools.TimerTools.MiscTimer;
 
 /*
  * Drops functions  - ronancpl (HeavenMS)
-*/
+ */
 
 public class ReactorActionManager extends AbstractPlayerInteraction {
-    
+
     private Reactor reactor;
     private ScheduledFuture<?> sprayTask = null;
 
@@ -64,98 +63,225 @@ public class ReactorActionManager extends AbstractPlayerInteraction {
         super(c);
         this.reactor = reactor;
     }
-    
+
     public void destroyNpc(int npcId) {
         reactor.getMap().destroyNPC(npcId);
     }
-    
+
     public void sprayItems() {
         sprayItems(false, 0, 0, 0, 0);
     }
 
-    public void sprayItems(boolean meso, int mesoChance, int minMeso, int maxMeso) {
+    public void sprayItems(
+        boolean meso,
+        int mesoChance,
+        int minMeso,
+        int maxMeso
+    ) {
         sprayItems(meso, mesoChance, minMeso, maxMeso, 0);
     }
-    
-    public void sprayItems(boolean meso, int mesoChance, int minMeso, int maxMeso, int minItems) {
-        sprayItems((int)reactor.getPosition().getX(), (int)reactor.getPosition().getY(), meso, mesoChance, minMeso, maxMeso, minItems);
+
+    public void sprayItems(
+        boolean meso,
+        int mesoChance,
+        int minMeso,
+        int maxMeso,
+        int minItems
+    ) {
+        sprayItems(
+            (int) reactor.getPosition().getX(),
+            (int) reactor.getPosition().getY(),
+            meso,
+            mesoChance,
+            minMeso,
+            maxMeso,
+            minItems
+        );
     }
-    
-    public void sprayItems(int posX, int posY, boolean meso, int mesoChance, int minMeso, int maxMeso, int minItems) {
-        dropItems(true, posX, posY, meso, mesoChance, minMeso, maxMeso, minItems);
+
+    public void sprayItems(
+        int posX,
+        int posY,
+        boolean meso,
+        int mesoChance,
+        int minMeso,
+        int maxMeso,
+        int minItems
+    ) {
+        dropItems(
+            true,
+            posX,
+            posY,
+            meso,
+            mesoChance,
+            minMeso,
+            maxMeso,
+            minItems
+        );
     }
 
     public void dropItems() {
         dropItems(false, 0, 0, 0, 0);
     }
 
-    public void dropItems(boolean meso, int mesoChance, int minMeso, int maxMeso) {
+    public void dropItems(
+        boolean meso,
+        int mesoChance,
+        int minMeso,
+        int maxMeso
+    ) {
         dropItems(meso, mesoChance, minMeso, maxMeso, 0);
     }
-    
-    public void dropItems(boolean meso, int mesoChance, int minMeso, int maxMeso, int minItems) {
-        dropItems((int) reactor.getPosition().getX(), (int) reactor.getPosition().getY(), meso, mesoChance, minMeso, maxMeso, minItems);
+
+    public void dropItems(
+        boolean meso,
+        int mesoChance,
+        int minMeso,
+        int maxMeso,
+        int minItems
+    ) {
+        dropItems(
+            (int) reactor.getPosition().getX(),
+            (int) reactor.getPosition().getY(),
+            meso,
+            mesoChance,
+            minMeso,
+            maxMeso,
+            minItems
+        );
     }
 
-    public void dropItems(int posX, int posY, boolean meso, int mesoChance, int minMeso, int maxMeso, int minItems) {
-        dropItems(false, posX, posY, meso, mesoChance, minMeso, maxMeso, minItems);
+    public void dropItems(
+        int posX,
+        int posY,
+        boolean meso,
+        int mesoChance,
+        int minMeso,
+        int maxMeso,
+        int minItems
+    ) {
+        dropItems(
+            false,
+            posX,
+            posY,
+            meso,
+            mesoChance,
+            minMeso,
+            maxMeso,
+            minItems
+        );
     }
-    
-    public void dropItems(boolean delayed, int posX, int posY, boolean meso, int mesoChance, final int minMeso, final int maxMeso, int minItems) {
+
+    public void dropItems(
+        boolean delayed,
+        int posX,
+        int posY,
+        boolean meso,
+        int mesoChance,
+        final int minMeso,
+        final int maxMeso,
+        int minItems
+    ) {
         if (c.getPlayer() == null) {
             return;
         }
-        
-        List<ReactorDropEntry> items = generateDropList(getDropChances(), c.getChannelServer().getDropRate(), meso, mesoChance, minItems);
-        
+
+        List<ReactorDropEntry> items = generateDropList(
+            getDropChances(),
+            c.getChannelServer().getDropRate(),
+            meso,
+            mesoChance,
+            minItems
+        );
+
         if (items.size() % 2 == 0) {
             posX -= 12;
         }
         final Point dropPos = new Point(posX, posY);
-        
+
         if (!delayed) {
             ItemInformationProvider ii = ItemInformationProvider.getInstance();
-            
+
             byte p = 1;
             for (ReactorDropEntry d : items) {
-                dropPos.x = (int) (posX + ((p % 2 == 0) ? (25 * ((p + 1) / 2)) : -(25 * (p / 2))));
+                dropPos.x =
+                    (int) (
+                        posX +
+                        ((p % 2 == 0) ? (25 * ((p + 1) / 2)) : -(25 * (p / 2)))
+                    );
                 p++;
-                
+
                 if (!ii.isItemValid(d.itemId)) {
-                    System.out.println("[REMOVER - ReactorDrops] Item invalido: " + d.itemId);
+                    System.out.println(
+                        "[REMOVER - ReactorDrops] Item invalido: " + d.itemId
+                    );
                     continue;
                 }
-                
-                
-                
+
                 if (d.itemId == 0) {
                     int range = maxMeso - minMeso;
                     int displayDrop = (int) (Math.random() * range) + minMeso;
-                    int mesoDrop = (displayDrop * c.getChannelServer().getMesoRate());
-                    reactor.getMap().spawnMesoDrop(mesoDrop, reactor.getMap().calcDropPos(dropPos, reactor.getPosition()), reactor, c.getPlayer(), false, (byte) 2);
+                    int mesoDrop =
+                        (displayDrop * c.getChannelServer().getMesoRate());
+                    reactor
+                        .getMap()
+                        .spawnMesoDrop(
+                            mesoDrop,
+                            reactor
+                                .getMap()
+                                .calcDropPos(dropPos, reactor.getPosition()),
+                            reactor,
+                            c.getPlayer(),
+                            false,
+                            (byte) 2
+                        );
                 } else {
                     Item drop;
-                    
+
                     if (!ii.isItemValid(d.itemId)) {
                         int invalidItem = d.itemId;
-                        String sql = "DELETE FROM reactordrops WHERE reactorid = ? AND itemid = " + invalidItem;
+                        String sql =
+                            "DELETE FROM reactordrops WHERE reactorid = ? AND itemid = " +
+                            invalidItem;
                         Connection con = DatabaseConnection.getConnection();
                         try (PreparedStatement ps = con.prepareStatement(sql)) {
                             ps.setInt(1, reactor.getId());
                             ps.executeUpdate();
                         } catch (SQLException ex) {
-                            Logger.getLogger(Field.class.getName()).log(Level.SEVERE, null, ex);
+                            Logger
+                                .getLogger(Field.class.getName())
+                                .log(Level.SEVERE, null, ex);
                         }
-                        System.out.println("[REACTOR] Item removido da DB {react: " + reactor.getId() + "} | {item: " + invalidItem + "}");
-                    }
-                    
-                    if (ItemConstants.getInventoryType(d.itemId) != InventoryType.EQUIP) {
-                        drop = new Item(d.itemId, (short) 0, (short) 1);
-                    } else {
-                        drop = ii.randomizeStats((Equip) ii.getEquipById(d.itemId));
+                        System.out.println(
+                            "[REACTOR] Item removido da DB {react: " +
+                            reactor.getId() +
+                            "} | {item: " +
+                            invalidItem +
+                            "}"
+                        );
                     }
 
-                    reactor.getMap().dropFromReactor(getPlayer(), reactor, drop, dropPos, (short) d.questid);
+                    if (
+                        ItemConstants.getInventoryType(d.itemId) !=
+                        InventoryType.EQUIP
+                    ) {
+                        drop = new Item(d.itemId, (short) 0, (short) 1);
+                    } else {
+                        drop =
+                            ii.randomizeStats(
+                                (Equip) ii.getEquipById(d.itemId)
+                            );
+                    }
+
+                    reactor
+                        .getMap()
+                        .dropFromReactor(
+                            getPlayer(),
+                            reactor,
+                            drop,
+                            dropPos,
+                            (short) d.questid
+                        );
                 }
             }
         } else {
@@ -163,85 +289,138 @@ public class ReactorActionManager extends AbstractPlayerInteraction {
             final Reactor r = reactor;
             final List<ReactorDropEntry> dropItems = items;
             final int worldMesoRate = c.getChannelServer().getMesoRate();
-            
+
             dropPos.x -= (12 * items.size());
-            
-            sprayTask = MiscTimer.getInstance().register(() -> {
-                if(dropItems.isEmpty()) {
-                    sprayTask.cancel(false);
-                    return;
-                }
-                
-                ReactorDropEntry d = dropItems.remove(0);
-                if (d.itemId == 0) {
-                    int range = maxMeso - minMeso;
-                    int displayDrop = (int) (Math.random() * range) + minMeso;
-                    int mesoDrop = (displayDrop * worldMesoRate);
-                    r.getMap().spawnMesoDrop(mesoDrop, r.getMap().calcDropPos(dropPos, r.getPosition()), r, p, false, (byte) 2);
-                } else {
-                    Item drop;
-                    
-                    if (ItemConstants.getInventoryType(d.itemId) != InventoryType.EQUIP) {
-                        drop = new Item(d.itemId, (short) 0, (short) 1);
-                    } else {
-                        ItemInformationProvider ii = ItemInformationProvider.getInstance();
-                        drop = ii.randomizeStats((Equip) ii.getEquipById(d.itemId));
-                    }
-                    
-                    r.getMap().dropFromReactor(getPlayer(), r, drop, dropPos, (short) d.questid);
-                }
-                
-                dropPos.x += 25;
-            }, 100);
+
+            sprayTask =
+                MiscTimer
+                    .getInstance()
+                    .register(
+                        () -> {
+                            if (dropItems.isEmpty()) {
+                                sprayTask.cancel(false);
+                                return;
+                            }
+
+                            ReactorDropEntry d = dropItems.remove(0);
+                            if (d.itemId == 0) {
+                                int range = maxMeso - minMeso;
+                                int displayDrop = (int) (
+                                    Math.random() * range
+                                ) +
+                                minMeso;
+                                int mesoDrop = (displayDrop * worldMesoRate);
+                                r
+                                    .getMap()
+                                    .spawnMesoDrop(
+                                        mesoDrop,
+                                        r
+                                            .getMap()
+                                            .calcDropPos(
+                                                dropPos,
+                                                r.getPosition()
+                                            ),
+                                        r,
+                                        p,
+                                        false,
+                                        (byte) 2
+                                    );
+                            } else {
+                                Item drop;
+
+                                if (
+                                    ItemConstants.getInventoryType(d.itemId) !=
+                                    InventoryType.EQUIP
+                                ) {
+                                    drop =
+                                        new Item(
+                                            d.itemId,
+                                            (short) 0,
+                                            (short) 1
+                                        );
+                                } else {
+                                    ItemInformationProvider ii = ItemInformationProvider.getInstance();
+                                    drop =
+                                        ii.randomizeStats(
+                                            (Equip) ii.getEquipById(d.itemId)
+                                        );
+                                }
+
+                                r
+                                    .getMap()
+                                    .dropFromReactor(
+                                        getPlayer(),
+                                        r,
+                                        drop,
+                                        dropPos,
+                                        (short) d.questid
+                                    );
+                            }
+
+                            dropPos.x += 25;
+                        },
+                        100
+                    );
         }
     }
-    
+
     private List<ReactorDropEntry> getDropChances() {
         return ReactorScriptManager.getInstance().getDrops(reactor.getId());
     }
-    
-    private static List<ReactorDropEntry> generateDropList(List<ReactorDropEntry> drops, int dropRate, boolean meso, int mesoChance, int minItems) {
+
+    private static List<ReactorDropEntry> generateDropList(
+        List<ReactorDropEntry> drops,
+        int dropRate,
+        boolean meso,
+        int mesoChance,
+        int minItems
+    ) {
         ItemInformationProvider ii = ItemInformationProvider.getInstance();
-        
+
         List<ReactorDropEntry> items = new ArrayList<>();
         List<ReactorDropEntry> questItems = new ArrayList<>();
         int numItems = 0;
-        
+
         if (meso && Math.random() < (1 / (double) mesoChance)) {
             items.add(new ReactorDropEntry(0, mesoChance, -1));
         }
-        
+
         for (ReactorDropEntry mde : drops) {
             if (Math.random() < (dropRate / (double) mde.chance)) {
-                if(!ii.isQuestItem(mde.itemId)) {
+                if (!ii.isQuestItem(mde.itemId)) {
                     items.add(mde);
                 } else {
                     questItems.add(mde);
                 }
-                
+
                 numItems++;
             }
         }
-        
+
         while (numItems < minItems) {
             items.add(new ReactorDropEntry(0, mesoChance, -1));
             numItems++;
         }
-        
+
         java.util.Collections.shuffle(items);
         java.util.Collections.shuffle(questItems);
-        
+
         items.addAll(questItems);
         return items;
     }
 
     @Override
     public EventManager getEventManager(String event) {
-        return getClient().getChannelServer().getEventSM().getEventManager(event);
+        return getClient()
+            .getChannelServer()
+            .getEventSM()
+            .getEventManager(event);
     }
 
     public void spawnZakum(int id) {
-        reactor.getMap().spawnZakum(MapleLifeFactory.getMonster(id), getPosition());
+        reactor
+            .getMap()
+            .spawnZakum(MapleLifeFactory.getMonster(id), getPosition());
     }
 
     public void spawnMonster(int id) {
@@ -262,7 +441,9 @@ public class ReactorActionManager extends AbstractPlayerInteraction {
 
     private void spawnMonster(int id, int qty, Point pos) {
         for (int i = 0; i < qty; i++) {
-            reactor.getMap().spawnMonsterOnGroudBelow(MapleLifeFactory.getMonster(id), pos);
+            reactor
+                .getMap()
+                .spawnMonsterOnGroudBelow(MapleLifeFactory.getMonster(id), pos);
         }
     }
 
@@ -277,17 +458,17 @@ public class ReactorActionManager extends AbstractPlayerInteraction {
     }
 
     public void spawnNpc(int npcId, int x, int y) {
-        spawnNpc(npcId, new Point(x,y));
+        spawnNpc(npcId, new Point(x, y));
     }
-    
-    public void hitMonsterWithReactor(int id, int hitsToKill) { 
+
+    public void hitMonsterWithReactor(int id, int hitsToKill) {
         MapleMonster mm = reactor.getMap().getMonsterById(id);
-        if(mm != null) {
-            int damage = (int)Math.ceil(mm.getMaxHp() / hitsToKill);
+        if (mm != null) {
+            int damage = (int) Math.ceil(mm.getMaxHp() / hitsToKill);
             reactor.getMap().damageMonster(this.getPlayer(), mm, damage);
         }
     }
-	
+
     public void spawnNpc(int npcId, Point pos) {
         MapleNPC npc = MapleLifeFactory.getNPC(npcId);
         if (npc != null && !npc.getName().equals("MISSINGNO")) {
@@ -297,11 +478,11 @@ public class ReactorActionManager extends AbstractPlayerInteraction {
             npc.setRx1(pos.x - 50);
             npc.setFh(reactor.getMap().getFootholds().findBelow(pos).getId());
             npc.getStats().setCustom(true);
-            reactor.getMap().addMapObject(npc);  
+            reactor.getMap().addMapObject(npc);
             reactor.getMap().broadcastMessage(PacketCreator.SpawnNPC(npc));
         }
     }
-	
+
     public Reactor getReactor() {
         return reactor;
     }
@@ -343,14 +524,25 @@ public class ReactorActionManager extends AbstractPlayerInteraction {
     }
 
     public void closeDoor(int mapid) {
-        getClient().getChannelServer().getMapFactory().getMap(mapid).setReactorState();
+        getClient()
+            .getChannelServer()
+            .getMapFactory()
+            .getMap(mapid)
+            .setReactorState();
     }
 
     public void openDoor(int mapid) {
-        getClient().getChannelServer().getMapFactory().getMap(mapid).resetReactors();
+        getClient()
+            .getChannelServer()
+            .getMapFactory()
+            .getMap(mapid)
+            .resetReactors();
     }
 
     public void createMapMonitor(int mapId, String portal) {
-        new FieldMonitor(c.getChannelServer().getMapFactory().getMap(mapId), portal);
+        new FieldMonitor(
+            c.getChannelServer().getMapFactory().getMap(mapId),
+            portal
+        );
     }
 }

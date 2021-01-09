@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -20,8 +20,6 @@
 */
 package server;
 
-import java.sql.SQLException;
-
 import database.DatabaseConnection;
 import handling.channel.ChannelServer;
 import handling.login.LoginServer;
@@ -29,6 +27,7 @@ import handling.world.service.AllianceService;
 import handling.world.service.BroadcastService;
 import handling.world.service.GuildService;
 import java.lang.management.ManagementFactory;
+import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.management.InstanceAlreadyExistsException;
@@ -65,39 +64,63 @@ public class ShutdownServer implements ShutdownServerMBean {
         MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
         try {
             instance = new ShutdownServer();
-            mBeanServer.registerMBean(instance, new ObjectName("server:type=ShutdownServer"));
-        } catch (InstanceAlreadyExistsException | MBeanRegistrationException | MalformedObjectNameException | NotCompliantMBeanException e) {
+            mBeanServer.registerMBean(
+                instance,
+                new ObjectName("server:type=ShutdownServer")
+            );
+        } catch (
+            InstanceAlreadyExistsException
+            | MBeanRegistrationException
+            | MalformedObjectNameException
+            | NotCompliantMBeanException e
+        ) {
             System.out.println("Error registering Shutdown MBean");
             e.printStackTrace();
         }
     }
-    
-     public static ShutdownServer getInstance() {
+
+    public static ShutdownServer getInstance() {
         return instance;
     }
-     
+
     @Override
-      public void run() {
+    public void run() {
         if (this.mode == 0) {
             int ret = 0;
-            BroadcastService.broadcastMessage(PacketCreator.ServerNotice(0, "The world is going to shutdown soon. Please log off safely."));
+            BroadcastService.broadcastMessage(
+                PacketCreator.ServerNotice(
+                    0,
+                    "The world is going to shutdown soon. Please log off safely."
+                )
+            );
             for (ChannelServer cs : ChannelServer.getAllInstances()) {
                 cs.setShutdown();
-                cs.setServerMessage("The world is going to shutdown soon. Please log off safely.");
+                cs.setServerMessage(
+                    "The world is going to shutdown soon. Please log off safely."
+                );
             }
 
             GuildService.save();
             AllianceService.save();
-            
-            System.out.println("Shutdown 1 has completed. Hired merchants saved: " + ret);
+
+            System.out.println(
+                "Shutdown 1 has completed. Hired merchants saved: " + ret
+            );
             this.mode += 1;
         } else if (this.mode == 1) {
             this.mode += 1;
             System.out.println("Shutdown 2 commencing...");
 
             try {
-                BroadcastService.broadcastMessage(PacketCreator.ServerNotice(0, "The world is going to shutdown now. Please log off safely."));
-                Integer[] chs = ChannelServer.getAllInstance().toArray(new Integer[0]);
+                BroadcastService.broadcastMessage(
+                    PacketCreator.ServerNotice(
+                        0,
+                        "The world is going to shutdown now. Please log off safely."
+                    )
+                );
+                Integer[] chs = ChannelServer
+                    .getAllInstance()
+                    .toArray(new Integer[0]);
 
                 for (int i : chs) {
                     try {
@@ -111,17 +134,17 @@ public class ShutdownServer implements ShutdownServerMBean {
                 }
                 LoginServer.shutdown();
                 WorldTimer.getInstance().stop();
-                MiscTimer.getInstance().stop();   
-                ClientTimer.getInstance().stop();   
-                MountTimer.getInstance().stop();           
-                MonsterTimer.getInstance().stop();    
-                ItemTimer.getInstance().stop();   
-                MapTimer.getInstance().stop();   
-                EventTimer.getInstance().stop();   
-                AntiCheatTimer.getInstance().stop();   
-                NPCTimer.getInstance().stop();   
-                CharacterTimer.getInstance().stop();   
-                SkillTimer.getInstance().stop(); 
+                MiscTimer.getInstance().stop();
+                ClientTimer.getInstance().stop();
+                MountTimer.getInstance().stop();
+                MonsterTimer.getInstance().stop();
+                ItemTimer.getInstance().stop();
+                MapTimer.getInstance().stop();
+                EventTimer.getInstance().stop();
+                AntiCheatTimer.getInstance().stop();
+                NPCTimer.getInstance().stop();
+                CharacterTimer.getInstance().stop();
+                SkillTimer.getInstance().stop();
                 CheatTrackerTimer.getInstance().stop();
             } catch (Exception e) {
                 System.out.println("Failed to shutdown..." + e);
@@ -131,13 +154,15 @@ public class ShutdownServer implements ShutdownServerMBean {
             try {
                 DatabaseConnection.getConnection().close();
             } catch (SQLException ex) {
-                Logger.getLogger(ShutdownServer.class.getName()).log(Level.SEVERE, null, ex);
+                Logger
+                    .getLogger(ShutdownServer.class.getName())
+                    .log(Level.SEVERE, null, ex);
             }
             this.mode = 0;
             System.out.println("Done.");
         }
     }
-    
+
     @Override
     public void shutdown() {
         run();
