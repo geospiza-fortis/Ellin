@@ -43,6 +43,8 @@ services:
         ports:
             - "8484:8484"
             - "7575:7575"
+            - "7576:7576"
+            - "7577:7577"
         depends_on:
             - db
         command: bash -c "bin/run_ellin_sql.sh && exec bin/launch.sh"

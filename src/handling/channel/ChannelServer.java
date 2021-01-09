@@ -251,7 +251,7 @@ public class ChannelServer {
 
     public static final void startChannelMain() {
         for (int i = 0; i < ServerProperties.Channel.COUNT; i++) {
-            newInstance(i + 1).runStartupConfigurations();
+            newInstance(i).runStartupConfigurations();
         }
     }
 
