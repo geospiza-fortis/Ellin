@@ -32,7 +32,6 @@ import packet.creators.PetPackets;
 import scripting.event.EventInstanceManager;
 import server.itens.InventoryManipulator;
 import server.itens.ItemInformationProvider;
-import server.events.RussianRoulette;
 import server.expeditions.MapleExpedition;
 import server.expeditions.MapleExpeditionType;
 import server.transitions.Boats;
@@ -248,8 +247,6 @@ public class AbstractPlayerInteraction {
                 return Cabin.cabinOpen();
             case "Genio":  
                 return Genie.genioOpen();
-            case "RoletaRussa":  
-                return RussianRoulette.RoletaDisponivel();
             case "ElevadorDescendo":  
                 return Elevator.elevatorIsDown();
             case "ElevadorSubindo":  
@@ -667,7 +664,7 @@ public class AbstractPlayerInteraction {
             getPlayer().getMap().clearDrops();
             
             p.getClient().getSession().write(PacketCreator.GetClockTimer(8 * 60));
-            p.dropMessage(5, "É recomendado mover o seu minimap para baixo um pouco, a fim de visualizar os rankings.");
+            p.dropMessage(5, "It is recommended to move your minimap down a bit in order to view the rankings.");
             
             MapTimer.getInstance().schedule(p::updateAriantScore, 800);
             MiscTimer.getInstance().schedule(() -> {

@@ -3,6 +3,7 @@ package server.minirooms;
 import server.minirooms.components.SoldItem;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.concurrent.ScheduledFuture;
 import client.player.Player;
 import client.Client;
@@ -10,7 +11,6 @@ import client.player.inventory.Inventory;
 import client.player.inventory.types.InventoryType;
 import client.player.inventory.Item;
 import client.player.inventory.ItemFactory;
-import com.mysql.jdbc.Statement;
 import constants.GameConstants;
 import constants.ItemConstants;
 import database.DatabaseConnection;
@@ -339,10 +339,10 @@ public final class Merchant extends AbstractMapleFieldObject {
                         pItem.setDoesExist(false);
                     }
                 } else {
-                    c.getPlayer().dropMessage(1, "Seu inventário está cheio. Por favor, limpe um slot antes de comprar este item.");
+                    c.getPlayer().dropMessage(1, "Your inventory is full. Please clear a slot before purchasing this item.");
                 }
             } else {
-                c.getPlayer().dropMessage(1, "Você não tem mesos suficientes.");
+                c.getPlayer().dropMessage(1, "You donâ€™t have enough mesos.");
             }
             try {
                 this.saveItems(false);
@@ -692,7 +692,7 @@ public final class Merchant extends AbstractMapleFieldObject {
                 p.announce(MerchantPackets.MerchantMaintenanceMessage());
                 return;
             } else if (!this.addVisitor(p)) {
-                p.dropMessage(1, "Esta loja atingiu sua capacidade máxima, por favor, tente mais tarde.");
+                p.dropMessage(1, "This store has reached its maximum capacity, please try again later.");
                 return;
             } else {
                 p.announce(MerchantPackets.GetMerchant(p, this, false));

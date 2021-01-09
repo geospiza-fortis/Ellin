@@ -1,8 +1,3 @@
-/**
- * Ellin é um servidor privado de MapleStory
- * Baseado em um servidor GMS-Like na v.62
- */
-
 package client.player;
 
 import client.player.inventory.types.InventoryType;

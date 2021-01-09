@@ -21,6 +21,6 @@ public Field myRide, returnMap, map, docked, onRide;
 public long timeOnRide = 60; 
 
         public Hak () {
-           //Sem animação para terminar :(
+           // No animation to finish :(
       }
 }  
