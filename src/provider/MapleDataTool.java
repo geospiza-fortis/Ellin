@@ -1,6 +1,6 @@
 /*
 This file is part of the OdinMS Maple Story Server
-Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc> 
+Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc>
 Matthias Butz <matze@odinms.de>
 Jan Christian Meyer <vimes@odinms.de>
 
@@ -22,7 +22,6 @@ package provider;
 
 import java.awt.Point;
 import java.awt.image.BufferedImage;
-
 import provider.wzxml.MapleDataType;
 
 public class MapleDataTool {
@@ -79,7 +78,9 @@ public class MapleDataTool {
                 case STRING:
                     return Integer.parseInt(getString(data));
                 case SHORT:
-                    return Integer.valueOf(((Short) data.getData()).shortValue());
+                    return Integer.valueOf(
+                        ((Short) data.getData()).shortValue()
+                    );
                 default:
                     return ((Integer) data.getData()).intValue();
             }

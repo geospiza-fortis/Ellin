@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -25,6 +25,7 @@ import java.awt.Point;
 import packet.transfer.write.WritingPacket;
 
 public class ChangeEquipSpecialAwesome implements LifeMovementFragment {
+
     private final int wui;
 
     public ChangeEquipSpecialAwesome(int wui) {
@@ -39,6 +40,6 @@ public class ChangeEquipSpecialAwesome implements LifeMovementFragment {
 
     @Override
     public Point getPosition() {
-        return new Point(0,0);
+        return new Point(0, 0);
     }
 }

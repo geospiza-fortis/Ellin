@@ -19,7 +19,7 @@ import tools.HexTool;
 import tools.Pair;
 
 public class MerchantPackets {
-    
+
     public static OutPacket MerchantVisitorAdd(Player p, int slot) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
@@ -29,7 +29,7 @@ public class MerchantPackets {
         wp.writeMapleAsciiString(p.getName());
         return wp.getPacket();
     }
-    
+
     public static OutPacket MerchantMaintenanceMessage() {
         WritingPacket wp = new WritingPacket(5);
         wp.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
@@ -38,7 +38,7 @@ public class MerchantPackets {
         wp.write(0x10);
         return wp.getPacket();
     }
-    
+
     public static OutPacket MerchantVisitorLeave(int slot) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
@@ -48,7 +48,7 @@ public class MerchantPackets {
         }
         return wp.getPacket();
     }
-    
+
     public static OutPacket MerchantOwnerLeave() {
         final WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
@@ -56,7 +56,7 @@ public class MerchantPackets {
         wp.write(0);
         return wp.getPacket();
     }
-    
+
     public static OutPacket MerchantLeave(int error, int type) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
@@ -65,7 +65,7 @@ public class MerchantPackets {
         wp.write(type);
         return wp.getPacket();
     }
-    
+
     public static OutPacket HiredMerchantForceLeaveOne() {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
@@ -83,7 +83,7 @@ public class MerchantPackets {
         wp.write(0x0D);
         return wp.getPacket();
     }
-    
+
     public static OutPacket MerchantSpawn(Merchant miniRoom, int miniRoomType) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.SPAWN_HIRED_MERCHANT.getValue());
@@ -98,29 +98,39 @@ public class MerchantPackets {
         }
         return wp.getPacket();
     }
-    
-    public static OutPacket UpdateHiredMerchantBalloon(Merchant miniRoom, int miniRoomType) {
+
+    public static OutPacket UpdateHiredMerchantBalloon(
+        Merchant miniRoom,
+        int miniRoomType
+    ) {
         final WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.UPDATE_HIRED_MERCHANT.getValue());
         wp.writeInt(miniRoom.getOwnerId());
         wp.write(miniRoomType);
         if (miniRoomType == 5) {
             updateMerchatBalloon(wp, miniRoom);
-        }   
+        }
         return wp.getPacket();
     }
-    
-    public static void updateMerchatBalloon(WritingPacket wp, Merchant miniRoom) {
-        wp.writeInt(miniRoom.getObjectId()); 
-        wp.writeMapleAsciiString(miniRoom.getDescription()); 
+
+    public static void updateMerchatBalloon(
+        WritingPacket wp,
+        Merchant miniRoom
+    ) {
+        wp.writeInt(miniRoom.getObjectId());
+        wp.writeMapleAsciiString(miniRoom.getDescription());
         wp.write(miniRoom.getItemId() % 10);
-        wp.write(miniRoom.getSize()); 
+        wp.write(miniRoom.getSize());
         wp.write(miniRoom.getMaxSize());
     }
-    
-    public static OutPacket GetMerchant(Player p, Merchant hm, boolean firstTime) {
+
+    public static OutPacket GetMerchant(
+        Player p,
+        Merchant hm,
+        boolean firstTime
+    ) {
         WritingPacket wp = new WritingPacket();
-        wp.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue()); 
+        wp.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
         wp.write(HexTool.getByteArrayFromHexString("05 05 04"));
         wp.write(hm.isOwner(p) ? 0 : 1);
         wp.write(0);
@@ -142,7 +152,7 @@ public class MerchantPackets {
                 wp.write(msgList.get(i).getRight());
             }
         } else {
-                wp.writeShort(0);
+            wp.writeShort(0);
         }
         wp.writeMapleAsciiString(hm.getOwner());
         if (hm.isOwner(p)) {
@@ -152,9 +162,9 @@ public class MerchantPackets {
             wp.write(sold.size());
             for (SoldItem s : sold) {
                 wp.writeInt(s.getItemId());
-                wp.writeShort(s.getQuantity()); 
+                wp.writeShort(s.getQuantity());
                 wp.writeInt(s.getMesos());
-                wp.writeMapleAsciiString(s.getBuyer()); 
+                wp.writeMapleAsciiString(s.getBuyer());
             }
             wp.writeInt(p.getMerchantMeso());
         }
@@ -174,7 +184,7 @@ public class MerchantPackets {
         }
         return wp.getPacket();
     }
-    
+
     public static OutPacket MerchantChat(String message, int slot) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
@@ -184,14 +194,14 @@ public class MerchantPackets {
         wp.writeMapleAsciiString(message);
         return wp.getPacket();
     }
-    
+
     public static OutPacket MerchantDestroy(int id) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.DESTROY_HIRED_MERCHANT.getValue());
         wp.writeInt(id);
         return wp.getPacket();
     }
-  
+
     public static OutPacket UpdateMerchant(Merchant hm, Player chr) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());

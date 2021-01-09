@@ -6,8 +6,8 @@
 package packet.creators;
 
 import client.player.Player;
-import community.MapleGuildAlliance;
 import community.MapleGuild;
+import community.MapleGuildAlliance;
 import community.MapleGuildCharacter;
 import handling.channel.handler.ChannelHeaders.GuildHeaders;
 import handling.world.service.GuildService;
@@ -20,29 +20,33 @@ import packet.transfer.write.WritingPacket;
 import tools.StringUtil;
 
 public class GuildPackets {
-    
+
     public static OutPacket ShowGuildInfo(Player p) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.GUILD_OPERATION.getValue());
         wp.write(0x1A);
-        if (p == null) { 
+        if (p == null) {
             wp.write(0);
             return wp.getPacket();
         }
         MapleGuild g = GuildService.getGuild(p.getGuildId());
-        if (g == null) { 
+        if (g == null) {
             wp.write(0);
             return wp.getPacket();
         } else {
             MapleGuildCharacter mgc = g.getMGC(p.getId());
             p.setGuildRank(mgc.getGuildRank());
         }
-        wp.write(1); 
+        wp.write(1);
         GetGuildInfo(wp, g);
         return wp.getPacket();
     }
-    
-    public static OutPacket GuildMemberOnline(int gID, int cID, boolean bOnline) {
+
+    public static OutPacket GuildMemberOnline(
+        int gID,
+        int cID,
+        boolean bOnline
+    ) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.GUILD_OPERATION.getValue());
         wp.write(GuildHeaders.CHANNEL_CHANGE);
@@ -60,7 +64,7 @@ public class GuildPackets {
         wp.writeMapleAsciiString(charName);
         return wp.getPacket();
     }
-    
+
     public static OutPacket DenyGuildInvitation(String charName) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.GUILD_OPERATION.getValue());
@@ -68,7 +72,7 @@ public class GuildPackets {
         wp.writeMapleAsciiString(charName);
         return wp.getPacket();
     }
-	
+
     public static OutPacket GenericGuildMessage(byte code) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.GUILD_OPERATION.getValue());
@@ -82,20 +86,29 @@ public class GuildPackets {
         wp.write(GuildHeaders.JOINED_GUILD);
         wp.writeInt(mgc.getGuildId());
         wp.writeInt(mgc.getId());
-        wp.writeAsciiString(StringUtil.getRightPaddedStr(mgc.getName(), '\0', 13));
+        wp.writeAsciiString(
+            StringUtil.getRightPaddedStr(mgc.getName(), '\0', 13)
+        );
         wp.writeInt(mgc.getJobId());
         wp.writeInt(mgc.getLevel());
-        wp.writeInt(mgc.getGuildRank()); 
+        wp.writeInt(mgc.getGuildRank());
         wp.writeInt(mgc.isOnline() ? 1 : 0);
-        wp.writeInt(1); 
+        wp.writeInt(1);
         wp.writeInt(3);
         return wp.getPacket();
     }
 
-    public static OutPacket MemberLeft(MapleGuildCharacter mgc, boolean bExpelled) {
+    public static OutPacket MemberLeft(
+        MapleGuildCharacter mgc,
+        boolean bExpelled
+    ) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.GUILD_OPERATION.getValue());
-        wp.write(bExpelled ? GuildHeaders.EXPELLED_FROM_GUILD : GuildHeaders.LEFT_GUILD);
+        wp.write(
+            bExpelled
+                ? GuildHeaders.EXPELLED_FROM_GUILD
+                : GuildHeaders.LEFT_GUILD
+        );
         wp.writeInt(mgc.getGuildId());
         wp.writeInt(mgc.getId());
         wp.writeMapleAsciiString(mgc.getName());
@@ -138,7 +151,7 @@ public class GuildPackets {
         wp.write(GuildHeaders.RANK_TITLES_CHANGED);
         wp.writeInt(gID);
         for (int i = 0; i < 5; i++) {
-                wp.writeMapleAsciiString(ranks[i]);
+            wp.writeMapleAsciiString(ranks[i]);
         }
         return wp.getPacket();
     }
@@ -152,7 +165,13 @@ public class GuildPackets {
         return wp.getPacket();
     }
 
-    public static OutPacket GuildEmblemChange(int gID, short bg, byte bgColor, short logo, byte logoColor) {
+    public static OutPacket GuildEmblemChange(
+        int gID,
+        short bg,
+        byte bgColor,
+        short logo,
+        byte logoColor
+    ) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.GUILD_OPERATION.getValue());
         wp.write(GuildHeaders.EMBLEM_CHANGED);
@@ -173,16 +192,20 @@ public class GuildPackets {
         return wp.getPacket();
     }
 
-    public static void AddThread(WritingPacket mplew, ResultSet rs) throws SQLException {
+    public static void AddThread(WritingPacket mplew, ResultSet rs)
+        throws SQLException {
         mplew.writeInt(rs.getInt("localthreadid"));
         mplew.writeInt(rs.getInt("postercid"));
         mplew.writeMapleAsciiString(rs.getString("name"));
-        mplew.writeLong(PacketCreator.GetKoreanTimestamp(rs.getLong("timestamp")));
+        mplew.writeLong(
+            PacketCreator.GetKoreanTimestamp(rs.getLong("timestamp"))
+        );
         mplew.writeInt(rs.getInt("icon"));
         mplew.writeInt(rs.getInt("replycount"));
     }
 
-    public static OutPacket BBSThreadList(ResultSet rs, int start) throws SQLException {
+    public static OutPacket BBSThreadList(ResultSet rs, int start)
+        throws SQLException {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.BBS_OPERATION.getValue());
         wp.write(0x06);
@@ -213,13 +236,19 @@ public class GuildPackets {
         return wp.getPacket();
     }
 
-    public static OutPacket ShowThread(int localThreadID, ResultSet threadRS, ResultSet repliesRS) throws SQLException, RuntimeException {
+    public static OutPacket ShowThread(
+        int localThreadID,
+        ResultSet threadRS,
+        ResultSet repliesRS
+    ) throws SQLException, RuntimeException {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.BBS_OPERATION.getValue());
         wp.write(0x07);
         wp.writeInt(localThreadID);
         wp.writeInt(threadRS.getInt("postercid"));
-        wp.writeLong(PacketCreator.GetKoreanTimestamp(threadRS.getLong("timestamp")));
+        wp.writeLong(
+            PacketCreator.GetKoreanTimestamp(threadRS.getLong("timestamp"))
+        );
         wp.writeMapleAsciiString(threadRS.getString("name"));
         wp.writeMapleAsciiString(threadRS.getString("startpost"));
         wp.writeInt(threadRS.getInt("icon"));
@@ -230,28 +259,35 @@ public class GuildPackets {
             for (i = 0; i < replyCount && repliesRS.next(); i++) {
                 wp.writeInt(repliesRS.getInt("replyid"));
                 wp.writeInt(repliesRS.getInt("postercid"));
-                wp.writeLong(PacketCreator.GetKoreanTimestamp(repliesRS.getLong("timestamp")));
+                wp.writeLong(
+                    PacketCreator.GetKoreanTimestamp(
+                        repliesRS.getLong("timestamp")
+                    )
+                );
                 wp.writeMapleAsciiString(repliesRS.getString("content"));
             }
             if (i != replyCount || repliesRS.next()) {
-                throw new RuntimeException(String.valueOf(threadRS.getInt("threadid")));
+                throw new RuntimeException(
+                    String.valueOf(threadRS.getInt("threadid"))
+                );
             }
         } else {
-            wp.writeInt(0); 
+            wp.writeInt(0);
         }
         return wp.getPacket();
     }
-    
-    public static OutPacket ShowGuildRanks(int npcID, ResultSet rs) throws SQLException {
+
+    public static OutPacket ShowGuildRanks(int npcID, ResultSet rs)
+        throws SQLException {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.GUILD_OPERATION.getValue());
         wp.write(GuildHeaders.SHOW_GUILD_RANK_BOARD);
         wp.writeInt(npcID);
-        if (!rs.last())	{  
+        if (!rs.last()) {
             wp.writeInt(0);
             return wp.getPacket();
         }
-        wp.writeInt(rs.getRow());  
+        wp.writeInt(rs.getRow());
         rs.beforeFirst();
         while (rs.next()) {
             wp.writeMapleAsciiString(rs.getString("name"));
@@ -263,7 +299,7 @@ public class GuildPackets {
         }
         return wp.getPacket();
     }
-	
+
     public static OutPacket UpdateGP(int gID, int GP) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.GUILD_OPERATION.getValue());
@@ -272,7 +308,7 @@ public class GuildPackets {
         wp.writeInt(GP);
         return wp.getPacket();
     }
-    
+
     public static OutPacket LoadGuildName(Player p) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.UPDATE_GUILD_MEMBERSHIP.getValue());
@@ -285,7 +321,7 @@ public class GuildPackets {
         }
         return wp.getPacket();
     }
-   
+
     public static OutPacket LoadGuildIcon(Player p) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.UPDATE_GUILD_EMBLEM.getValue());
@@ -305,9 +341,13 @@ public class GuildPackets {
         }
         return wp.getPacket();
     }
-    
-    public static OutPacket ContractGuildMember(int nPartyID, String sGuildName, String sMasterName) {
-        WritingPacket wp = new WritingPacket();    
+
+    public static OutPacket ContractGuildMember(
+        int nPartyID,
+        String sGuildName,
+        String sMasterName
+    ) {
+        WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.GUILD_OPERATION.getValue());
         wp.write(GuildHeaders.GUILD_CONTRACT);
         wp.writeInt(nPartyID);
@@ -315,20 +355,22 @@ public class GuildPackets {
         wp.writeMapleAsciiString(sGuildName);
         return wp.getPacket();
     }
-    
+
     public static OutPacket GetAllianceInfo(MapleGuildAlliance alliance) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.ALLIANCE_OPERATION.getValue());
         wp.write(0x0C);
-        wp.write(alliance == null ? 0 : 1); 
+        wp.write(alliance == null ? 0 : 1);
         if (alliance != null) {
             AddAllianceInfo(wp, alliance);
         }
         return wp.getPacket();
     }
-    
-     private static void AddAllianceInfo(WritingPacket mplew, MapleGuildAlliance alliance) {
-        
+
+    private static void AddAllianceInfo(
+        WritingPacket mplew,
+        MapleGuildAlliance alliance
+    ) {
         mplew.writeInt(alliance.getId());
         mplew.writeMapleAsciiString(alliance.getName());
         for (int i = 1; i <= 5; i++) {
@@ -338,11 +380,14 @@ public class GuildPackets {
         for (int i = 0; i < alliance.getNoGuilds(); i++) {
             mplew.writeInt(alliance.getGuildId(i));
         }
-        mplew.writeInt(alliance.getCapacity());  
+        mplew.writeInt(alliance.getCapacity());
         mplew.writeMapleAsciiString(alliance.getNotice());
     }
 
-    public static OutPacket UpdateAlliance(MapleGuildCharacter mgc, int allianceid) {
+    public static OutPacket UpdateAlliance(
+        MapleGuildCharacter mgc,
+        int allianceid
+    ) {
         WritingPacket mplew = new WritingPacket();
         mplew.writeShort(SendPacketOpcode.ALLIANCE_OPERATION.getValue());
         mplew.write(0x18);
@@ -378,19 +423,21 @@ public class GuildPackets {
         return wp.getPacket();
     }
 
-    public static OutPacket AddGuildToAlliance(MapleGuildAlliance alliance, MapleGuild newGuild) {
+    public static OutPacket AddGuildToAlliance(
+        MapleGuildAlliance alliance,
+        MapleGuild newGuild
+    ) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.ALLIANCE_OPERATION.getValue());
         wp.write(0x12);
         AddAllianceInfo(wp, alliance);
         wp.writeInt(newGuild.getId());
         GetGuildInfo(wp, newGuild);
-        wp.write(0);  
+        wp.write(0);
         return wp.getPacket();
     }
-    
-     private static void GetGuildInfo(WritingPacket wp, MapleGuild guild) {
-        
+
+    private static void GetGuildInfo(WritingPacket wp, MapleGuild guild) {
         wp.writeInt(guild.getId());
         wp.writeMapleAsciiString(guild.getName());
         for (int i = 1; i <= 5; i++) {
@@ -406,9 +453,13 @@ public class GuildPackets {
         wp.writeInt(guild.getGP());
         wp.writeInt(guild.getAllianceId() > 0 ? guild.getAllianceId() : 0);
     }
-    
-    
-    public static OutPacket AllianceMemberOnline(int alliance, int gid, int id, boolean online) {
+
+    public static OutPacket AllianceMemberOnline(
+        int alliance,
+        int gid,
+        int id,
+        boolean online
+    ) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.ALLIANCE_OPERATION.getValue());
         wp.write(0x0E);
@@ -428,7 +479,10 @@ public class GuildPackets {
         return wp.getPacket();
     }
 
-    public static OutPacket ChangeAllianceRankTitle(int alliance, String[] ranks) {
+    public static OutPacket ChangeAllianceRankTitle(
+        int alliance,
+        String[] ranks
+    ) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.ALLIANCE_OPERATION.getValue());
         wp.write(0x1A);
@@ -450,14 +504,18 @@ public class GuildPackets {
         wp.writeInt(p.getJob().getId());
         return wp.getPacket();
     }
-    
-    public static OutPacket RemoveGuildFromAlliance(MapleGuildAlliance alliance, MapleGuild expelledGuild, boolean expelled) {   
+
+    public static OutPacket RemoveGuildFromAlliance(
+        MapleGuildAlliance alliance,
+        MapleGuild expelledGuild,
+        boolean expelled
+    ) {
         WritingPacket mplew = new WritingPacket();
         mplew.writeShort(SendPacketOpcode.ALLIANCE_OPERATION.getValue());
         mplew.write(0x10);
         AddAllianceInfo(mplew, alliance);
         GetGuildInfo(mplew, expelledGuild);
-        mplew.write(expelled ? 1 : 0); 
+        mplew.write(expelled ? 1 : 0);
         return mplew.getPacket();
     }
 
@@ -468,7 +526,7 @@ public class GuildPackets {
         wp.writeInt(alliance);
         return wp.getPacket();
     }
-    
+
     public static OutPacket CreateGuildAlliance(MapleGuildAlliance alliance) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.ALLIANCE_OPERATION.getValue());
@@ -488,7 +546,10 @@ public class GuildPackets {
         return wp.getPacket();
     }
 
-    public static OutPacket ChangeAlliance(MapleGuildAlliance alliance, final boolean in) {
+    public static OutPacket ChangeAlliance(
+        MapleGuildAlliance alliance,
+        final boolean in
+    ) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.ALLIANCE_OPERATION.getValue());
         wp.write(0x01);
@@ -514,7 +575,7 @@ public class GuildPackets {
         }
         return wp.getPacket();
     }
-    
+
     public static OutPacket GetAllianceUpdate(MapleGuildAlliance alliance) {
         WritingPacket mplew = new WritingPacket();
         mplew.writeShort(SendPacketOpcode.ALLIANCE_OPERATION.getValue());
@@ -523,7 +584,11 @@ public class GuildPackets {
         return mplew.getPacket();
     }
 
-    public static OutPacket ChangeGuildInAlliance(MapleGuildAlliance alliance, MapleGuild guild, final boolean add) {
+    public static OutPacket ChangeGuildInAlliance(
+        MapleGuildAlliance alliance,
+        MapleGuild guild,
+        final boolean add
+    ) {
         WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.ALLIANCE_OPERATION.getValue());
         wp.write(0x04);
@@ -537,8 +602,12 @@ public class GuildPackets {
         }
         return wp.getPacket();
     }
-    
-    public static OutPacket ChangeAllianceLeader(int allianceid, int newLeader, int oldLeader) {
+
+    public static OutPacket ChangeAllianceLeader(
+        int allianceid,
+        int newLeader,
+        int oldLeader
+    ) {
         WritingPacket mplew = new WritingPacket();
         mplew.writeShort(SendPacketOpcode.ALLIANCE_OPERATION.getValue());
         mplew.write(0x02);
@@ -547,8 +616,12 @@ public class GuildPackets {
         mplew.writeInt(newLeader);
         return mplew.getPacket();
     }
-    
-    public static OutPacket UpdateAllianceLeader(int allianceid, int newLeader, int oldLeader) {
+
+    public static OutPacket UpdateAllianceLeader(
+        int allianceid,
+        int newLeader,
+        int oldLeader
+    ) {
         WritingPacket mplew = new WritingPacket();
         mplew.writeShort(SendPacketOpcode.ALLIANCE_OPERATION.getValue());
         mplew.write(0x19);
@@ -558,7 +631,10 @@ public class GuildPackets {
         return mplew.getPacket();
     }
 
-     public static OutPacket SendAllianceInvite(String allianceName, Player inviter) {
+    public static OutPacket SendAllianceInvite(
+        String allianceName,
+        Player inviter
+    ) {
         WritingPacket mplew = new WritingPacket();
         mplew.writeShort(SendPacketOpcode.ALLIANCE_OPERATION.getValue());
         mplew.write(0x03);

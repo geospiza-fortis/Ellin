@@ -33,13 +33,13 @@ import server.quest.MapleQuestActionType;
  * @author Tyler (Twdtwd)
  */
 public final class BuffAction extends MapleQuestAction {
+
     int itemEffect;
 
     public BuffAction(MapleQuest quest, MapleData data) {
         super(MapleQuestActionType.BUFF, quest);
         processData(data);
     }
-
 
     @Override
     public void processData(MapleData data) {
@@ -48,6 +48,9 @@ public final class BuffAction extends MapleQuestAction {
 
     @Override
     public void run(Player p, Integer extSelection) {
-        ItemInformationProvider.getInstance().getItemEffect(itemEffect).applyTo(p);
+        ItemInformationProvider
+            .getInstance()
+            .getItemEffect(itemEffect)
+            .applyTo(p);
     }
-} 
+}

@@ -1,6 +1,6 @@
 /*
 This file is part of the OdinMS Maple Story Server
-Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc> 
+Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc>
 Matthias Butz <matze@odinms.de>
 Jan Christian Meyer <vimes@odinms.de>
 
@@ -34,7 +34,24 @@ import org.apache.mina.core.buffer.IoBuffer;
  */
 public class HexTool {
 
-    private static final char[] HEX = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+    private static final char[] HEX = {
+        '0',
+        '1',
+        '2',
+        '3',
+        '4',
+        '5',
+        '6',
+        '7',
+        '8',
+        '9',
+        'A',
+        'B',
+        'C',
+        'D',
+        'E',
+        'F',
+    };
 
     /**
      * Turns a byte into a hexadecimal string.
@@ -44,7 +61,7 @@ public class HexTool {
      */
     public static String toString(byte byteValue) {
         int tmp = byteValue << 8;
-        char[] retstr = {HEX[(tmp >> 12 & 0xF)], HEX[(tmp >> 8 & 0xF)]};
+        char[] retstr = { HEX[(tmp >> 12 & 0xF)], HEX[(tmp >> 8 & 0xF)] };
         return String.valueOf(retstr);
     }
 
@@ -76,7 +93,6 @@ public class HexTool {
         return Integer.toHexString(intValue);
     }
 
-
     /**
      * Turns an array of bytes into a hexadecimal string.
      *
@@ -91,7 +107,6 @@ public class HexTool {
         }
         return hexed.substring(0, hexed.length() - 1);
     }
-
 
     /**
      * Turns an array of bytes into a ASCII string. Any non-printable characters
@@ -138,8 +153,7 @@ public class HexTool {
         int nextb = 0;
 
         boolean highoc = true;
-        outer:
-        while (true) {
+        outer:while (true) {
             int number = -1;
             while (number == -1) {
                 if (nexti == hex.length()) {
@@ -170,10 +184,19 @@ public class HexTool {
     }
 
     public static String getOpcodeToString(int op) {
-        return new StringBuilder().append("0x").append(StringUtil.getLeftPaddedStr(Integer.toHexString(op).toUpperCase(), '0', 4)).toString();
+        return new StringBuilder()
+            .append("0x")
+            .append(
+                StringUtil.getLeftPaddedStr(
+                    Integer.toHexString(op).toUpperCase(),
+                    '0',
+                    4
+                )
+            )
+            .toString();
     }
 
-       public static byte rollLeft(byte in, int count) {
+    public static byte rollLeft(byte in, int count) {
         int tmp = (int) in & 0xFF;
         tmp = tmp << (count % 8);
         return (byte) ((tmp & 0xFF) | (tmp >> 8));

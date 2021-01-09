@@ -1,12 +1,13 @@
 package cashshop;
 
-import client.Client;
-import client.player.PlayerJob;
 import static client.player.PlayerJob.CLASS_BOWMAN;
 import static client.player.PlayerJob.CLASS_MAGICIAN;
 import static client.player.PlayerJob.CLASS_PIRATE;
 import static client.player.PlayerJob.CLASS_THIEF;
 import static client.player.PlayerJob.CLASS_WARRIOR;
+
+import client.Client;
+import client.player.PlayerJob;
 import client.player.inventory.types.InventoryType;
 import java.util.Calendar;
 
@@ -32,21 +33,21 @@ public class CashShopTools {
                         if (PlayerJob.getAdvancement(job) > 1) {
                             max += 4;
                         }
-                    break;
+                        break;
                 }
-            break;
+                break;
             case CLASS_MAGICIAN:
                 switch (type) {
                     case ETC:
                         if (PlayerJob.getAdvancement(job) > 1) {
-                             max += 4;
+                            max += 4;
                         }
                         break;
-                    }
-            break;
+                }
+                break;
             case CLASS_BOWMAN:
                 switch (type) {
-                    case EQUIP: 
+                    case EQUIP:
                     case USE:
                         max += 4;
                         break;
@@ -54,13 +55,13 @@ public class CashShopTools {
                         if (PlayerJob.getAdvancement(job) > 1) {
                             max += 4;
                         }
-                    break;
+                        break;
                 }
-            break;
+                break;
             case CLASS_THIEF:
             case CLASS_PIRATE:
                 switch (type) {
-                    case EQUIP: 
+                    case EQUIP:
                     case ETC:
                         max += 4;
                         break;
@@ -68,13 +69,13 @@ public class CashShopTools {
                         if (PlayerJob.getAdvancement(job) > 1) {
                             max += 4;
                         }
-                    break;
+                        break;
                 }
-            break;
+                break;
         }
-      return max;
+        return max;
     }
-    
+
     public static boolean checkBirthday(Client c, int idate) {
         int year = idate / 10000;
         int month = (idate - year * 10000) / 100;

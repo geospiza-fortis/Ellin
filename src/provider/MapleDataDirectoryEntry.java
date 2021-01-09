@@ -1,6 +1,6 @@
 /*
 This file is part of the OdinMS Maple Story Server
-Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc> 
+Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc>
 Matthias Butz <matze@odinms.de>
 Jan Christian Meyer <vimes@odinms.de>
 
@@ -27,7 +27,6 @@ import java.util.List;
  * @author Matze
  */
 public interface MapleDataDirectoryEntry extends MapleDataEntry {
-
     public List<MapleDataDirectoryEntry> getSubdirectories();
 
     public List<MapleDataFileEntry> getFiles();

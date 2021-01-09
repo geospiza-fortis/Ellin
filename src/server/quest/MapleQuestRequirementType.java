@@ -26,30 +26,29 @@ package server.quest;
  * @author Matze
  */
 public enum MapleQuestRequirementType {
-    
     UNDEFINED(-1),
-    JOB(0), 
+    JOB(0),
     ITEM(1),
     QUEST(2),
     MIN_LEVEL(3),
-    MAX_LEVEL(4), 
-    END_DATE(5), 
+    MAX_LEVEL(4),
+    END_DATE(5),
     MOB(6),
-    NPC(7), 
+    NPC(7),
     FIELD_ENTER(8),
-    INTERVAL(9), 
-    SCRIPT(10), 
+    INTERVAL(9),
+    SCRIPT(10),
     PET(11),
     MIN_PET_TAMENESS(12),
-    MONSTER_BOOK(13), 
+    MONSTER_BOOK(13),
     NORMAL_AUTO_START(14),
     INFO_NUMBER(15),
     INFO_EX(16),
-    COMPLETED_QUEST(17), 
+    COMPLETED_QUEST(17),
     START(18),
-    END(19), 
+    END(19),
     DAY_BY_DAY(20);
-    
+
     final byte type;
 
     private MapleQuestRequirementType(int type) {
@@ -102,8 +101,8 @@ public enum MapleQuestRequirementType {
                 return COMPLETED_QUEST;
             case "start":
                 return START;
-        //    case "end":
-          //      return END;
+            //    case "end":
+            //      return END;
             case "daybyday":
                 return DAY_BY_DAY;
             default:

@@ -14,10 +14,17 @@ import client.player.Player;
  * GameConstants
  */
 public class CommandConstants {
-    
-    public final static String[] HELP_TYPES = {"bug", "quest", "party", "party", "npcs", "mob"};
-    
-    public static String HelpCommandGM (String type, Player p) {
+
+    public static final String[] HELP_TYPES = {
+        "bug",
+        "quest",
+        "party",
+        "party",
+        "npcs",
+        "mob",
+    };
+
+    public static String HelpCommandGM(String type, Player p) {
         switch (type) {
             case "bug":
                 p.dropMessage("[Auto-Help] Desc.");
@@ -37,11 +44,11 @@ public class CommandConstants {
         }
         return "";
     }
-    
-    public static enum CommandType {
 
+    public static enum CommandType {
         NORMAL(0),
         TRADE(1);
+
         private final int level;
 
         CommandType(int level) {
@@ -52,14 +59,13 @@ public class CommandConstants {
             return level;
         }
     }
-    
-    public static enum CoomandRank {
 
+    public static enum CoomandRank {
         NORMAL('@', 0),
         DONOR('#', 1),
         GM('!', 2),
         ADMIN('!', 3);
-        
+
         private final char prefix;
         private final int level;
 

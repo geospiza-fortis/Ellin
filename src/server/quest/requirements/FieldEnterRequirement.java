@@ -32,6 +32,7 @@ import server.quest.MapleQuestRequirementType;
  * @author Tyler (Twdtwd)
  */
 public final class FieldEnterRequirement extends MapleQuestRequirement {
+
     private int fielId = -1;
 
     public FieldEnterRequirement(MapleQuest quest, MapleData data) {

@@ -1,6 +1,6 @@
 /*
 This file is part of the OdinMS Maple Story Server
-Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc> 
+Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc>
 Matthias Butz <matze@odinms.de>
 Jan Christian Meyer <vimes@odinms.de>
 
@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-
 import provider.MapleData;
 import provider.MapleDataDirectoryEntry;
 import provider.MapleDataProvider;
@@ -38,7 +37,6 @@ public class XMLWZFile implements MapleDataProvider {
         root = fileIn;
         rootForNavigation = new WZDirectoryEntry(fileIn.getName(), 0, 0, null);
         fillMapleDataEntitys(root, rootForNavigation);
-        
     }
 
     private void fillMapleDataEntitys(File lroot, WZDirectoryEntry wzdir) {
@@ -46,12 +44,23 @@ public class XMLWZFile implements MapleDataProvider {
             String fileName = file.getName();
 
             if (file.isDirectory() && !fileName.endsWith(".img")) {
-                WZDirectoryEntry newDir = new WZDirectoryEntry(fileName, 0, 0, wzdir);
+                WZDirectoryEntry newDir = new WZDirectoryEntry(
+                    fileName,
+                    0,
+                    0,
+                    wzdir
+                );
                 wzdir.addDirectory(newDir);
                 fillMapleDataEntitys(file, newDir);
-
-            } else if (fileName.endsWith(".xml")) { 
-                wzdir.addFile(new WZFileEntry(fileName.substring(0, fileName.length() - 4), 0, 0, wzdir));
+            } else if (fileName.endsWith(".xml")) {
+                wzdir.addFile(
+                    new WZFileEntry(
+                        fileName.substring(0, fileName.length() - 4),
+                        0,
+                        0,
+                        wzdir
+                    )
+                );
             }
         }
     }
@@ -64,11 +73,17 @@ public class XMLWZFile implements MapleDataProvider {
         try {
             fis = new FileInputStream(dataFile);
         } catch (FileNotFoundException e) {
-            throw new RuntimeException("Datafile " + path + " does not exist in " + root.getAbsolutePath());
+            throw new RuntimeException(
+                "Datafile " +
+                path +
+                " does not exist in " +
+                root.getAbsolutePath()
+            );
         }
         final XMLDomMapleData domMapleData;
         try {
-            domMapleData = new XMLDomMapleData(fis, imageDataDir.getParentFile());
+            domMapleData =
+                new XMLDomMapleData(fis, imageDataDir.getParentFile());
         } finally {
             try {
                 fis.close();

@@ -1,4 +1,3 @@
-
 package server.maps;
 
 import java.awt.Point;
@@ -47,7 +46,7 @@ public class MapleFoothold implements Comparable<MapleFoothold> {
             return 0;
         }
     }
-    
+
     public int getId() {
         return id;
     }

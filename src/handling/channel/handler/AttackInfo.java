@@ -16,7 +16,7 @@ import server.MapleStatEffect;
  *
  * @author GabrielSin
  */
- public class AttackInfo {
+public class AttackInfo {
 
     public int numAttacked;
     public int skill;
@@ -34,8 +34,10 @@ import server.MapleStatEffect;
     public boolean isTempest = false;
     public Map<Integer, List<Integer>> allDamage;
 
-
-    public final MapleStatEffect getAttackEffect(Player p, PlayerSkill theSkill) {
+    public final MapleStatEffect getAttackEffect(
+        Player p,
+        PlayerSkill theSkill
+    ) {
         PlayerSkill mySkill = theSkill;
         if (mySkill == null) {
             mySkill = PlayerSkillFactory.getSkill(skill);

@@ -1,8 +1,8 @@
 /*
-	This file was written by "StellarAshes" <stellar_dust@hotmail.com> 
+	This file was written by "StellarAshes" <stellar_dust@hotmail.com>
 			as a part of the Guild package for
 			the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -27,22 +27,21 @@ import packet.creators.GuildPackets;
 import packet.transfer.write.OutPacket;
 
 public enum MapleGuildResponse {
-    
     NOT_IN_CHANNEL(0x2a),
     ALREADY_IN_GUILD(0x28),
     NOT_IN_GUILD(0x2d);
 
     private final int value;
-    
+
     private MapleGuildResponse(int val) {
         value = val;
     }
-    
+
     public int getValue() {
         return value;
     }
-    
+
     public OutPacket getPacket() {
-        return GuildPackets.GenericGuildMessage((byte)value);
+        return GuildPackets.GenericGuildMessage((byte) value);
     }
 }

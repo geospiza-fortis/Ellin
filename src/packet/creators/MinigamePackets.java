@@ -14,19 +14,31 @@ import packet.transfer.write.WritingPacket;
 import server.minirooms.Minigame;
 
 public class MinigamePackets {
-    
-   public static void AddAnnounceBox(WritingPacket wp, Minigame game, int gameType, int type, int ammount, int joinAble) {
+
+    public static void AddAnnounceBox(
+        WritingPacket wp,
+        Minigame game,
+        int gameType,
+        int type,
+        int ammount,
+        int joinAble
+    ) {
         wp.write(gameType);
-        wp.writeInt(game.getObjectId()); 
-        wp.writeMapleAsciiString(game.getDescription()); 
+        wp.writeInt(game.getObjectId());
+        wp.writeMapleAsciiString(game.getDescription());
         wp.writeBool(game.getPassword() != null);
         wp.write(type);
         wp.write(ammount);
         wp.write(2);
         wp.write(joinAble);
     }
-    
-    public static OutPacket GetMiniGame(Client c, Minigame miniGame, boolean owner, int piece) {
+
+    public static OutPacket GetMiniGame(
+        Client c,
+        Minigame miniGame,
+        boolean owner,
+        int piece
+    ) {
         final WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
         wp.write(ChannelHeaders.PlayerInteractionHeaders.ACT_JOIN);
@@ -38,7 +50,7 @@ public class MinigamePackets {
         wp.writeMapleAsciiString(miniGame.getOwner().getName());
         if (miniGame.getVisitor() != null) {
             Player visitor = miniGame.getVisitor();
-            wp.write(1); 
+            wp.write(1);
             PacketCreator.AddCharLook(wp, visitor, false);
             wp.writeMapleAsciiString(visitor.getName());
         }
@@ -63,7 +75,7 @@ public class MinigamePackets {
         wp.writeShort(piece);
         return wp.getPacket();
     }
-    
+
     public static OutPacket GetMiniGameReady(Minigame game) {
         final WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
@@ -115,8 +127,8 @@ public class MinigamePackets {
         wp.write(2);
         return wp.getPacket();
     }
-    
-    public static OutPacket GetMiniGamePassIncorrect(){
+
+    public static OutPacket GetMiniGamePassIncorrect() {
         final WritingPacket mplew = new WritingPacket(5);
         mplew.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
         mplew.write(ChannelHeaders.PlayerInteractionHeaders.ACT_JOIN);
@@ -133,7 +145,12 @@ public class MinigamePackets {
         return wp.getPacket();
     }
 
-    public static OutPacket GetMiniGameMoveOmok(Minigame game, int moveOne, int moveTwo, int moveThree) {
+    public static OutPacket GetMiniGameMoveOmok(
+        Minigame game,
+        int moveOne,
+        int moveTwo,
+        int moveThree
+    ) {
         final WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
         wp.write(ChannelHeaders.PlayerInteractionHeaders.ACT_MOVE_OMOK);
@@ -166,7 +183,15 @@ public class MinigamePackets {
         return wp.getPacket();
     }
 
-    private static OutPacket GetMiniGameResult(Minigame game, int win, int lose, int tie, int result, int forfeit, boolean omok) {
+    private static OutPacket GetMiniGameResult(
+        Minigame game,
+        int win,
+        int lose,
+        int tie,
+        int result,
+        int forfeit,
+        boolean omok
+    ) {
         final WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
         wp.write(ChannelHeaders.PlayerInteractionHeaders.ACT_FINISH_GAME);
@@ -179,14 +204,14 @@ public class MinigamePackets {
         }
         wp.write(result - 1);
         wp.writeInt(1);
-        wp.writeInt(game.getOwner().getMiniGamePoints("wins", omok) + win); 
-        wp.writeInt(game.getOwner().getMiniGamePoints("ties", omok) + tie); 
-        wp.writeInt(game.getOwner().getMiniGamePoints("losses", omok) + lose); 
+        wp.writeInt(game.getOwner().getMiniGamePoints("wins", omok) + win);
+        wp.writeInt(game.getOwner().getMiniGamePoints("ties", omok) + tie);
+        wp.writeInt(game.getOwner().getMiniGamePoints("losses", omok) + lose);
         wp.writeInt(2000);
-        wp.writeInt(1); 
-        wp.writeInt(game.getVisitor().getMiniGamePoints("wins", omok) + lose); 
-        wp.writeInt(game.getVisitor().getMiniGamePoints("ties", omok) + tie); 
-        wp.writeInt(game.getVisitor().getMiniGamePoints("losses", omok) + win); 
+        wp.writeInt(1);
+        wp.writeInt(game.getVisitor().getMiniGamePoints("wins", omok) + lose);
+        wp.writeInt(game.getVisitor().getMiniGamePoints("ties", omok) + tie);
+        wp.writeInt(game.getVisitor().getMiniGamePoints("losses", omok) + win);
         wp.writeInt(2000);
         game.getOwner().setMiniGamePoints(game.getVisitor(), result, omok);
         return wp.getPacket();
@@ -221,7 +246,12 @@ public class MinigamePackets {
         return wp.getPacket();
     }
 
-    public static OutPacket GetMatchCard(Client c, Minigame miniGame, boolean owner, int piece) {
+    public static OutPacket GetMatchCard(
+        Client c,
+        Minigame miniGame,
+        boolean owner,
+        int piece
+    ) {
         final WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
         wp.write(ChannelHeaders.PlayerInteractionHeaders.ACT_JOIN);
@@ -266,13 +296,13 @@ public class MinigamePackets {
         wp.write(ChannelHeaders.PlayerInteractionHeaders.ACT_START);
         wp.write(loser);
         int last = 13;
-        if (game.getMatchesToWin() > 10){
+        if (game.getMatchesToWin() > 10) {
             last = 31;
-        }else if(game.getMatchesToWin() > 6){
+        } else if (game.getMatchesToWin() > 6) {
             last = 21;
         }
         wp.write(last - 1);
-        for (int i = 1; i < last; i++){
+        for (int i = 1; i < last; i++) {
             wp.writeInt(game.getCardId(i));
         }
         return wp.getPacket();
@@ -293,13 +323,18 @@ public class MinigamePackets {
         return wp.getPacket();
     }
 
-    public static OutPacket GetMatchCardSelect(Minigame game, int turn, int slot, int firstslot, int type) {
+    public static OutPacket GetMatchCardSelect(
+        Minigame game,
+        int turn,
+        int slot,
+        int firstslot,
+        int type
+    ) {
         final WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.PLAYER_INTERACTION.getValue());
         wp.write(ChannelHeaders.PlayerInteractionHeaders.ACT_SELECT_CARD);
         wp.write(turn);
-        if (turn == 1)
-            wp.write(slot);
+        if (turn == 1) wp.write(slot);
         if (turn == 0) {
             wp.write(slot);
             wp.write(firstslot);
@@ -307,20 +342,25 @@ public class MinigamePackets {
         }
         return wp.getPacket();
     }
-    
-    public static OutPacket GetMatchCardOwnerWin(Minigame game){
+
+    public static OutPacket GetMatchCardOwnerWin(Minigame game) {
         return GetMiniGameResult(game, 1, 0, 0, 1, 0, false);
     }
 
-    public static OutPacket GetMatchCardVisitorWin(Minigame game){
+    public static OutPacket GetMatchCardVisitorWin(Minigame game) {
         return GetMiniGameResult(game, 0, 1, 0, 2, 0, false);
     }
 
-    public static OutPacket GetMatchCardTie(Minigame game){
+    public static OutPacket GetMatchCardTie(Minigame game) {
         return GetMiniGameResult(game, 0, 0, 1, 3, 0, false);
     }
 
-    public static OutPacket AddBoxGame(Player p, int ammount, int type, boolean omok) {
+    public static OutPacket AddBoxGame(
+        Player p,
+        int ammount,
+        int type,
+        boolean omok
+    ) {
         final WritingPacket wp = new WritingPacket();
         wp.writeShort(SendPacketOpcode.UPDATE_CHAR_BOX.getValue());
         wp.writeInt(p.getId());

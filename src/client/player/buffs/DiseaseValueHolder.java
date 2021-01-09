@@ -9,10 +9,13 @@ public class DiseaseValueHolder implements Serializable {
     public long length;
     public Disease disease;
 
-    public DiseaseValueHolder(final Disease disease, final long startTime, final long length) {
+    public DiseaseValueHolder(
+        final Disease disease,
+        final long startTime,
+        final long length
+    ) {
         this.disease = disease;
         this.startTime = startTime;
         this.length = length;
     }
 }
-

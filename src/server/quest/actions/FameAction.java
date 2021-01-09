@@ -34,6 +34,7 @@ import server.quest.MapleQuestActionType;
  * @author Tyler (Twdtwd)
  */
 public final class FameAction extends MapleQuestAction {
+
     int fame;
 
     public FameAction(MapleQuest quest, MapleData data) {
@@ -53,4 +54,4 @@ public final class FameAction extends MapleQuestAction {
         p.getStat().updateSingleStat(PlayerStat.FAME, p.getFame());
         p.announce(PacketCreator.GetShowFameGain(fame));
     }
-} 
+}

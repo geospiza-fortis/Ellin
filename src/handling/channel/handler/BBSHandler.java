@@ -5,10 +5,11 @@
  */
 package handling.channel.handler;
 
-import client.player.Player;
-import client.Client;
-import database.DatabaseConnection;
 import static handling.channel.handler.ChannelHeaders.BBSHeaders.*;
+
+import client.Client;
+import client.player.Player;
+import database.DatabaseConnection;
 import handling.mina.PacketReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -22,7 +23,7 @@ import tools.FileLogger;
  * @author GabrielSin
  */
 public class BBSHandler {
-    
+
     private static String correctLength(String in, int maxSize) {
         if (in.length() > maxSize) {
             return in.substring(0, maxSize);
@@ -33,7 +34,7 @@ public class BBSHandler {
     public static void BBSOperation(PacketReader packet, Client c) {
         if (c.getPlayer().getGuildId() <= 0) {
             return;
-        } 
+        }
         byte mode = packet.readByte();
         int localthreadid = 0;
         switch (mode) {
@@ -47,7 +48,12 @@ public class BBSHandler {
                 String text = correctLength(packet.readMapleAsciiString(), 600);
                 int icon = packet.readInt();
                 if (icon >= 0x64 && icon <= 0x6a) {
-                    if (c.getPlayer().getItemQuantity(5290000 + icon - 0x64, false) > 0) {
+                    if (
+                        c
+                            .getPlayer()
+                            .getItemQuantity(5290000 + icon - 0x64, false) >
+                        0
+                    ) {
                         return;
                     }
                 } else if (icon < 0 || icon > 3) {
@@ -67,17 +73,17 @@ public class BBSHandler {
                 int start = packet.readInt();
                 listBBSThreads(c, start * 10);
                 break;
-            case LIST_TOPIC_REPLY: 
+            case LIST_TOPIC_REPLY:
                 localthreadid = packet.readInt();
                 displayThread(c, localthreadid);
                 break;
-            case TOPIC_REPLY: 
+            case TOPIC_REPLY:
                 localthreadid = packet.readInt();
                 text = correctLength(packet.readMapleAsciiString(), 25);
                 newBBSReply(c, localthreadid, text);
                 break;
             case DELETE_REPLY:
-                /* localthreadid  = */ packet.readInt();  
+                /* localthreadid  = */packet.readInt();
                 int replyid = packet.readInt();
                 deleteBBSReply(c, replyid);
                 break;
@@ -85,10 +91,16 @@ public class BBSHandler {
                 System.out.println("Unknown mode BBS: " + packet.toString());
         }
     }
-    
+
     private static void listBBSThreads(Client c, int start) {
         try {
-            try (PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement("SELECT * FROM bbs_threads WHERE guildid = ? ORDER BY localthreadid DESC")) {
+            try (
+                PreparedStatement ps = DatabaseConnection
+                    .getConnection()
+                    .prepareStatement(
+                        "SELECT * FROM bbs_threads WHERE guildid = ? ORDER BY localthreadid DESC"
+                    )
+            ) {
                 ps.setInt(1, c.getPlayer().getGuildId());
                 try (ResultSet rs = ps.executeQuery()) {
                     c.announce(GuildPackets.BBSThreadList(rs, start));
@@ -105,7 +117,9 @@ public class BBSHandler {
         }
         Connection con = DatabaseConnection.getConnection();
         try {
-            PreparedStatement ps = con.prepareStatement("SELECT threadid FROM bbs_threads WHERE guildid = ? AND localthreadid = ?");
+            PreparedStatement ps = con.prepareStatement(
+                "SELECT threadid FROM bbs_threads WHERE guildid = ? AND localthreadid = ?"
+            );
             ps.setInt(1, c.getPlayer().getGuildId());
             ps.setInt(2, localthreadid);
             ResultSet threadRS = ps.executeQuery();
@@ -117,14 +131,22 @@ public class BBSHandler {
             int threadid = threadRS.getInt("threadid");
             threadRS.close();
             ps.close();
-            ps = con.prepareStatement("INSERT INTO bbs_replies " + "(`threadid`, `postercid`, `timestamp`, `content`) VALUES " + "(?, ?, ?, ?)");
+            ps =
+                con.prepareStatement(
+                    "INSERT INTO bbs_replies " +
+                    "(`threadid`, `postercid`, `timestamp`, `content`) VALUES " +
+                    "(?, ?, ?, ?)"
+                );
             ps.setInt(1, threadid);
             ps.setInt(2, c.getPlayer().getId());
             ps.setLong(3, System.currentTimeMillis());
             ps.setString(4, text);
             ps.execute();
             ps.close();
-            ps = con.prepareStatement("UPDATE bbs_threads SET replycount = replycount + 1 WHERE threadid = ?");
+            ps =
+                con.prepareStatement(
+                    "UPDATE bbs_threads SET replycount = replycount + 1 WHERE threadid = ?"
+                );
             ps.setInt(1, threadid);
             ps.execute();
             ps.close();
@@ -134,13 +156,27 @@ public class BBSHandler {
         }
     }
 
-    private static void editBBSThread(Client client, String title, String text, int icon, int localthreadid) {
+    private static void editBBSThread(
+        Client client,
+        String title,
+        String text,
+        int icon,
+        int localthreadid
+    ) {
         Player c = client.getPlayer();
         if (c.getGuildId() < 1) {
             return;
         }
         try {
-            try (PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement("UPDATE bbs_threads SET `name` = ?, `timestamp` = ?, " + "`icon` = ?, " + "`startpost` = ? WHERE guildid = ? AND localthreadid = ? AND (postercid = ? OR ?)")) {
+            try (
+                PreparedStatement ps = DatabaseConnection
+                    .getConnection()
+                    .prepareStatement(
+                        "UPDATE bbs_threads SET `name` = ?, `timestamp` = ?, " +
+                        "`icon` = ?, " +
+                        "`startpost` = ? WHERE guildid = ? AND localthreadid = ? AND (postercid = ? OR ?)"
+                    )
+            ) {
                 ps.setString(1, title);
                 ps.setLong(2, System.currentTimeMillis());
                 ps.setInt(3, icon);
@@ -157,7 +193,13 @@ public class BBSHandler {
         }
     }
 
-    private static void newBBSThread(Client client, String title, String text, int icon, boolean bNotice) {
+    private static void newBBSThread(
+        Client client,
+        String title,
+        String text,
+        int icon,
+        boolean bNotice
+    ) {
         Player c = client.getPlayer();
         if (c.getGuildId() <= 0) {
             return;
@@ -167,7 +209,10 @@ public class BBSHandler {
             Connection con = DatabaseConnection.getConnection();
             PreparedStatement ps;
             if (!bNotice) {
-                ps = con.prepareStatement("SELECT MAX(localthreadid) AS lastLocalId FROM bbs_threads WHERE guildid = ?");
+                ps =
+                    con.prepareStatement(
+                        "SELECT MAX(localthreadid) AS lastLocalId FROM bbs_threads WHERE guildid = ?"
+                    );
                 ps.setInt(1, c.getGuildId());
                 try (ResultSet rs = ps.executeQuery()) {
                     rs.next();
@@ -175,7 +220,13 @@ public class BBSHandler {
                 }
                 ps.close();
             }
-            ps = con.prepareStatement("INSERT INTO bbs_threads " + "(`postercid`, `name`, `timestamp`, `icon`, `startpost`, " + "`guildid`, `localthreadid`) " + "VALUES(?, ?, ?, ?, ?, ?, ?)");
+            ps =
+                con.prepareStatement(
+                    "INSERT INTO bbs_threads " +
+                    "(`postercid`, `name`, `timestamp`, `icon`, `startpost`, " +
+                    "`guildid`, `localthreadid`) " +
+                    "VALUES(?, ?, ?, ?, ?, ?, ?)"
+                );
             ps.setInt(1, c.getId());
             ps.setString(2, title);
             ps.setLong(3, System.currentTimeMillis());
@@ -198,7 +249,9 @@ public class BBSHandler {
         }
         Connection con = DatabaseConnection.getConnection();
         try {
-            PreparedStatement ps = con.prepareStatement("SELECT threadid, postercid FROM bbs_threads WHERE guildid = ? AND localthreadid = ?");
+            PreparedStatement ps = con.prepareStatement(
+                "SELECT threadid, postercid FROM bbs_threads WHERE guildid = ? AND localthreadid = ?"
+            );
             ps.setInt(1, mc.getGuildId());
             ps.setInt(2, localthreadid);
             ResultSet threadRS = ps.executeQuery();
@@ -207,18 +260,27 @@ public class BBSHandler {
                 ps.close();
                 return;
             }
-            if (mc.getId() != threadRS.getInt("postercid") && mc.getGuildRank() > 2) {
+            if (
+                mc.getId() != threadRS.getInt("postercid") &&
+                mc.getGuildRank() > 2
+            ) {
                 threadRS.close();
                 ps.close();
                 return;
             }
             int threadid = threadRS.getInt("threadid");
             ps.close();
-            ps = con.prepareStatement("DELETE FROM bbs_replies WHERE threadid = ?");
+            ps =
+                con.prepareStatement(
+                    "DELETE FROM bbs_replies WHERE threadid = ?"
+                );
             ps.setInt(1, threadid);
             ps.execute();
             ps.close();
-            ps = con.prepareStatement("DELETE FROM bbs_threads WHERE threadid = ?");
+            ps =
+                con.prepareStatement(
+                    "DELETE FROM bbs_threads WHERE threadid = ?"
+                );
             ps.setInt(1, threadid);
             ps.execute();
             threadRS.close();
@@ -236,7 +298,9 @@ public class BBSHandler {
         int threadid;
         Connection con = DatabaseConnection.getConnection();
         try {
-            PreparedStatement ps = con.prepareStatement("SELECT postercid, threadid FROM bbs_replies WHERE replyid = ?");
+            PreparedStatement ps = con.prepareStatement(
+                "SELECT postercid, threadid FROM bbs_replies WHERE replyid = ?"
+            );
             ps.setInt(1, replyid);
             ResultSet rs = ps.executeQuery();
             if (!rs.next()) {
@@ -252,11 +316,17 @@ public class BBSHandler {
             threadid = rs.getInt("threadid");
             rs.close();
             ps.close();
-            ps = con.prepareStatement("DELETE FROM bbs_replies WHERE replyid = ?");
+            ps =
+                con.prepareStatement(
+                    "DELETE FROM bbs_replies WHERE replyid = ?"
+                );
             ps.setInt(1, replyid);
             ps.execute();
             ps.close();
-            ps = con.prepareStatement("UPDATE bbs_threads SET replycount = replycount - 1 WHERE threadid = ?");
+            ps =
+                con.prepareStatement(
+                    "UPDATE bbs_threads SET replycount = replycount - 1 WHERE threadid = ?"
+                );
             ps.setInt(1, threadid);
             ps.execute();
             ps.close();
@@ -270,7 +340,11 @@ public class BBSHandler {
         displayThread(client, threadid, true);
     }
 
-     public static void displayThread(Client client, int threadid, boolean bIsThreadIdLocal) {
+    public static void displayThread(
+        Client client,
+        int threadid,
+        boolean bIsThreadIdLocal
+    ) {
         Player mc = client.getPlayer();
         if (mc.getGuildId() <= 0) {
             return;
@@ -278,7 +352,13 @@ public class BBSHandler {
         Connection con = DatabaseConnection.getConnection();
         try {
             PreparedStatement ps2;
-            try (PreparedStatement ps = con.prepareStatement("SELECT * FROM bbs_threads WHERE guildid = ? AND " + (bIsThreadIdLocal ? "local" : "") + "threadid = ?")) {
+            try (
+                PreparedStatement ps = con.prepareStatement(
+                    "SELECT * FROM bbs_threads WHERE guildid = ? AND " +
+                    (bIsThreadIdLocal ? "local" : "") +
+                    "threadid = ?"
+                )
+            ) {
                 ps.setInt(1, mc.getGuildId());
                 ps.setInt(2, threadid);
                 ResultSet threadRS = ps.executeQuery();
@@ -286,15 +366,31 @@ public class BBSHandler {
                     threadRS.close();
                     ps.close();
                     return;
-                }   
+                }
                 ResultSet repliesRS = null;
                 ps2 = null;
                 if (threadRS.getInt("replycount") >= 0) {
-                    ps2 = con.prepareStatement("SELECT * FROM bbs_replies WHERE threadid = ?");
-                    ps2.setInt(1, !bIsThreadIdLocal ? threadid : threadRS.getInt("threadid"));
+                    ps2 =
+                        con.prepareStatement(
+                            "SELECT * FROM bbs_replies WHERE threadid = ?"
+                        );
+                    ps2.setInt(
+                        1,
+                        !bIsThreadIdLocal
+                            ? threadid
+                            : threadRS.getInt("threadid")
+                    );
                     repliesRS = ps2.executeQuery();
-                }  
-                client.announce(GuildPackets.ShowThread(bIsThreadIdLocal ? threadid : threadRS.getInt("localthreadid"), threadRS, repliesRS));
+                }
+                client.announce(
+                    GuildPackets.ShowThread(
+                        bIsThreadIdLocal
+                            ? threadid
+                            : threadRS.getInt("localthreadid"),
+                        threadRS,
+                        repliesRS
+                    )
+                );
                 if (repliesRS != null) {
                     repliesRS.close();
                 }
@@ -305,7 +401,9 @@ public class BBSHandler {
         } catch (SQLException se) {
             FileLogger.printError(FileLogger.DATABASE_EXCEPTION, se);
         } catch (RuntimeException re) {
-            System.out.println("The number of reply rows does not match the replycount in thread.");
+            System.out.println(
+                "The number of reply rows does not match the replycount in thread."
+            );
             FileLogger.printError(FileLogger.DATABASE_EXCEPTION, re);
         }
     }

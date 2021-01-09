@@ -1,6 +1,6 @@
 /*
 This file is part of the OdinMS Maple Story Server
-Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc> 
+Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc>
 Matthias Butz <matze@odinms.de>
 Jan Christian Meyer <vimes@odinms.de>
 
@@ -20,13 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package community;
 
-import java.util.List;
-import java.util.LinkedList;
+import database.DatabaseConnection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import database.DatabaseConnection;
+import java.util.LinkedList;
+import java.util.List;
 
 public class MapleGuildRanking {
 
@@ -48,7 +47,13 @@ public class MapleGuildRanking {
         ranks.clear();
         try {
             ResultSet rs;
-            try (PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement("SELECT * FROM guilds ORDER BY `GP` DESC LIMIT 50")) {
+            try (
+                PreparedStatement ps = DatabaseConnection
+                    .getConnection()
+                    .prepareStatement(
+                        "SELECT * FROM guilds ORDER BY `GP` DESC LIMIT 50"
+                    )
+            ) {
                 rs = ps.executeQuery();
                 while (rs.next()) {
                     final GuildRankingInfo rank = new GuildRankingInfo(
@@ -57,8 +62,9 @@ public class MapleGuildRanking {
                         rs.getInt("logo"),
                         rs.getInt("logoColor"),
                         rs.getInt("logoBG"),
-                        rs.getInt("logoBGColor"));
-                    
+                        rs.getInt("logoBGColor")
+                    );
+
                     ranks.add(rank);
                 }
             }
@@ -77,7 +83,14 @@ public class MapleGuildRanking {
         private final int logobg;
         private final int logobgcolor;
 
-        public GuildRankingInfo(String name, int gp, int logo, int logocolor, int logobg, int logobgcolor) {
+        public GuildRankingInfo(
+            String name,
+            int gp,
+            int logo,
+            int logocolor,
+            int logobg,
+            int logobgcolor
+        ) {
             this.name = name;
             this.gp = gp;
             this.logo = logo;

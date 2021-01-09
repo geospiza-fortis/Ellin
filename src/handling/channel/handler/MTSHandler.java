@@ -13,10 +13,8 @@ import handling.mina.PacketReader;
  * @author GabrielSin
  */
 public class MTSHandler {
-    
-    public static void EnterMTS(PacketReader slea, Client c) {
-       // add later
-    }
- }
-    
 
+    public static void EnterMTS(PacketReader slea, Client c) {
+        // add later
+    }
+}

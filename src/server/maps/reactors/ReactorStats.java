@@ -32,6 +32,7 @@ import tools.Pair;
  * @author Ronan
  */
 public class ReactorStats {
+
     private Point tl;
     private Point br;
     private Map<Byte, List<StateData>> stateInfo = new HashMap<>();
@@ -59,14 +60,17 @@ public class ReactorStats {
             timeoutInfo.put(state, timeOut);
         }
     }
-    
+
     public int getTimeout(byte state) {
         Integer i = timeoutInfo.get(state);
         return (i == null) ? -1 : i;
     }
-    
+
     public byte getTimeoutState(byte state) {
-        return stateInfo.get(state).get(stateInfo.get(state).size() - 1).getNextState();
+        return stateInfo
+            .get(state)
+            .get(stateInfo.get(state).size() - 1)
+            .getNextState();
     }
 
     public byte getStateSize(byte state) {
@@ -74,7 +78,10 @@ public class ReactorStats {
     }
 
     public byte getNextState(byte state, byte index) {
-        if (stateInfo.get(state) == null || stateInfo.get(state).size() < (index + 1)) return -1;
+        if (
+            stateInfo.get(state) == null ||
+            stateInfo.get(state).size() < (index + 1)
+        ) return -1;
         StateData nextState = stateInfo.get(state).get(index);
         if (nextState != null) {
             return nextState.getNextState();
@@ -101,13 +108,17 @@ public class ReactorStats {
         }
     }
 
-
     public static class StateData {
+
         private int type;
         private Pair<Integer, Integer> reactItem;
         private byte nextState;
 
-        public StateData(int type, Pair<Integer, Integer> reactItem, byte nextState) {
+        public StateData(
+            int type,
+            Pair<Integer, Integer> reactItem,
+            byte nextState
+        ) {
             this.type = type;
             this.reactItem = reactItem;
             this.nextState = nextState;

@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -22,7 +22,7 @@
 package server.maps.portal;
 
 public class FieldPortal extends GenericPortal {
-    
+
     public FieldPortal() {
         super(Portal.MAP_PORTAL);
     }

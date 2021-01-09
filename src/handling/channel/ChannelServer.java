@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -22,14 +22,14 @@
 package handling.channel;
 
 import client.player.Player;
-import constants.ServerProperties;
-import database.DatabaseConnection;
-import handling.ServerHandler;
-import handling.login.LoginServer;
 import community.MapleParty;
 import community.MaplePartyCharacter;
 import constants.GameConstants;
+import constants.ServerProperties;
+import database.DatabaseConnection;
+import handling.ServerHandler;
 import handling.coordinator.MapleMatchCheckerCoordinator;
+import handling.login.LoginServer;
 import handling.world.CheaterData;
 import handling.world.service.PartyService;
 import handling.world.worker.MerchantWorker;
@@ -93,7 +93,8 @@ import tools.locks.MonitoredLockType;
 import tools.locks.MonitoredReentrantLock;
 import tools.locks.MonitoredReentrantReadWriteLock;
 
-public class ChannelServer  {
+public class ChannelServer {
+
     private final int channel;
     public int expRate;
     public int mesoRate;
@@ -120,38 +121,61 @@ public class ChannelServer  {
     private static final Map<Integer, ChannelServer> instances = new HashMap<>();
     private ConcurrentHashMap<Integer, Integer> mostSearchedItem = new ConcurrentHashMap<>();
     private ConcurrentLinkedQueue<Integer> topResults = new ConcurrentLinkedQueue<>();
-    
+
     private Map<Integer, Integer> owlSearched = new LinkedHashMap<>();
-    private Lock owlLock = new MonitoredReentrantLock(MonitoredLockType.WORLD_OWL);
-    
-    /*                      MERCHANTS                    */ 
-    private Lock activeMerchantsLock = new MonitoredReentrantLock(MonitoredLockType.WORLD_MERCHS, true);
-    private ReentrantReadWriteLock merchantLock = new MonitoredReentrantReadWriteLock(MonitoredLockType.MERCHANT, true);
+    private Lock owlLock = new MonitoredReentrantLock(
+        MonitoredLockType.WORLD_OWL
+    );
+
+    /*                      MERCHANTS                    */
+    private Lock activeMerchantsLock = new MonitoredReentrantLock(
+        MonitoredLockType.WORLD_MERCHS,
+        true
+    );
+    private ReentrantReadWriteLock merchantLock = new MonitoredReentrantReadWriteLock(
+        MonitoredLockType.MERCHANT,
+        true
+    );
     private ReadLock merchRlock = merchantLock.readLock();
     private WriteLock merchWlock = merchantLock.writeLock();
-    
+
     private Map<Integer, Merchant> hiredMerchants = new HashMap<>();
     private Map<Integer, Pair<Merchant, Integer>> activeMerchants = new LinkedHashMap<>();
     private ScheduledFuture<?> merchantSchedule;
     private long merchantUpdate;
-    /******************************************************/ 
-    /*                     SERVER MESSAGE                 */ 
-    private Map<Integer, Integer> disabledServerMessages = new HashMap<>();   
-    private MonitoredReentrantLock srvMessagesLock = new MonitoredReentrantLock(MonitoredLockType.WORLD_SRVMESSAGES);
+    /******************************************************/
+    /*                     SERVER MESSAGE                 */
+    private Map<Integer, Integer> disabledServerMessages = new HashMap<>();
+    private MonitoredReentrantLock srvMessagesLock = new MonitoredReentrantLock(
+        MonitoredLockType.WORLD_SRVMESSAGES
+    );
     private ScheduledFuture<?> srvMessagesSchedule;
-    /******************************************************/ 
-    /*                     COORDINATOR                    */ 
+    /******************************************************/
+    /*                     COORDINATOR                    */
     private MapleMatchCheckerCoordinator matchChecker = new MapleMatchCheckerCoordinator();
-    /******************************************************/ 
-    
-    private Lock activePlayerShopsLock = new MonitoredReentrantLock(MonitoredLockType.WORLD_PSHOPS, true);
+    /******************************************************/
+
+    private Lock activePlayerShopsLock = new MonitoredReentrantLock(
+        MonitoredLockType.WORLD_PSHOPS,
+        true
+    );
     private Map<Integer, PlayerShop> activePlayerShops = new LinkedHashMap<>();
 
     private ChannelServer(final int channel) {
         this.channel = channel;
-        this.mapFactory = new FieldManager(null, MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzpath") + "/Map")), MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzpath") + "/String")), channel);
+        this.mapFactory =
+            new FieldManager(
+                null,
+                MapleDataProviderFactory.getDataProvider(
+                    new File(System.getProperty("wzpath") + "/Map")
+                ),
+                MapleDataProviderFactory.getDataProvider(
+                    new File(System.getProperty("wzpath") + "/String")
+                ),
+                channel
+            );
     }
-   
+
     public static Set<Integer> getAllInstance() {
         return new HashSet<>(instances.keySet());
     }
@@ -167,50 +191,70 @@ public class ChannelServer  {
             petExpRate = ServerProperties.World.PET_EXP;
             mountExpRate = ServerProperties.World.MOUNT_EXP;
             serverMessage = ServerProperties.World.SERVER_MESSAGE;
-            eventSM = new EventScriptManager(this, ServerProperties.Channel.EVENTS.split(","));
+            eventSM =
+                new EventScriptManager(
+                    this,
+                    ServerProperties.Channel.EVENTS.split(",")
+                );
             port = Short.parseShort(String.valueOf(port + channel));
         } catch (NumberFormatException e) {
             throw new RuntimeException(e);
         }
-        
+
         ip = ServerProperties.World.HOST + ":" + port;
         try {
-        IoBuffer.setUseDirectBuffer(false);
-        IoBuffer.setAllocator(new SimpleBufferAllocator());
+            IoBuffer.setUseDirectBuffer(false);
+            IoBuffer.setAllocator(new SimpleBufferAllocator());
 
-        players = new PlayerStorage(channel);
-        acceptor = new NioSocketAcceptor();
+            players = new PlayerStorage(channel);
+            acceptor = new NioSocketAcceptor();
 
-        loadTransitions(this);
-        loadSearchedItems();
-        
-        WorldTimer tman = WorldTimer.getInstance();
-        merchantSchedule = tman.register(new MerchantWorker(this), 10 * 60 * 1000, 10 * 60 * 1000);
-        srvMessagesSchedule = tman.register(new ServerMessageWorker(this), 10 * 1000, 10 * 1000);
+            loadTransitions(this);
+            loadSearchedItems();
 
-        for (MapleExpeditionType exped : MapleExpeditionType.values()) {
-            expedType.add(exped);
-        }
+            WorldTimer tman = WorldTimer.getInstance();
+            merchantSchedule =
+                tman.register(
+                    new MerchantWorker(this),
+                    10 * 60 * 1000,
+                    10 * 60 * 1000
+                );
+            srvMessagesSchedule =
+                tman.register(
+                    new ServerMessageWorker(this),
+                    10 * 1000,
+                    10 * 1000
+                );
 
-        acceptor.setHandler(new ServerHandler(channel));
-        acceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 30);
-        acceptor.getFilterChain().addLast("codec", (IoFilter) new ProtocolCodecFilter(new MapleCodecFactory()));
-        acceptor.bind(new InetSocketAddress(port));
-        ((SocketSessionConfig) acceptor.getSessionConfig()).setTcpNoDelay(true);
-        
-        eventSM.init();   
-                             
+            for (MapleExpeditionType exped : MapleExpeditionType.values()) {
+                expedType.add(exped);
+            }
+
+            acceptor.setHandler(new ServerHandler(channel));
+            acceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 30);
+            acceptor
+                .getFilterChain()
+                .addLast(
+                    "codec",
+                    (IoFilter) new ProtocolCodecFilter(new MapleCodecFactory())
+                );
+            acceptor.bind(new InetSocketAddress(port));
+            ((SocketSessionConfig) acceptor.getSessionConfig()).setTcpNoDelay(
+                    true
+                );
+
+            eventSM.init();
         } catch (IOException e) {
             e.printStackTrace();
         }
-    } 
-    
+    }
+
     public static final void startChannelMain() {
         for (int i = 0; i < ServerProperties.Channel.COUNT; i++) {
             newInstance(i + 1).runStartupConfigurations();
         }
     }
-        
+
     public static Map<Integer, Integer> getChannelLoad() {
         Map<Integer, Integer> ret = new HashMap<>();
         for (ChannelServer cs : instances.values()) {
@@ -218,11 +262,15 @@ public class ChannelServer  {
         }
         return ret;
     }
-    
+
     public final void setShutdown() {
         this.shutdown = true;
         saveSearchedItems();
-        System.out.println("Channel " + channel + " has set to shutdown and is closing Hired Merchants...");
+        System.out.println(
+            "Channel " +
+            channel +
+            " has set to shutdown and is closing Hired Merchants..."
+        );
     }
 
     public final void setFinishShutdown() {
@@ -233,11 +281,11 @@ public class ChannelServer  {
     public final boolean hasFinishedShutdown() {
         return finishedShutdown;
     }
-   
+
     public final int getChannelId() {
         return channel;
     }
-    
+
     public Map<Integer, Merchant> getHiredMerchants() {
         merchRlock.lock();
         try {
@@ -258,7 +306,7 @@ public class ChannelServer  {
 
     public void removeHiredMerchant(int chrid) {
         merchWlock.lock();
-        try {        
+        try {
             hiredMerchants.remove(chrid);
         } finally {
             merchWlock.unlock();
@@ -269,9 +317,10 @@ public class ChannelServer  {
         activeMerchantsLock.lock();
         try {
             int initProc;
-            if (System.currentTimeMillis() - merchantUpdate > 5 * 60 * 1000) initProc = 1;
-            else initProc = 0;
-            
+            if (
+                System.currentTimeMillis() - merchantUpdate > 5 * 60 * 1000
+            ) initProc = 1; else initProc = 0;
+
             activeMerchants.put(hm.getOwnerId(), new Pair<>(hm, initProc));
         } finally {
             activeMerchantsLock.unlock();
@@ -286,20 +335,23 @@ public class ChannelServer  {
             activeMerchantsLock.unlock();
         }
     }
-    
+
     public void runHiredMerchantSchedule() {
         Map<Integer, Pair<Merchant, Integer>> deployedMerchants;
         activeMerchantsLock.lock();
         try {
             merchantUpdate = System.currentTimeMillis();
             deployedMerchants = new LinkedHashMap<>(activeMerchants);
-        
-            for (Map.Entry<Integer, Pair<Merchant, Integer>> dm: deployedMerchants.entrySet()) {
+
+            for (Map.Entry<Integer, Pair<Merchant, Integer>> dm : deployedMerchants.entrySet()) {
                 int timeOn = dm.getValue().getRight();
                 Merchant hm = dm.getValue().getLeft();
-                
+
                 if (timeOn <= 144) {
-                    activeMerchants.put(hm.getOwnerId(), new Pair<>(dm.getValue().getLeft(), timeOn + 1));
+                    activeMerchants.put(
+                        hm.getOwnerId(),
+                        new Pair<>(dm.getValue().getLeft(), timeOn + 1)
+                    );
                 } else {
                     hm.forceClose();
                     removeHiredMerchant(hm.getOwnerId());
@@ -311,37 +363,37 @@ public class ChannelServer  {
             activeMerchantsLock.unlock();
         }
     }
-    
-     public List<Merchant> getActiveMerchants() {
+
+    public List<Merchant> getActiveMerchants() {
         List<Merchant> hmList = new ArrayList<>();
         activeMerchantsLock.lock();
         try {
-            for(Pair<Merchant, Integer> hmp : activeMerchants.values()) {
+            for (Pair<Merchant, Integer> hmp : activeMerchants.values()) {
                 Merchant hm = hmp.getLeft();
-                if(hm.isOpen()) {
+                if (hm.isOpen()) {
                     hmList.add(hm);
                 }
             }
-            
+
             return hmList;
         } finally {
             activeMerchantsLock.unlock();
         }
     }
-    
+
     public Merchant getHiredMerchant(int ownerid) {
         activeMerchantsLock.lock();
         try {
-            if(activeMerchants.containsKey(ownerid)) {
+            if (activeMerchants.containsKey(ownerid)) {
                 return activeMerchants.get(ownerid).getLeft();
             }
-            
+
             return null;
         } finally {
             activeMerchantsLock.unlock();
         }
     }
-   
+
     public void registerPlayerShop(PlayerShop ps) {
         activePlayerShopsLock.lock();
         try {
@@ -350,7 +402,7 @@ public class ChannelServer  {
             activePlayerShopsLock.unlock();
         }
     }
-    
+
     public void unregisterPlayerShop(PlayerShop ps) {
         activePlayerShopsLock.lock();
         try {
@@ -359,21 +411,21 @@ public class ChannelServer  {
             activePlayerShopsLock.unlock();
         }
     }
-    
+
     public List<PlayerShop> getActivePlayerShops() {
         List<PlayerShop> psList = new ArrayList<>();
         activePlayerShopsLock.lock();
         try {
-            for(PlayerShop mps : activePlayerShops.values()) {
+            for (PlayerShop mps : activePlayerShops.values()) {
                 psList.add(mps);
             }
-            
+
             return psList;
         } finally {
             activePlayerShopsLock.unlock();
         }
     }
-    
+
     public PlayerShop getPlayerShop(int ownerid) {
         activePlayerShopsLock.lock();
         try {
@@ -382,7 +434,7 @@ public class ChannelServer  {
             activePlayerShopsLock.unlock();
         }
     }
-    
+
     public void resetDisabledServerMessages() {
         srvMessagesLock.lock();
         try {
@@ -391,19 +443,19 @@ public class ChannelServer  {
             srvMessagesLock.unlock();
         }
     }
-    
+
     public boolean registerDisabledServerMessage(int chrid) {
         srvMessagesLock.lock();
         try {
             boolean alreadyDisabled = disabledServerMessages.containsKey(chrid);
             disabledServerMessages.put(chrid, 0);
-            
+
             return alreadyDisabled;
         } finally {
             srvMessagesLock.unlock();
         }
     }
-    
+
     public boolean unregisterDisabledServerMessage(int chrid) {
         srvMessagesLock.lock();
         try {
@@ -412,13 +464,13 @@ public class ChannelServer  {
             srvMessagesLock.unlock();
         }
     }
-    
+
     public void runDisabledServerMessagesSchedule() {
         List<Integer> toRemove = new LinkedList<>();
-        
+
         srvMessagesLock.lock();
         try {
-            for(Map.Entry<Integer, Integer> dsm : disabledServerMessages.entrySet()) {
+            for (Map.Entry<Integer, Integer> dsm : disabledServerMessages.entrySet()) {
                 int b = dsm.getValue();
                 if (b >= 4) {
                     toRemove.add(dsm.getKey());
@@ -426,14 +478,14 @@ public class ChannelServer  {
                     disabledServerMessages.put(dsm.getKey(), ++b);
                 }
             }
-            
-            for(Integer chrid : toRemove) {
+
+            for (Integer chrid : toRemove) {
                 disabledServerMessages.remove(chrid);
             }
         } finally {
             srvMessagesLock.unlock();
         }
-        
+
         if (!toRemove.isEmpty()) {
             for (Integer chrid : toRemove) {
                 Player p = players.getCharacterById(chrid);
@@ -444,12 +496,12 @@ public class ChannelServer  {
             }
         }
     }
-    
+
     public static void loadTransitions(ChannelServer channel) {
         try {
             AirPlane airPlane = new AirPlane();
             airPlane.Start(channel);
-            
+
             Boats boats = new Boats();
             boats.Start(channel);
 
@@ -467,35 +519,39 @@ public class ChannelServer  {
 
             Trains trains = new Trains();
             trains.Start(channel);
-
         } catch (Exception ex) {
             System.err.println(ex);
         }
     }
-    
+
     public EventScriptManager getEventSM() {
         return eventSM;
     }
-    
+
     public void reloadEvents() {
         eventSM.cancel();
         eventSM = null;
         eventSM = new EventScriptManager(this, getEvents());
         eventSM.init();
     }
-    
-    private static String [] getEvents(){
-    	List<String> events = new ArrayList<>();
-    	for (File file : new File(ServerProperties.Misc.DATA_ROOT + "/Script/event").listFiles()){
-            events.add(file.getName().substring(0, file.getName().length() - 3));
-    	}
-    	return events.toArray(new String[0]);
+
+    private static String[] getEvents() {
+        List<String> events = new ArrayList<>();
+        for (File file : new File(
+            ServerProperties.Misc.DATA_ROOT + "/Script/event"
+        )
+            .listFiles()) {
+            events.add(
+                file.getName().substring(0, file.getName().length() - 3)
+            );
+        }
+        return events.toArray(new String[0]);
     }
-    
+
     public void removeMapPartyMembers(int partyid) {
         MapleParty party = PartyService.getParty(partyid);
         if (party == null) return;
-        
+
         for (MaplePartyCharacter mpc : party.getMembers()) {
             Player mc = mpc.getPlayer();
             if (mc != null) {
@@ -506,12 +562,13 @@ public class ChannelServer  {
             }
         }
     }
-                  
+
     public List<Player> getPartyMembers(MapleParty party) {
         List<Player> partym = new ArrayList<>(8);
         for (MaplePartyCharacter partychar : party.getMembers()) {
             if (partychar.getChannel() == getChannelId()) {
-                Player chr = getPlayerStorage().getCharacterByName(partychar.getName());
+                Player chr = getPlayerStorage()
+                    .getCharacterByName(partychar.getName());
                 if (chr != null) {
                     partym.add(chr);
                 }
@@ -519,11 +576,11 @@ public class ChannelServer  {
         }
         return partym;
     }
-       
+
     public boolean isConnected(String name) {
         return getPlayerStorage().getCharacterByName(name) != null;
-    }   
-      
+    }
+
     public String getCharacterName(int charId) {
         if (names.get(charId) != null) return names.get(charId);
         for (ChannelServer cs : ChannelServer.getAllInstances()) {
@@ -536,7 +593,9 @@ public class ChannelServer  {
         }
         Connection con = DatabaseConnection.getConnection();
         try {
-            PreparedStatement ps = con.prepareStatement("SELECT * FROM characters WHERE id = ?");
+            PreparedStatement ps = con.prepareStatement(
+                "SELECT * FROM characters WHERE id = ?"
+            );
             ps.setInt(1, charId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -548,8 +607,8 @@ public class ChannelServer  {
             return "SQL Error: " + err;
         }
         return "No user";
-    } 
-    
+    }
+
     public int find(String name) {
         int channel = -1;
         Player chr = getPlayerStorage().getCharacterByName(name);
@@ -558,8 +617,7 @@ public class ChannelServer  {
         }
         return channel;
     }
-    
-    
+
     public void broadcastMessage(OutPacket message) {
         broadcastPacket(message);
     }
@@ -571,7 +629,7 @@ public class ChannelServer  {
     public void broadcastGMMessage(OutPacket message) {
         broadcastGMPacket(message);
     }
-    
+
     public final void broadcastPacket(final OutPacket data) {
         for (Player chr : players.getAllCharacters()) {
             chr.announce(data);
@@ -585,7 +643,7 @@ public class ChannelServer  {
             }
         }
     }
-    
+
     public final void broadcastGMPacket(final OutPacket data) {
         for (Player chr : players.getAllCharacters()) {
             if (chr.isGameMaster()) {
@@ -593,13 +651,13 @@ public class ChannelServer  {
             }
         }
     }
-    
+
     public void broadcastYellowMessage(String msg) {
         for (Player mc : getPlayerStorage().getAllCharacters()) {
             mc.announce(PacketCreator.SendYellowTip(msg));
         }
     }
-     
+
     public void worldMessage(String msg) {
         for (Player mc : getPlayerStorage().getAllCharacters()) {
             mc.dropMessage(msg);
@@ -617,21 +675,25 @@ public class ChannelServer  {
         if (finishedShutdown) {
             return;
         }
-        
+
         if (merchantSchedule != null) {
             merchantSchedule.cancel(false);
             merchantSchedule = null;
         }
-        
+
         if (srvMessagesSchedule != null) {
             srvMessagesSchedule.cancel(false);
             srvMessagesSchedule = null;
         }
-        
-        broadcastPacket(PacketCreator.ServerNotice(0, "This channel will now shut down."));
+
+        broadcastPacket(
+            PacketCreator.ServerNotice(0, "This channel will now shut down.")
+        );
         shutdown = true;
 
-        System.out.println("Channel " + channel + ", saving hired merchants...");
+        System.out.println(
+            "Channel " + channel + ", saving hired merchants..."
+        );
         //closeAllMerchant(); TODO
 
         System.out.println("Channel " + channel + ", saving characters...");
@@ -647,56 +709,55 @@ public class ChannelServer  {
         LoginServer.removeChannel(channel);
         setFinishShutdown();
     }
-	
+
     public void unBind() {
         acceptor.unbind();
     }
-    
+
     public FieldManager getMapFactory() {
         return mapFactory;
     }
-  
+
     public static final ChannelServer newInstance(final int channel) {
         return new ChannelServer(channel);
     }
-   
+
     public static final ChannelServer getInstance(final int channel) {
         return instances.get(channel);
     }
-    
+
     public final void addPlayer(final Player p) {
         getPlayerStorage().registerPlayer(p);
         broadcastPacket(PacketCreator.ServerMessage(serverMessage));
     }
-    
+
     public final void removePlayer(final Player chr) {
-	getPlayerStorage().deregisterPlayer(chr);
+        getPlayerStorage().deregisterPlayer(chr);
     }
-    
+
     public final void removePlayer(final int idz, final String namez) {
         getPlayerStorage().deregisterPlayer(idz, namez);
     }
-    
+
     public final PlayerStorage getPlayerStorage() {
         if (players == null) {
             players = new PlayerStorage(channel);
         }
         return players;
     }
-    
+
     public MapleMatchCheckerCoordinator getMatchCheckerCoordinator() {
         return matchChecker;
     }
 
-
     public int getConnectedClients() {
-        return  getPlayerStorage().getAllCharacters().size();
+        return getPlayerStorage().getAllCharacters().size();
     }
-	
+
     public String getServerMessage() {
         return serverMessage;
     }
-    
+
     public void setServerMessage(String newMessage) {
         serverMessage = newMessage;
         broadcastPacket(PacketCreator.ServerMessage(serverMessage));
@@ -725,29 +786,29 @@ public class ChannelServer  {
     }
 
     public String getIP() {
-	return ip;
+        return ip;
     }
 
     public boolean isShutdown() {
         return shutdown;
     }
-    
+
     public boolean getEventStarted() {
         return eventOn;
     }
-    
+
     public void setEvent(boolean set) {
         this.eventOn = set;
     }
-    
+
     public int getEventMap() {
         return eventMap;
     }
-    
+
     public void setEventMap(int map) {
         this.eventMap = map;
     }
-          	
+
     public int getLoadedMaps() {
         return mapFactory.getLoadedMapSize();
     }
@@ -759,7 +820,7 @@ public class ChannelServer  {
     public void setExpRate(int expRate) {
         this.expRate = expRate;
     }
-   
+
     public int getQuestRate() {
         return questExpRate;
     }
@@ -767,7 +828,7 @@ public class ChannelServer  {
     public void setQuestRate(int QuestExpRate) {
         this.questExpRate = QuestExpRate;
     }
-	
+
     public int getMesoRate() {
         return mesoRate;
     }
@@ -815,48 +876,57 @@ public class ChannelServer  {
     public ConcurrentLinkedQueue<Integer> retrieveTopResults() {
         return topResults;
     }
-	
+
     public void checkSearchedItems(int itemId) {
         loadSearchedItems();
-    	if (!mostSearchedItem.contains(itemId)) {
+        if (!mostSearchedItem.contains(itemId)) {
             mostSearchedItem.put(itemId, 1);
             insertSearchedItem(itemId);
-    	} else {
+        } else {
             int count = mostSearchedItem.get(itemId);
             mostSearchedItem.put(itemId, count++);
-    	}
-    	updateTopItemSearchResults();
+        }
+        updateTopItemSearchResults();
     }
-	
+
     public void updateTopItemSearchResults() {
-        topResults.clear(); 
-        ArrayList<Map.Entry<Integer, Integer>> entries = new ArrayList<>(mostSearchedItem.entrySet());
-        Collections.sort(entries, (o1, o2) -> { 
-            Map.Entry<Integer, Integer> entry1 = o1;
-            Map.Entry<Integer, Integer> entry2 = o2;
-            if (entry1.getValue() > entry2.getValue()) {
+        topResults.clear();
+        ArrayList<Map.Entry<Integer, Integer>> entries = new ArrayList<>(
+            mostSearchedItem.entrySet()
+        );
+        Collections.sort(
+            entries,
+            (o1, o2) -> {
+                Map.Entry<Integer, Integer> entry1 = o1;
+                Map.Entry<Integer, Integer> entry2 = o2;
+                if (entry1.getValue() > entry2.getValue()) {
                     return -1;
-            }
-            if (entry1.getValue() < entry2.getValue()) {
+                }
+                if (entry1.getValue() < entry2.getValue()) {
                     return 1;
+                }
+                return 0;
             }
-            return 0;
-        });
+        );
         int i = 0;
-        for (Map.Entry<Integer, Integer> item : entries) { 
+        for (Map.Entry<Integer, Integer> item : entries) {
             int itemId = item.getKey();
             topResults.add(itemId);
             i++;
             if (i == 9) {
-                    break;
+                break;
             }
         }
     }
-	
+
     public void loadSearchedItems() {
         Connection con = DatabaseConnection.getConnection();
         try {
-            try (PreparedStatement ps = con.prepareStatement("SELECT * FROM topresults WHERE world = ?")) {
+            try (
+                PreparedStatement ps = con.prepareStatement(
+                    "SELECT * FROM topresults WHERE world = ?"
+                )
+            ) {
                 ps.setInt(1, 1); // Todo world
                 try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
@@ -874,10 +944,14 @@ public class ChannelServer  {
     public void saveSearchedItems() {
         Connection con = DatabaseConnection.getConnection();
         try {
-            try (PreparedStatement ps = con.prepareStatement("UPDATE topresults SET count = ? WHERE world = ? and itemid = ?")) {
+            try (
+                PreparedStatement ps = con.prepareStatement(
+                    "UPDATE topresults SET count = ? WHERE world = ? and itemid = ?"
+                )
+            ) {
                 for (Map.Entry<Integer, Integer> itemSearched : mostSearchedItem.entrySet()) {
                     ps.setInt(1, itemSearched.getValue());
-                    ps.setInt(2, 1);  // Todo world
+                    ps.setInt(2, 1); // Todo world
                     ps.setInt(3, itemSearched.getKey());
                     ps.addBatch();
                 }
@@ -887,11 +961,15 @@ public class ChannelServer  {
             System.err.println(e);
         }
     }
-    
+
     public void insertSearchedItem(int itemId) {
         Connection con = DatabaseConnection.getConnection();
         try {
-            try (PreparedStatement ps = con.prepareStatement("INSERT INTO topresults (itemid, count, world) VALUES (?, ?, ?)")) {
+            try (
+                PreparedStatement ps = con.prepareStatement(
+                    "INSERT INTO topresults (itemid, count, world) VALUES (?, ?, ?)"
+                )
+            ) {
                 ps.setInt(1, itemId);
                 ps.setInt(2, 1);
                 ps.setInt(3, 1); // Todo world
@@ -902,22 +980,22 @@ public class ChannelServer  {
         }
     }
 
-    public void reloadEventScriptManager(){
-    	eventSM.cancel();
-    	eventSM = null;
-    	eventSM = new EventScriptManager(this, getEvents());
-    	eventSM.init();
+    public void reloadEventScriptManager() {
+        eventSM.cancel();
+        eventSM = null;
+        eventSM = new EventScriptManager(this, getEvents());
+        eventSM.init();
     }
 
     public List<MapleExpedition> getExpeditions() {
-    	return expeditions;
+        return expeditions;
     }
 
     public void addOwlItemSearch(Integer itemid) {
         owlLock.lock();
         try {
             Integer cur = owlSearched.get(itemid);
-            if(cur != null) {
+            if (cur != null) {
                 owlSearched.put(itemid, cur + 1);
             } else {
                 owlSearched.put(itemid, 1);
@@ -926,48 +1004,60 @@ public class ChannelServer  {
             owlLock.unlock();
         }
     }
-    
+
     public List<Pair<Integer, Integer>> getOwlSearchedItems() {
         if (GameConstants.USE_ENFORCE_OWL_SUGGESTIONS) {
             return new ArrayList<>(0);
         }
-        
+
         owlLock.lock();
         try {
-            List<Pair<Integer, Integer>> searchCounts = new ArrayList<>(owlSearched.size());
-            
+            List<Pair<Integer, Integer>> searchCounts = new ArrayList<>(
+                owlSearched.size()
+            );
+
             for (Map.Entry<Integer, Integer> e : owlSearched.entrySet()) {
                 searchCounts.add(new Pair<>(e.getKey(), e.getValue()));
             }
-            
+
             return searchCounts;
         } finally {
             owlLock.unlock();
         }
     }
 
-    public List<Pair<PlayerShopItem, AbstractMapleFieldObject>> getAvailableItemBundles(int itemid) {
+    public List<Pair<PlayerShopItem, AbstractMapleFieldObject>> getAvailableItemBundles(
+        int itemid
+    ) {
         List<Pair<PlayerShopItem, AbstractMapleFieldObject>> hmsAvailable = new ArrayList<>();
 
-        for (Merchant hm :  getActiveMerchants()) {
+        for (Merchant hm : getActiveMerchants()) {
             List<PlayerShopItem> itemBundles = hm.sendAvailableBundles(itemid);
 
-            for(PlayerShopItem mpsi : itemBundles) {
-                hmsAvailable.add(new Pair<>(mpsi, (AbstractMapleFieldObject) hm));
+            for (PlayerShopItem mpsi : itemBundles) {
+                hmsAvailable.add(
+                    new Pair<>(mpsi, (AbstractMapleFieldObject) hm)
+                );
             }
         }
 
         for (PlayerShop ps : getActivePlayerShops()) {
             List<PlayerShopItem> itemBundles = ps.sendAvailableBundles(itemid);
 
-            for(PlayerShopItem mpsi : itemBundles) {
-                hmsAvailable.add(new Pair<>(mpsi, (AbstractMapleFieldObject) ps));
+            for (PlayerShopItem mpsi : itemBundles) {
+                hmsAvailable.add(
+                    new Pair<>(mpsi, (AbstractMapleFieldObject) ps)
+                );
             }
         }
 
-        Collections.sort(hmsAvailable, (Pair<PlayerShopItem, AbstractMapleFieldObject> p1, Pair<PlayerShopItem, AbstractMapleFieldObject> p2) -> p1.getLeft().getPrice() - p2.getLeft().getPrice());
+        Collections.sort(
+            hmsAvailable,
+            (Pair<PlayerShopItem, AbstractMapleFieldObject> p1, Pair<PlayerShopItem, AbstractMapleFieldObject> p2) ->
+                p1.getLeft().getPrice() - p2.getLeft().getPrice()
+        );
 
-        hmsAvailable.subList(0, Math.min(hmsAvailable.size(), 200));    
+        hmsAvailable.subList(0, Math.min(hmsAvailable.size(), 200));
         return hmsAvailable;
     }
 }

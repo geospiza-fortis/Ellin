@@ -6,8 +6,15 @@
 package server.life;
 
 public class MonsterDropEntry {
-    
-    public MonsterDropEntry(int itemId, int chance, int Minimum, int Maximum, short questid, int MonsterId) {
+
+    public MonsterDropEntry(
+        int itemId,
+        int chance,
+        int Minimum,
+        int Maximum,
+        short questid,
+        int MonsterId
+    ) {
         this.itemId = itemId;
         this.chance = chance;
         this.questid = questid;
@@ -15,8 +22,7 @@ public class MonsterDropEntry {
         this.Maximum = Maximum;
         this.MonsterId = MonsterId;
     }
-    
+
     public short questid;
     public int itemId, chance, Minimum, Maximum, MonsterId;
-    
 }

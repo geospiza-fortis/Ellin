@@ -9,6 +9,4 @@ package handling.channel.handler;
  *
  * @author GabrielSin
  */
-public class BuffHandler {
-  
-}
+public class BuffHandler {}

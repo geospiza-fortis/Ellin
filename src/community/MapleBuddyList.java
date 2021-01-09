@@ -33,18 +33,18 @@ public class MapleBuddyList implements Serializable {
         BUDDYLIST_FULL,
         ALREADY_ON_LIST,
         OK,
-        NOT_FOUND
+        NOT_FOUND,
     }
 
     public static enum BuddyDelResult {
         NOT_ON_LIST,
-        IN_CASH_SHOP, 
+        IN_CASH_SHOP,
         OK,
-        ERROR
+        ERROR,
     }
 
     private static final long serialVersionUID = 1413738569L;
-    
+
     private byte capacity;
     private boolean changed = false;
     private final Map<Integer, MapleBuddyListEntry> buddies;
@@ -114,21 +114,33 @@ public class MapleBuddyList implements Serializable {
     }
 
     public void loadFromDb(int characterId) throws SQLException {
-        try (PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement("SELECT b.buddyid, c.name as buddyname FROM buddyentries as b, characters as c WHERE c.id = b.buddyid AND b.owner = ?")) {
+        try (
+            PreparedStatement ps = DatabaseConnection
+                .getConnection()
+                .prepareStatement(
+                    "SELECT b.buddyid, c.name as buddyname FROM buddyentries as b, characters as c WHERE c.id = b.buddyid AND b.owner = ?"
+                )
+        ) {
             ps.setInt(1, characterId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    put(new MapleBuddyListEntry(rs.getString("buddyname"), rs.getInt("buddyid"), -1));
+                    put(
+                        new MapleBuddyListEntry(
+                            rs.getString("buddyname"),
+                            rs.getInt("buddyid"),
+                            -1
+                        )
+                    );
                 }
             }
         }
     }
-    
+
     public void setChanged(boolean v) {
-	this.changed = v;
+        this.changed = v;
     }
 
     public boolean changed() {
-	return changed;
+        return changed;
     }
 }

@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -27,8 +27,8 @@ import java.util.concurrent.ScheduledFuture;
 import server.life.MobSkill;
 import tools.ArrayMap;
 
-
 public class MonsterStatusEffect {
+
     private final Map<MonsterStatus, Integer> stati;
     private final PlayerSkill skill;
     private final boolean monsterSkill;
@@ -36,13 +36,22 @@ public class MonsterStatusEffect {
     private ScheduledFuture<?> poisonSchedule;
     private MobSkill mobskill;
 
-    public MonsterStatusEffect(Map<MonsterStatus, Integer> stati, PlayerSkill skillId, boolean monsterSkill) {
+    public MonsterStatusEffect(
+        Map<MonsterStatus, Integer> stati,
+        PlayerSkill skillId,
+        boolean monsterSkill
+    ) {
         this.stati = new ArrayMap<>(stati);
         this.skill = skillId;
         this.monsterSkill = monsterSkill;
     }
 
-    public MonsterStatusEffect(Map<MonsterStatus, Integer> stati, PlayerSkill skillId, MobSkill mobskill, boolean monsterSkill) {
+    public MonsterStatusEffect(
+        Map<MonsterStatus, Integer> stati,
+        PlayerSkill skillId,
+        MobSkill mobskill,
+        boolean monsterSkill
+    ) {
         this.stati = new ArrayMap<>(stati);
         this.skill = skillId;
         this.monsterSkill = monsterSkill;
@@ -81,7 +90,7 @@ public class MonsterStatusEffect {
         this.poisonSchedule = poisonSchedule;
     }
 
-    public void cancelPoisonSchedule() { 
+    public void cancelPoisonSchedule() {
         if (poisonSchedule != null) {
             poisonSchedule.cancel(false);
         }

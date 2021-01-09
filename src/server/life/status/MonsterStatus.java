@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -24,7 +24,6 @@ package server.life.status;
 import java.io.Serializable;
 
 public enum MonsterStatus implements Serializable {
-
     WATK(0x00000001),
     WDEF(0x00000002),
     MATK(0x00000004),
@@ -32,7 +31,7 @@ public enum MonsterStatus implements Serializable {
     ACC(0x00000010),
     AVOID(0x00000020),
     SPEED(0x00000040),
-    STUN(0x00000080), 
+    STUN(0x00000080),
     FREEZE(0x00000100),
     POISON(0x00000200),
     SEAL(0x00000400),
@@ -47,9 +46,9 @@ public enum MonsterStatus implements Serializable {
     WEAPON_IMMUNITY(0x40000),
     MAGIC_IMMUNITY(0x80000),
     NINJA_AMBUSH(0x00400000),
-    
+
     INERTMOB(0x10000000);
-        
+
     static final long serialVersionUID = 0L;
     private final int i;
     private final boolean first;

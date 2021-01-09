@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -23,8 +23,6 @@ package packet.crypto;
 import client.Client;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.session.IoSession;
-
-
 import org.apache.mina.filter.codec.ProtocolEncoder;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 import packet.transfer.write.OutPacket;
@@ -33,31 +31,38 @@ import tools.HexTool;
 public class MaplePacketEncoder implements ProtocolEncoder {
 
     @Override
-    public void encode(IoSession session, Object message, ProtocolEncoderOutput out) throws Exception {
-	try {
-	    final Client client = (Client) session.getAttribute(Client.CLIENT_KEY);
-	    final byte[] input = ((OutPacket) message).getBytes();
-	    if (client != null) {
-		final byte[] unencrypted = new byte[input.length];
-		System.arraycopy(input, 0, unencrypted, 0, input.length);
-		final byte[] ret = new byte[unencrypted.length + 4];
-		encrypt(unencrypted);
-	
-		    final byte[] header = client.getSendCrypto().getPacketHeader(unencrypted.length);
-		    client.getSendCrypto().crypt(unencrypted);
-		    System.arraycopy(header, 0, ret, 0, 4);
-		    System.arraycopy(unencrypted, 0, ret, 4, unencrypted.length);
-		    IoBuffer out_buffer = IoBuffer.wrap(ret);
-		    session.write(out_buffer);
+    public void encode(
+        IoSession session,
+        Object message,
+        ProtocolEncoderOutput out
+    ) throws Exception {
+        try {
+            final Client client = (Client) session.getAttribute(
+                Client.CLIENT_KEY
+            );
+            final byte[] input = ((OutPacket) message).getBytes();
+            if (client != null) {
+                final byte[] unencrypted = new byte[input.length];
+                System.arraycopy(input, 0, unencrypted, 0, input.length);
+                final byte[] ret = new byte[unencrypted.length + 4];
+                encrypt(unencrypted);
 
-	    } else {
-		out.write(IoBuffer.wrap(input));
-	    }
-	} catch (Exception e) {
-	    System.out.println("ENCRYPTION EXCEPTION: "	+ e);
-	}
+                final byte[] header = client
+                    .getSendCrypto()
+                    .getPacketHeader(unencrypted.length);
+                client.getSendCrypto().crypt(unencrypted);
+                System.arraycopy(header, 0, ret, 0, 4);
+                System.arraycopy(unencrypted, 0, ret, 4, unencrypted.length);
+                IoBuffer out_buffer = IoBuffer.wrap(ret);
+                session.write(out_buffer);
+            } else {
+                out.write(IoBuffer.wrap(input));
+            }
+        } catch (Exception e) {
+            System.out.println("ENCRYPTION EXCEPTION: " + e);
+        }
     }
-    
+
     public static byte[] encrypt(byte data[]) {
         for (int j = 0; j < 6; j++) {
             byte remember = 0;
@@ -93,6 +98,5 @@ public class MaplePacketEncoder implements ProtocolEncoder {
     }
 
     @Override
-    public void dispose(IoSession is) throws Exception {
-    }
+    public void dispose(IoSession is) throws Exception {}
 }

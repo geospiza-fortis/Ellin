@@ -25,8 +25,8 @@ import client.Client;
 import client.player.Player;
 import client.player.PlayerJob;
 import client.player.inventory.Inventory;
-import client.player.inventory.types.InventoryType;
 import client.player.inventory.Item;
+import client.player.inventory.types.InventoryType;
 import constants.ItemConstants;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,6 +46,7 @@ import tools.Randomizer;
  * @author Tyler (Twdtwd)
  */
 public final class ItemAction extends MapleQuestAction {
+
     List<ItemData> items = new ArrayList<>();
 
     public ItemAction(MapleQuest quest, MapleData data) {
@@ -74,20 +75,33 @@ public final class ItemAction extends MapleQuestAction {
             if (iEntry.getChildByPath("job") != null) {
                 job = MapleDataTool.getInt(iEntry.getChildByPath("job"));
             }
-            items.add(new ItemData(Integer.parseInt(iEntry.getName()), id, count, prop, job, gender));
+            items.add(
+                new ItemData(
+                    Integer.parseInt(iEntry.getName()),
+                    id,
+                    count,
+                    prop,
+                    job,
+                    gender
+                )
+            );
         }
         Collections.sort(items, (ItemData o1, ItemData o2) -> o1.map - o2.map);
     }
-        
+
     @Override
     public void run(Player p, Integer extSelection) {
         List<Pair<Integer, Integer>> takeItem = new LinkedList<>();
         List<Pair<Integer, Integer>> giveItem = new LinkedList<>();
-        
+
         int props = 0, rndProps = 0, accProps = 0;
-        
+
         for (ItemData item : items) {
-            if (item.getProp() != null && item.getProp() != -1 && canGetItem(item, p)) {
+            if (
+                item.getProp() != null &&
+                item.getProp() != -1 &&
+                canGetItem(item, p)
+            ) {
                 props += item.getProp();
             }
         }
@@ -101,8 +115,7 @@ public final class ItemAction extends MapleQuestAction {
             }
             if (iEntry.getProp() != null) {
                 if (iEntry.getProp() == -1) {
-                    if (extSelection != extNum++)
-                        continue;
+                    if (extSelection != extNum++) continue;
                 } else {
                     accProps += iEntry.getProp();
                     if (accProps <= rndProps) {
@@ -112,111 +125,181 @@ public final class ItemAction extends MapleQuestAction {
                     }
                 }
             }
-            
+
             if (iEntry.getCount() < 0) {
                 takeItem.add(new Pair<>(iEntry.getId(), iEntry.getCount()));
             } else {
                 giveItem.add(new Pair<>(iEntry.getId(), iEntry.getCount()));
             }
         }
-        for(Pair<Integer, Integer> iPair: takeItem) {
-            InventoryType type = ItemConstants.getInventoryType(iPair.getLeft());
-                int quantity = iPair.getRight() * -1; 
-                if (type.equals(InventoryType.EQUIP)) {
-                    if (p.getInventory(type).countById(iPair.getLeft()) < quantity) {
-                        if (p.getInventory(InventoryType.EQUIPPED).countById(iPair.getLeft()) > quantity) {
-                            type = InventoryType.EQUIPPED;
-                        }
+        for (Pair<Integer, Integer> iPair : takeItem) {
+            InventoryType type = ItemConstants.getInventoryType(
+                iPair.getLeft()
+            );
+            int quantity = iPair.getRight() * -1;
+            if (type.equals(InventoryType.EQUIP)) {
+                if (
+                    p.getInventory(type).countById(iPair.getLeft()) < quantity
+                ) {
+                    if (
+                        p
+                            .getInventory(InventoryType.EQUIPPED)
+                            .countById(iPair.getLeft()) >
+                        quantity
+                    ) {
+                        type = InventoryType.EQUIPPED;
                     }
                 }
+            }
 
-                InventoryManipulator.removeById(p.getClient(), type, iPair.getLeft(), quantity, true, false);
-                p.announce(PacketCreator.GetShowItemGain(iPair.getLeft(), (short) iPair.getRight().shortValue(), true));
+            InventoryManipulator.removeById(
+                p.getClient(),
+                type,
+                iPair.getLeft(),
+                quantity,
+                true,
+                false
+            );
+            p.announce(
+                PacketCreator.GetShowItemGain(
+                    iPair.getLeft(),
+                    (short) iPair.getRight().shortValue(),
+                    true
+                )
+            );
         }
 
-        for (Pair<Integer, Integer> iPair: giveItem) {
-            InventoryManipulator.addById(p.getClient(), iPair.getLeft(), (short) iPair.getRight().shortValue(), "Add by quest");
-            p.announce(PacketCreator.GetShowItemGain(iPair.getLeft(), (short) iPair.getRight().shortValue(), true));
+        for (Pair<Integer, Integer> iPair : giveItem) {
+            InventoryManipulator.addById(
+                p.getClient(),
+                iPair.getLeft(),
+                (short) iPair.getRight().shortValue(),
+                "Add by quest"
+            );
+            p.announce(
+                PacketCreator.GetShowItemGain(
+                    iPair.getLeft(),
+                    (short) iPair.getRight().shortValue(),
+                    true
+                )
+            );
         }
     }
-	
+
     @Override
     public boolean check(Player p, Integer extSelection) {
         List<Pair<Item, InventoryType>> gainList = new LinkedList<>();
         List<Pair<Item, InventoryType>> selectList = new LinkedList<>();
         List<Pair<Item, InventoryType>> randomList = new LinkedList<>();
-        
+
         List<Integer> allSlotUsed = new ArrayList(5);
         for (byte i = 0; i < 5; i++) {
             allSlotUsed.add(0);
         }
 
-        for(ItemData item : items) {
+        for (ItemData item : items) {
             if (!canGetItem(item, p)) {
                 continue;
             }
-            
-        InventoryType type = ItemConstants.getInventoryType(item.getId());
-        if (item.getProp() != null) {
-            Item toItem = new Item(item.getId(), (short) 0, (short) item.getCount());
-            if (item.getProp() < 0) {
-                selectList.add(new Pair<>(toItem, type));
-            } else {
-                randomList.add(new Pair<>(toItem, type));
-            }
-        } else {
-            if(item.getCount() > 0) {
-                Item toItem = new Item(item.getId(), (short) 0, (short) item.getCount());
-                gainList.add(new Pair<>(toItem, type));
-            } else {
-                int quantity = item.getCount() * -1;
 
-                int freeSlotCount = p.getInventory(type).freeSlotCountById(item.getId(), quantity);
-                if (freeSlotCount == -1) {
-                    if (type.equals(InventoryType.EQUIP) && p.getInventory(InventoryType.EQUIPPED).countById(item.getId()) > quantity)
-                        continue;
-                        p.dropMessage(1, "Please make sure you have enough items in your inventory.");
-                        return false;
+            InventoryType type = ItemConstants.getInventoryType(item.getId());
+            if (item.getProp() != null) {
+                Item toItem = new Item(
+                    item.getId(),
+                    (short) 0,
+                    (short) item.getCount()
+                );
+                if (item.getProp() < 0) {
+                    selectList.add(new Pair<>(toItem, type));
                 } else {
-                        int idx = type.getType() - 1;   // more slots available from the given items!
-                        allSlotUsed.set(idx, allSlotUsed.get(idx) - freeSlotCount);
+                    randomList.add(new Pair<>(toItem, type));
                 }
+            } else {
+                if (item.getCount() > 0) {
+                    Item toItem = new Item(
+                        item.getId(),
+                        (short) 0,
+                        (short) item.getCount()
+                    );
+                    gainList.add(new Pair<>(toItem, type));
+                } else {
+                    int quantity = item.getCount() * -1;
+
+                    int freeSlotCount = p
+                        .getInventory(type)
+                        .freeSlotCountById(item.getId(), quantity);
+                    if (freeSlotCount == -1) {
+                        if (
+                            type.equals(InventoryType.EQUIP) &&
+                            p
+                                .getInventory(InventoryType.EQUIPPED)
+                                .countById(item.getId()) >
+                            quantity
+                        ) continue;
+                        p.dropMessage(
+                            1,
+                            "Please make sure you have enough items in your inventory."
+                        );
+                        return false;
+                    } else {
+                        int idx = type.getType() - 1; // more slots available from the given items!
+                        allSlotUsed.set(
+                            idx,
+                            allSlotUsed.get(idx) - freeSlotCount
+                        );
+                    }
                 }
-        }
-    }
-
-    if (!randomList.isEmpty()) {
-        int result;
-        Client c = p.getClient();
-
-        List<Integer> rndUsed = new ArrayList(5);
-        for (byte i = 0; i < 5; i++) rndUsed.add(allSlotUsed.get(i));
-
-        for (Pair<Item, InventoryType> it: randomList) {
-            int idx = it.getRight().getType() - 1;
-
-            result =  InventoryManipulator.checkSpaceProgressively(c, it.getLeft().getItemId(), it.getLeft().getQuantity(), "", rndUsed.get(idx));
-            if (result % 2 == 0) {
-                p.dropMessage(1, "Please make sure you have enough space in your inventory.");
-                return false;
             }
-
-            allSlotUsed.set(idx, Math.max(allSlotUsed.get(idx), result >> 1));
         }
+
+        if (!randomList.isEmpty()) {
+            int result;
+            Client c = p.getClient();
+
+            List<Integer> rndUsed = new ArrayList(5);
+            for (byte i = 0; i < 5; i++) rndUsed.add(allSlotUsed.get(i));
+
+            for (Pair<Item, InventoryType> it : randomList) {
+                int idx = it.getRight().getType() - 1;
+
+                result =
+                    InventoryManipulator.checkSpaceProgressively(
+                        c,
+                        it.getLeft().getItemId(),
+                        it.getLeft().getQuantity(),
+                        "",
+                        rndUsed.get(idx)
+                    );
+                if (result % 2 == 0) {
+                    p.dropMessage(
+                        1,
+                        "Please make sure you have enough space in your inventory."
+                    );
+                    return false;
+                }
+
+                allSlotUsed.set(
+                    idx,
+                    Math.max(allSlotUsed.get(idx), result >> 1)
+                );
+            }
+        }
+
+        if (!selectList.isEmpty()) {
+            Pair<Item, InventoryType> selected = selectList.get(extSelection);
+            gainList.add(selected);
+        }
+
+        if (!Inventory.checkSpots(p, gainList, allSlotUsed)) {
+            p.dropMessage(
+                1,
+                "Please check if you have enough space in your inventory."
+            );
+            return false;
+        }
+        return true;
     }
 
-    if (!selectList.isEmpty()) {
-        Pair<Item, InventoryType> selected = selectList.get(extSelection);
-        gainList.add(selected);
-    }
-
-    if (!Inventory.checkSpots(p, gainList, allSlotUsed)) {
-        p.dropMessage(1, "Please check if you have enough space in your inventory.");
-        return false;
-    }
-    return true;
-    }
-        
     private boolean canGetItem(ItemData item, Player p) {
         if (item.getGender() != 2 && item.getGender() != p.getGender()) {
             return false;
@@ -230,12 +313,20 @@ public final class ItemAction extends MapleQuestAction {
         }
         return true;
     }
-      
+
     private class ItemData {
+
         private final int map, id, count, job, gender;
         private final Integer prop;
 
-        public ItemData(int map, int id, int count, Integer prop, int job, int gender) {
+        public ItemData(
+            int map,
+            int id,
+            int count,
+            Integer prop,
+            int job,
+            int gender
+        ) {
             this.map = map;
             this.id = id;
             this.count = count;
@@ -264,4 +355,4 @@ public final class ItemAction extends MapleQuestAction {
             return gender;
         }
     }
-} 
+}

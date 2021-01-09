@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -25,7 +25,13 @@ import java.awt.Point;
 import packet.transfer.write.WritingPacket;
 
 public class RelativeLifeMovement extends AbstractLifeMovement {
-    public RelativeLifeMovement(int type, Point position, int duration, int newstate) {
+
+    public RelativeLifeMovement(
+        int type,
+        Point position,
+        int duration,
+        int newstate
+    ) {
         super(type, position, duration, newstate);
     }
 

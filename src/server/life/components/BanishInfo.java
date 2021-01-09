@@ -6,7 +6,7 @@
 package server.life.components;
 
 public class BanishInfo {
-    
+
     private int type = 0;
     private final int map;
     private final String portal, msg;

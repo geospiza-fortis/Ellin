@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class InventoryIdentifier implements Serializable {
 
     private static final long serialVersionUID = 21830921831301L;
-    
+
     private final AtomicInteger runningUID = new AtomicInteger(0);
     private static InventoryIdentifier instance = new InventoryIdentifier();
 
@@ -32,7 +32,9 @@ public class InventoryIdentifier implements Serializable {
         try {
             int[] ids = new int[4];
             Connection con = DatabaseConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement("SELECT MAX(uniqueid) FROM inventoryitems");
+            PreparedStatement ps = con.prepareStatement(
+                "SELECT MAX(uniqueid) FROM inventoryitems"
+            );
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 ids[0] = rs.getInt(1) + 1;

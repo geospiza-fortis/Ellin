@@ -22,19 +22,20 @@
 package server.quest.requirements;
 
 import client.player.Player;
-import server.quest.MapleQuestStatus;
 import java.util.ArrayList;
 import java.util.List;
 import provider.MapleData;
 import provider.MapleDataTool;
 import server.quest.MapleQuest;
 import server.quest.MapleQuestRequirementType;
+import server.quest.MapleQuestStatus;
 
 /**
  *
  * @author Tyler (Twdtwd)
  */
 public final class InfoExRequirement extends MapleQuestRequirement {
+
     private final List<String> infoExpected = new ArrayList<>();
     private final int questID;
 
@@ -46,7 +47,7 @@ public final class InfoExRequirement extends MapleQuestRequirement {
 
     @Override
     public void processData(MapleData data) {
-        for(MapleData infoEx : data.getChildren()) {
+        for (MapleData infoEx : data.getChildren()) {
             MapleData value = infoEx.getChildByPath("value");
             infoExpected.add(MapleDataTool.getString(value, ""));
         }

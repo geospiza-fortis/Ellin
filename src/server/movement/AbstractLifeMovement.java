@@ -1,6 +1,6 @@
 /*
     This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -24,12 +24,18 @@ package server.movement;
 import java.awt.Point;
 
 public abstract class AbstractLifeMovement implements LifeMovement {
+
     private final Point position;
     private final int duration;
     private final int newstate;
     private final int type;
 
-    public AbstractLifeMovement(int type, Point position, int duration, int newstate) {
+    public AbstractLifeMovement(
+        int type,
+        Point position,
+        int duration,
+        int newstate
+    ) {
         super();
         this.type = type;
         this.position = position;

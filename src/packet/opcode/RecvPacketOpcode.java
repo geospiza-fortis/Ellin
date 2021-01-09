@@ -1,6 +1,6 @@
 /*
 This file is part of the OdinMS Maple Story Server
-Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc> 
+Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc>
 Matthias Butz <matze@odinms.de>
 Jan Christian Meyer <vimes@odinms.de>
 
@@ -138,20 +138,20 @@ public enum RecvPacketOpcode {
     UNKNOWN((short) 0x81),
     ALLIANCE_OPERATION((short) 0x83),
     PET_AUTO_POT((short) 0x90),
-    PET_ITEM_IGNORE ((short) 0x91),
-    SILVER_BOX((short) 0x69), 
+    PET_ITEM_IGNORE((short) 0x91),
+    SILVER_BOX((short) 0x69),
     HIRED_MERCHANT_REQUEST((short) 0x3B),
     FREDRICK_REQUEST((short) 0x3C),
     OWL_ACTION((short) 0x3E),
     OWL_WARP((short) 0x3F),
     LOGGED_OUT((short) 0xC0);
- 
+
     private short code = -2;
 
     private RecvPacketOpcode(short code) {
         this.code = code;
     }
-    
+
     public static String getOpcodeName(int value) {
         for (SendPacketOpcode opcode : SendPacketOpcode.values()) {
             if (opcode.getValue() == value) {

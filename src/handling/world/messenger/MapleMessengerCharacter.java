@@ -1,6 +1,6 @@
 /*
 This file is part of the OdinMS Maple Story Server
-Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc> 
+Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc>
 Matthias Butz <matze@odinms.de>
 Jan Christian Meyer <vimes@odinms.de>
 
@@ -20,9 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package handling.world.messenger;
 
-import java.io.Serializable;
 import client.player.Player;
-
+import java.io.Serializable;
 
 public class MapleMessengerCharacter implements Serializable {
 
@@ -38,8 +37,7 @@ public class MapleMessengerCharacter implements Serializable {
         this.online = true;
     }
 
-    public MapleMessengerCharacter() {
-    }
+    public MapleMessengerCharacter() {}
 
     public int getChannel() {
         return channel;

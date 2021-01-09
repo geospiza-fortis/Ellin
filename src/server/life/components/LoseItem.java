@@ -1,7 +1,7 @@
 package server.life.components;
 
 public class LoseItem {
-    
+
     private final int id;
     private final byte chance;
     private final byte x;
@@ -22,5 +22,5 @@ public class LoseItem {
 
     public byte getX() {
         return x;
-    } 
+    }
 }

@@ -6,32 +6,48 @@
 
 package handling.world.service;
 
+import client.player.Player;
 import handling.channel.ChannelServer;
 import java.util.List;
 import packet.transfer.write.OutPacket;
-import client.player.Player;
 
 public class BroadcastService {
 
     public static void broadcastSmega(OutPacket message) {
-        ChannelServer.getAllInstances().forEach((cs) -> {
-            cs.broadcastSmega(message);
-        });
+        ChannelServer
+            .getAllInstances()
+            .forEach(
+                cs -> {
+                    cs.broadcastSmega(message);
+                }
+            );
     }
 
     public static void broadcastGMMessage(OutPacket message) {
-        ChannelServer.getAllInstances().forEach((cs) -> {
-            cs.broadcastGMMessage(message);
-        });
+        ChannelServer
+            .getAllInstances()
+            .forEach(
+                cs -> {
+                    cs.broadcastGMMessage(message);
+                }
+            );
     }
 
     public static void broadcastMessage(OutPacket message) {
-        ChannelServer.getAllInstances().forEach((cs) -> {
-            cs.broadcastMessage(message);
-        });
+        ChannelServer
+            .getAllInstances()
+            .forEach(
+                cs -> {
+                    cs.broadcastMessage(message);
+                }
+            );
     }
 
-    public static void sendPacket(List<Integer> targetIds, OutPacket packet, int exception) {
+    public static void sendPacket(
+        List<Integer> targetIds,
+        OutPacket packet,
+        int exception
+    ) {
         Player c;
         for (int i : targetIds) {
             if (i == exception) {
@@ -41,14 +57,23 @@ public class BroadcastService {
             if (ch < 0) {
                 continue;
             }
-            c = ChannelServer.getInstance(ch).getPlayerStorage().getCharacterById(i);
+            c =
+                ChannelServer
+                    .getInstance(ch)
+                    .getPlayerStorage()
+                    .getCharacterById(i);
             if (c != null) {
                 c.getClient().getSession().write(packet);
             }
         }
     }
 
-    public static void sendGuildPacket(int targetIds, OutPacket packet, int exception, int guildid) {
+    public static void sendGuildPacket(
+        int targetIds,
+        OutPacket packet,
+        int exception,
+        int guildid
+    ) {
         if (targetIds == exception) {
             return;
         }
@@ -56,9 +81,12 @@ public class BroadcastService {
         if (ch < 0) {
             return;
         }
-        final Player c = ChannelServer.getInstance(ch).getPlayerStorage().getCharacterById(targetIds);
+        final Player c = ChannelServer
+            .getInstance(ch)
+            .getPlayerStorage()
+            .getCharacterById(targetIds);
         if (c != null && c.getGuildId() == guildid) {
             c.getClient().getSession().write(packet);
         }
-    } 
+    }
 }

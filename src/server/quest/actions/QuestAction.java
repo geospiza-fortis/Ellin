@@ -22,19 +22,20 @@
 package server.quest.actions;
 
 import client.player.Player;
-import server.quest.MapleQuestStatus;
 import java.util.HashMap;
 import java.util.Map;
 import provider.MapleData;
 import provider.MapleDataTool;
 import server.quest.MapleQuest;
 import server.quest.MapleQuestActionType;
+import server.quest.MapleQuestStatus;
 
 /**
  *
  * @author Tyler (Twdtwd)
  */
 public final class QuestAction extends MapleQuestAction {
+
     int mesos;
     Map<Integer, Integer> quests = new HashMap<>();
 
@@ -57,7 +58,12 @@ public final class QuestAction extends MapleQuestAction {
     public void run(Player chr, Integer extSelection) {
         for (Integer questID : quests.keySet()) {
             int stat = quests.get(questID);
-            chr.updateQuest(new MapleQuestStatus(MapleQuest.getInstance(questID), MapleQuestStatus.Status.getById(stat)));
+            chr.updateQuest(
+                new MapleQuestStatus(
+                    MapleQuest.getInstance(questID),
+                    MapleQuestStatus.Status.getById(stat)
+                )
+            );
         }
     }
-} 
+}

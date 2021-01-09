@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -23,41 +23,49 @@ package packet.crypto;
 import client.Client;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.session.IoSession;
-
 import org.apache.mina.filter.codec.CumulativeProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 import tools.HexTool;
 
 public class MaplePacketDecoder extends CumulativeProtocolDecoder {
 
-    public static final String DECODER_STATE_KEY = MaplePacketDecoder.class.getName() + ".STATE";
+    public static final String DECODER_STATE_KEY =
+        MaplePacketDecoder.class.getName() + ".STATE";
 
     public static class DecoderState {
-	public int packetlength = -1;
+
+        public int packetlength = -1;
     }
 
     @Override
-    protected boolean doDecode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
+    protected boolean doDecode(
+        IoSession session,
+        IoBuffer in,
+        ProtocolDecoderOutput out
+    ) throws Exception {
         final Client client = (Client) session.getAttribute(Client.CLIENT_KEY);
-        DecoderState decoderState = (DecoderState) session.getAttribute(DECODER_STATE_KEY);
+        DecoderState decoderState = (DecoderState) session.getAttribute(
+            DECODER_STATE_KEY
+        );
         if (decoderState == null) {
             decoderState = new DecoderState();
             session.setAttribute(DECODER_STATE_KEY, decoderState);
         }
         if (in.remaining() >= 4 && decoderState.packetlength == -1) {
             int packetHeader = in.getInt();
-	    boolean passCheck = true;
+            boolean passCheck = true;
 
             if (!client.getReceiveCrypto().checkPacket(packetHeader)) {
                 passCheck = false;
             }
-	
+
             if (!passCheck) {
                 System.out.println("Closing session in decode");
                 session.close();
                 return false;
             }
-            decoderState.packetlength = MapleCrypto.getPacketLength(packetHeader);
+            decoderState.packetlength =
+                MapleCrypto.getPacketLength(packetHeader);
         } else if (in.remaining() < 4 && decoderState.packetlength == -1) {
             return false;
         }
@@ -66,15 +74,15 @@ public class MaplePacketDecoder extends CumulativeProtocolDecoder {
             in.get(decryptedPacket, 0, decoderState.packetlength);
             decoderState.packetlength = -1;
 
-		client.getReceiveCrypto().crypt(decryptedPacket);
-		decrypt(decryptedPacket);
-		out.write(decryptedPacket);
+            client.getReceiveCrypto().crypt(decryptedPacket);
+            decrypt(decryptedPacket);
+            out.write(decryptedPacket);
 
             return true;
         }
         return false;
     }
-    
+
     public static byte[] decrypt(byte data[]) {
         for (int j = 1; j <= 6; j++) {
             byte remember = 0;

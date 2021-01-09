@@ -20,106 +20,40 @@
  */
 package client.player;
 
+import static client.player.buffs.BuffStat.*;
+
+import cashshop.CashShop;
 import client.Client;
+import client.ClientLoginState;
 import client.player.Player.FameStatus;
 import client.player.buffs.BuffStat;
-import static client.player.buffs.BuffStat.*;
 import client.player.buffs.BuffStatValueHolder;
 import client.player.buffs.Disease;
 import client.player.buffs.DiseaseValueHolder;
 import client.player.inventory.Equip;
 import client.player.inventory.Inventory;
 import client.player.inventory.InventoryIdentifier;
-import client.player.inventory.types.InventoryType;
 import client.player.inventory.Item;
 import client.player.inventory.ItemFactory;
 import client.player.inventory.ItemPet;
 import client.player.inventory.ItemRing;
 import client.player.inventory.TamingMob;
+import client.player.inventory.types.InventoryType;
+import client.player.inventory.types.ItemRingType;
 import client.player.skills.PlayerSkill;
 import client.player.skills.PlayerSkillEntry;
 import client.player.skills.PlayerSkillFactory;
 import client.player.skills.PlayerSkillMacro;
 import client.player.violation.CheatTracker;
 import community.MapleBuddyList;
-import constants.ExperienceConstants;
-import server.quest.MapleQuestStatus;
 import community.MapleGuild;
 import community.MapleGuildCharacter;
-import java.awt.Point;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
-import java.util.concurrent.ScheduledFuture;
 import community.MapleParty;
-import constants.*;
-import database.DatabaseConnection;
-import database.DatabaseException;
-import java.util.Date;
-import java.util.EnumMap;
-import java.util.concurrent.locks.Lock;
-import packet.transfer.write.OutPacket;
-import handling.channel.ChannelServer;
-import handling.world.messenger.MapleMessenger;
-import handling.world.messenger.MapleMessengerCharacter;
 import community.MaplePartyCharacter;
 import community.MaplePartyOperation;
-import handling.world.PlayerBuffValueHolder;
-import handling.world.PlayerCoolDownValueHolder;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import scripting.event.EventInstanceManager;
-import server.itens.ItemInformationProvider;
-import server.shops.Shop;
-import server.MapleStatEffect;
-import server.itens.StorageKeeper;
-import server.itens.Trade;
-import server.life.MapleMonster;
-import server.maps.object.AbstractAnimatedFieldObject;
-import server.maps.MapleDoor;
-import server.maps.Field;
-import server.maps.object.FieldObject;
-import server.maps.object.FieldObjectType;
-import server.maps.MapleSummon;
-import server.quest.MapleQuest;
-import tools.Pair;
-import server.itens.InventoryManipulator;
-import server.minirooms.Merchant;
-import server.minirooms.PlayerShop;
-import server.life.MobSkill;
-import cashshop.CashShop;
-import client.ClientLoginState;
-import client.player.inventory.types.ItemRingType;
+import constants.*;
+import constants.ExperienceConstants;
 import constants.SkillConstants;
-import handling.world.PlayerBuffStorage;
-import handling.world.service.BroadcastService;
-import handling.world.service.GuildService;
-import handling.world.service.MessengerService;
-import handling.world.service.PartyService;
-import java.io.Serializable;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.concurrent.atomic.AtomicInteger;
-import packet.creators.EffectPackets;
-import packet.creators.GuildPackets;
-import packet.creators.MonsterPackets;
-import packet.creators.PacketCreator;
-import packet.creators.PartyPackets;
-import packet.creators.PetPackets;
 import constants.SkillConstants.Beginner;
 import constants.SkillConstants.Bishop;
 import constants.SkillConstants.Brawler;
@@ -140,29 +74,98 @@ import constants.SkillConstants.Sniper;
 import constants.SkillConstants.SpearMan;
 import constants.SkillConstants.SuperGm;
 import constants.SkillConstants.Swordman;
+import database.DatabaseConnection;
+import database.DatabaseException;
+import handling.channel.ChannelServer;
+import handling.world.PlayerBuffStorage;
+import handling.world.PlayerBuffValueHolder;
+import handling.world.PlayerCoolDownValueHolder;
+import handling.world.messenger.MapleMessenger;
+import handling.world.messenger.MapleMessengerCharacter;
+import handling.world.service.BroadcastService;
+import handling.world.service.GuildService;
+import handling.world.service.MessengerService;
+import handling.world.service.PartyService;
+import java.awt.Point;
+import java.io.Serializable;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.EnumMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import packet.creators.EffectPackets;
+import packet.creators.GuildPackets;
 import packet.creators.MinigamePackets;
-import server.shops.ShopFactory;
-import tools.TimerTools.CharacterTimer;
-import server.minirooms.Minigame;
-import server.minirooms.PlayerShopItem;
+import packet.creators.MonsterPackets;
+import packet.creators.PacketCreator;
+import packet.creators.PartyPackets;
+import packet.creators.PetPackets;
+import packet.transfer.write.OutPacket;
+import scripting.event.EventInstanceManager;
+import server.MapleStatEffect;
+import server.itens.InventoryManipulator;
+import server.itens.ItemInformationProvider;
+import server.itens.StorageKeeper;
+import server.itens.Trade;
 import server.life.MapleLifeFactory;
+import server.life.MapleMonster;
+import server.life.MobSkill;
+import server.maps.Field;
 import server.maps.FieldLimit;
+import server.maps.MapleDoor;
 import server.maps.MapleFoothold;
+import server.maps.MapleSummon;
 import server.maps.SavedLocationType;
+import server.maps.object.AbstractAnimatedFieldObject;
+import server.maps.object.FieldObject;
+import server.maps.object.FieldObjectType;
 import server.maps.portal.Portal;
-import tools.ConcurrentEnumMap;
-import tools.FileLogger;
+import server.minirooms.Merchant;
+import server.minirooms.Minigame;
+import server.minirooms.PlayerShop;
+import server.minirooms.PlayerShopItem;
 import server.partyquest.mcpq.MCField;
 import server.partyquest.mcpq.MCField.MCTeam;
 import server.partyquest.mcpq.MCParty;
 import server.partyquest.mcpq.MonsterCarnival;
+import server.quest.MapleQuest;
+import server.quest.MapleQuestStatus;
+import server.shops.Shop;
+import server.shops.ShopFactory;
+import tools.ConcurrentEnumMap;
+import tools.FileLogger;
+import tools.Pair;
 import tools.Randomizer;
+import tools.TimerTools.CharacterTimer;
 import tools.TimerTools.EventTimer;
 import tools.locks.MonitoredLockType;
 import tools.locks.MonitoredReentrantLock;
 
-public class Player extends AbstractAnimatedFieldObject implements Serializable {
-    
+public class Player
+    extends AbstractAnimatedFieldObject
+    implements Serializable {
+
     protected int id;
     protected int world;
     protected int accountid;
@@ -177,25 +180,27 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     protected int pop;
     protected int gm;
     protected String name;
-   
+
     protected int savedLocations[];
-    
+
     protected final AtomicInteger exp = new AtomicInteger();
     protected final AtomicInteger meso = new AtomicInteger();
-    
+
     protected int savedSpawnPoint;
-    
+
     protected PlayerSkin skin = PlayerSkin.NORMAL;
     protected PlayerJob job = PlayerJob.BEGINNER;
-    
+
     private Client client;
-   
+
     protected final PlayerStatsManager stats;
     protected Map<Short, MapleQuestStatus> quests;
     private transient EventInstanceManager eventInstance;
-    private transient Map<BuffStat, BuffStatValueHolder> effects = new ConcurrentEnumMap<>(BuffStat.class);
+    private transient Map<BuffStat, BuffStatValueHolder> effects = new ConcurrentEnumMap<>(
+        BuffStat.class
+    );
     protected Map<Integer, PlayerKeyBinding> keymap = new LinkedHashMap<>();
-    
+
     // Field
     protected int mapId, doorSlot = -1;
     private boolean canDoor = true;
@@ -284,7 +289,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     private MCParty MCPQParty;
     private MCField MCPQField;
     private int availableCP = 0;
-    private int totalCP = 0;  
+    private int totalCP = 0;
     // Playtime
     public long playtimeStart;
     public long playtime;
@@ -293,7 +298,8 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     private long targetHpBarTime = 0;
     protected int[] rocks, regrocks;
     private String chalkBoardText;
-    private boolean challenged = false, allowMapChange = true, canSmega = true, smegaEnabled = true;
+    private boolean challenged = false, allowMapChange = true, canSmega =
+        true, smegaEnabled = true;
     private boolean changedTrockLocations, changedRegrockLocations, changedSavedLocations, changedReports, changedSkillMacros;
     protected int votePoints, ariantPoints, ringRequest;
     private long lastPortalEntry = 0, lastCatch = 0, useTime = 0;
@@ -302,28 +308,37 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     private long npcCd;
     private RockPaperScissors rps = null;
     private int owlSearch;
-    // Speed Quiz Test 
+    // Speed Quiz Test
     private transient SpeedQuiz sq;
     private long lastSpeedQuiz;
     // Third kill feature
     private long loginTime = System.currentTimeMillis();
     private AtomicInteger mobKills = new AtomicInteger(0);
-    
+
     protected ScheduledFuture<?> expireTask;
     protected ScheduledFuture<?> recoveryTask;
     private final List<ScheduledFuture<?>> timers = new ArrayList<>();
-    
+
     public String dataString;
     public String[] ariantRoomLeader = new String[3];
     public int[] ariantRoomSlot = new int[3];
-    
+
     private int newWarpMap = -1;
-    private boolean canWarpMap = true; 
-    private int canWarpCounter = 0;     
-    
-    private Lock chrLock = new MonitoredReentrantLock(MonitoredLockType.CHR, true);
-    private Lock effLock = new MonitoredReentrantLock(MonitoredLockType.EFF, true);
-    private Lock saveLock = new MonitoredReentrantLock(MonitoredLockType.CHR_SAVE, true);
+    private boolean canWarpMap = true;
+    private int canWarpCounter = 0;
+
+    private Lock chrLock = new MonitoredReentrantLock(
+        MonitoredLockType.CHR,
+        true
+    );
+    private Lock effLock = new MonitoredReentrantLock(
+        MonitoredLockType.EFF,
+        true
+    );
+    private Lock saveLock = new MonitoredReentrantLock(
+        MonitoredLockType.CHR_SAVE,
+        true
+    );
     private Lock prtLock = new MonitoredReentrantLock(MonitoredLockType.PRT);
 
     private Player(final boolean ChannelServer) {
@@ -336,7 +351,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         savedLocations = new int[SavedLocationType.values().length];
         for (int i = 0; i < SavedLocationType.values().length; i++) {
             savedLocations[i] = -1;
-        } 
+        }
         if (ChannelServer) {
             changedReports = false;
             changedTrockLocations = false;
@@ -368,47 +383,55 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public Player getThis() {
         return this;
     }
-    
-    public static Player loadinCharacterDatabase(int characterId, Client client, boolean channelserver) throws SQLException {
+
+    public static Player loadinCharacterDatabase(
+        int characterId,
+        Client client,
+        boolean channelserver
+    ) throws SQLException {
         final Player ret = new Player(channelserver);
         ret.client = client;
         ret.id = characterId;
-        
+
         PreparedStatement ps = null;
         PreparedStatement pse = null;
         ResultSet rs = null;
-        
+
         try {
             Connection con = DatabaseConnection.getConnection();
             ps = con.prepareStatement("SELECT * FROM characters WHERE id = ?");
             ps.setInt(1, ret.getId());
             rs = ps.executeQuery();
-            
+
             PlayerFactory.loadingCharacterStats(ret, rs, con);
-            
+
             PlayerFactory.loadingCharacterItems(ret, channelserver);
-            
-            PlayerFactory.loadingCharacterMount(ret, rs.getInt("mountexp"), rs.getInt("mountlevel"), rs.getInt("mounttiredness"));
-            
+
+            PlayerFactory.loadingCharacterMount(
+                ret,
+                rs.getInt("mountexp"),
+                rs.getInt("mountlevel"),
+                rs.getInt("mounttiredness")
+            );
+
             PlayerFactory.loadingCharacterIntoGame(ret, channelserver, rs);
-            
+
             rs.close();
             ps.close();
-          
-            
+
             PlayerFactory.loadingCharacterAccountStats(ret, ps, rs, con);
-            
+
             ret.cashShop = new CashShop(ret.accountid, ret.id);
-            
+
             if (channelserver) {
                 PlayerFactory.loadingCharacterQuestStats(ret, ps, pse, rs, con);
-                
+
                 PlayerFactory.loadingCharacterSkillsAndMacros(ret, ps, rs, con);
-                
+
                 PlayerFactory.loadingCharacterLocations(ret, ps, rs, con);
-                
+
                 PlayerFactory.loadingCharacterFame(ret, ps, rs, con);
-                
+
                 ret.buddyList.loadFromDb(characterId);
                 ret.storage = StorageKeeper.loadStorage(ret.accountid);
                 ret.stats.recalcLocalStats();
@@ -436,7 +459,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         }
         return null;
     }
- 
+
     public static Player getDefault(Client client, int chrid) {
         Player ret = getDefault(client);
         ret.id = chrid;
@@ -445,13 +468,13 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
 
     public static Player getDefault(Client client) {
         Player ret = new Player(false);
-        
+
         ret.client = client;
         ret.stats.maxHP = GameConstants.DEFAULT_MAXHP;
         ret.stats.hp = GameConstants.DEFAULT_HP;
         ret.stats.maxMP = GameConstants.DEFAULT_MAXMP;
         ret.stats.mp = GameConstants.DEFAULT_MP;
-        
+
         ret.field = null;
         ret.exp.set(0);
         ret.meso.set(0);
@@ -461,33 +484,50 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         ret.accountid = client.getAccountID();
         ret.buddyList = new MapleBuddyList(GameConstants.DEFAULT_BUDDY);
         ret.tamingMob = null;
-        
-        ret.getInventory(InventoryType.EQUIP).setSlotLimit(GameConstants.DEFAULT_SLOTLIMIT);
-        ret.getInventory(InventoryType.USE).setSlotLimit(GameConstants.DEFAULT_SLOTLIMIT);
-        ret.getInventory(InventoryType.SETUP).setSlotLimit(GameConstants.DEFAULT_SLOTLIMIT);
-        ret.getInventory(InventoryType.ETC).setSlotLimit(GameConstants.DEFAULT_SLOTLIMIT);
-        
+
+        ret
+            .getInventory(InventoryType.EQUIP)
+            .setSlotLimit(GameConstants.DEFAULT_SLOTLIMIT);
+        ret
+            .getInventory(InventoryType.USE)
+            .setSlotLimit(GameConstants.DEFAULT_SLOTLIMIT);
+        ret
+            .getInventory(InventoryType.SETUP)
+            .setSlotLimit(GameConstants.DEFAULT_SLOTLIMIT);
+        ret
+            .getInventory(InventoryType.ETC)
+            .setSlotLimit(GameConstants.DEFAULT_SLOTLIMIT);
+
         try {
-            try (PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement("SELECT * FROM accounts WHERE id = ?")) {
+            try (
+                PreparedStatement ps = DatabaseConnection
+                    .getConnection()
+                    .prepareStatement("SELECT * FROM accounts WHERE id = ?")
+            ) {
                 ps.setInt(1, ret.accountid);
                 try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
                         ret.client.setAccountName(rs.getString("name"));
-                        
                     }
                 }
             }
-          } catch (SQLException e) {
+        } catch (SQLException e) {
             System.out.println("[ERROR] Failed getDefault function!");
             FileLogger.printError(FileLogger.DATABASE_EXCEPTION, e);
         }
         for (int i = 0; i < GameConstants.DEFAULT_KEY.length; i++) {
-            ret.keymap.put(GameConstants.DEFAULT_KEY[i], new PlayerKeyBinding(GameConstants.DEFAULT_TYPE[i], GameConstants.DEFAULT_ACTION[i]));
+            ret.keymap.put(
+                GameConstants.DEFAULT_KEY[i],
+                new PlayerKeyBinding(
+                    GameConstants.DEFAULT_TYPE[i],
+                    GameConstants.DEFAULT_ACTION[i]
+                )
+            );
         }
         ret.stats.recalcLocalStats();
         return ret;
     }
-    
+
     public void saveNewCharDB(Player p) {
         Connection con = null;
         PreparedStatement ps = null;
@@ -495,10 +535,19 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         ResultSet rse = null;
         try {
             con = DatabaseConnection.getConnection();
-            con.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
+            con.setTransactionIsolation(
+                Connection.TRANSACTION_READ_UNCOMMITTED
+            );
             con.setAutoCommit(false);
             /*                                                      1          2        3        4        5         6              7        8       9       10         11        12      13           14        15             16         17       18         19       20            21          22           23              24            25             26               27            28              29                 30                31                 32               33               34                   35              36            37             38            39           40            41              42            43        44             45          46              */
-            ps = con.prepareStatement("INSERT INTO characters SET level = ?, fame = ?, str = ?, dex = ?, luk = ?, `int` = ?, " + "exp = ?, hp = ?, mp = ?, maxhp = ?, maxmp = ?, sp = ?, ap = ?, " + "gm = ?, skincolor = ?, gender = ?, job = ?, hair = ?, face = ?, map = ?, " + "meso = ?, hpApUsed = ?, mpApUsed = ?, spawnpoint = ?, party = ?, buddyCapacity = ?,  married = ?, partnerid = ?,  marriagequest = ?, alliancerank = ?, ariantPoints = ?, hpMpUsed = ?, matchcardwins = ?, matchcardlosses = ?, matchcardties = ?, omokwins = ?, omoklosses = ?, omokties = ?,  pets = ?, autoHpPot = ?, autoMpPot = ?, playtime = ?, spouseId = ?, accountid = ?, world = ?, name = ?", Statement.RETURN_GENERATED_KEYS);
+            ps =
+                con.prepareStatement(
+                    "INSERT INTO characters SET level = ?, fame = ?, str = ?, dex = ?, luk = ?, `int` = ?, " +
+                    "exp = ?, hp = ?, mp = ?, maxhp = ?, maxmp = ?, sp = ?, ap = ?, " +
+                    "gm = ?, skincolor = ?, gender = ?, job = ?, hair = ?, face = ?, map = ?, " +
+                    "meso = ?, hpApUsed = ?, mpApUsed = ?, spawnpoint = ?, party = ?, buddyCapacity = ?,  married = ?, partnerid = ?,  marriagequest = ?, alliancerank = ?, ariantPoints = ?, hpMpUsed = ?, matchcardwins = ?, matchcardlosses = ?, matchcardties = ?, omokwins = ?, omoklosses = ?, omokties = ?,  pets = ?, autoHpPot = ?, autoMpPot = ?, playtime = ?, spouseId = ?, accountid = ?, world = ?, name = ?",
+                    Statement.RETURN_GENERATED_KEYS
+                );
             ps.setInt(1, 1);
             ps.setInt(2, 0);
             final PlayerStatsManager stat = p.stats;
@@ -547,7 +596,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             ps.setInt(45, p.world);
             ps.setString(46, p.name);
             ps.executeUpdate();
-            
+
             rse = ps.getGeneratedKeys();
             if (rse.next()) {
                 p.id = rse.getInt(1);
@@ -556,9 +605,17 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             }
             ps.close();
             rse.close();
-            
-            ps = con.prepareStatement("INSERT INTO queststatus (`queststatusid`, `characterid`, `quest`, `status`, `time`, `forfeited`, `completed`) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
-            try (PreparedStatement psee = con.prepareStatement("INSERT INTO questprogress VALUES (DEFAULT, ?, ?, ?)")) {
+
+            ps =
+                con.prepareStatement(
+                    "INSERT INTO queststatus (`queststatusid`, `characterid`, `quest`, `status`, `time`, `forfeited`, `completed`) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?)",
+                    Statement.RETURN_GENERATED_KEYS
+                );
+            try (
+                PreparedStatement psee = con.prepareStatement(
+                    "INSERT INTO questprogress VALUES (DEFAULT, ?, ?, ?)"
+                )
+            ) {
                 ps.setInt(1, id);
                 for (MapleQuestStatus q : quests.values()) {
                     ps.setInt(2, q.getQuest().getId());
@@ -581,8 +638,11 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
                 }
                 ps.close();
             }
-            
-            ps = con.prepareStatement("INSERT INTO skills (characterid, skillid, skilllevel, masterlevel) VALUES (?, ?, ?, ?)");
+
+            ps =
+                con.prepareStatement(
+                    "INSERT INTO skills (characterid, skillid, skilllevel, masterlevel) VALUES (?, ?, ?, ?)"
+                );
             ps.setInt(1, id);
             for (Entry<PlayerSkill, PlayerSkillEntry> skill_ : skills.entrySet()) {
                 ps.setInt(2, skill_.getKey().getId());
@@ -591,16 +651,19 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
                 ps.executeUpdate();
             }
             ps.close();
-            
+
             List<Pair<Item, InventoryType>> itemsWithType = new ArrayList<>();
             for (Inventory iv : inventory) {
                 for (Item item : iv.list()) {
                     itemsWithType.add(new Pair<>(item, iv.getType()));
                 }
             }
-	    ItemFactory.INVENTORY.saveItems(itemsWithType, id);   
-            
-            ps = con.prepareStatement("INSERT INTO keymap (characterid, `key`, `type`, `action`) VALUES (?, ?, ?, ?)");
+            ItemFactory.INVENTORY.saveItems(itemsWithType, id);
+
+            ps =
+                con.prepareStatement(
+                    "INSERT INTO keymap (characterid, `key`, `type`, `action`) VALUES (?, ?, ?, ?)"
+                );
             ps.setInt(1, id);
             for (Entry<Integer, PlayerKeyBinding> keybinding : keymap.entrySet()) {
                 ps.setInt(2, keybinding.getKey().intValue());
@@ -609,18 +672,23 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
                 ps.executeUpdate();
             }
             ps.close();
-            
-            ps = con.prepareStatement("INSERT INTO mountdata (characterid, `Level`, `Exp`, `Fatigue`) VALUES (?, ?, ?, ?)");
+
+            ps =
+                con.prepareStatement(
+                    "INSERT INTO mountdata (characterid, `Level`, `Exp`, `Fatigue`) VALUES (?, ?, ?, ?)"
+                );
             ps.setInt(1, id);
             ps.setByte(2, (byte) 1);
             ps.setInt(3, 0);
             ps.setByte(4, (byte) 0);
             ps.execute();
             ps.close();
-            
+
             con.commit();
         } catch (DatabaseException | SQLException e) {
-            System.out.println("[ERROR]  Error saving character data saveNewCharDB!");
+            System.out.println(
+                "[ERROR]  Error saving character data saveNewCharDB!"
+            );
             FileLogger.printError(FileLogger.DATABASE_EXCEPTION, e);
             try {
                 con.rollback();
@@ -640,20 +708,26 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
                     rse.close();
                 }
                 con.setAutoCommit(true);
-                con.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
+                con.setTransactionIsolation(
+                    Connection.TRANSACTION_REPEATABLE_READ
+                );
             } catch (SQLException e) {
-                System.out.println("[ERROR] Error going back to autocommit mode in saveNewCharDB!");
+                System.out.println(
+                    "[ERROR] Error going back to autocommit mode in saveNewCharDB!"
+                );
                 FileLogger.printError(FileLogger.DATABASE_EXCEPTION, e);
             }
-        } 
+        }
     }
-   
+
     public synchronized void saveDatabase() {
         Connection con = null;
         PreparedStatement ps = null;
         try {
             con = DatabaseConnection.getConnection();
-            con.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
+            con.setTransactionIsolation(
+                Connection.TRANSACTION_READ_UNCOMMITTED
+            );
             con.setAutoCommit(false);
 
             PlayerSaveFactory.savingCharacterStats(this, ps, con);
@@ -694,7 +768,11 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             }
 
             if (getChangedRegrockLocations()) {
-                PlayerSaveFactory.savingCharacterRegRockLocations(this, ps, con);
+                PlayerSaveFactory.savingCharacterRegRockLocations(
+                    this,
+                    ps,
+                    con
+                );
             }
 
             con.commit();
@@ -704,57 +782,89 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             try {
                 con.rollback();
             } catch (SQLException ex) {
-                System.out.println("[ERROR] Error rolling back saveToDB (" + getName() + ")!");
+                System.out.println(
+                    "[ERROR] Error rolling back saveToDB (" + getName() + ")!"
+                );
                 FileLogger.printError(FileLogger.DATABASE_EXCEPTION, ex);
             }
-        }  catch (Exception e) {
-            FileLogger.printError(FileLogger.DATABASE_EXCEPTION, e, "Error saving " + name + " Level: " + level + " Job: " + job.getId());
+        } catch (Exception e) {
+            FileLogger.printError(
+                FileLogger.DATABASE_EXCEPTION,
+                e,
+                "Error saving " +
+                name +
+                " Level: " +
+                level +
+                " Job: " +
+                job.getId()
+            );
         } finally {
             try {
                 if (ps != null) {
                     ps.close();
                 }
                 con.setAutoCommit(true);
-                con.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
+                con.setTransactionIsolation(
+                    Connection.TRANSACTION_REPEATABLE_READ
+                );
             } catch (SQLException e) {
-                System.out.println("[ERROR] Error rolling back saveToDB (" + getName() + ")!");
+                System.out.println(
+                    "[ERROR] Error rolling back saveToDB (" + getName() + ")!"
+                );
                 FileLogger.printError(FileLogger.DATABASE_EXCEPTION, e);
             }
-        } 
+        }
     }
-      
+
     public void updateQuestInfo(int quest, String info) {
         MapleQuest q = MapleQuest.getInstance(quest);
         MapleQuestStatus qs = getQuest(q);
         qs.setInfo(info);
-        
+
         synchronized (quests) {
             quests.put(q.getId(), qs);
         }
-        
+
         announce(PacketCreator.UpdateQuest(qs, false));
         if (qs.getQuest().getInfoNumber() > 0) {
             announce(PacketCreator.UpdateQuest(qs, true));
         }
-        announce(PacketCreator.UpdateQuestInfo((short) qs.getQuest().getId(), qs.getNpc()));
+        announce(
+            PacketCreator.UpdateQuestInfo(
+                (short) qs.getQuest().getId(),
+                qs.getNpc()
+            )
+        );
     }
 
     public void updateQuest(MapleQuestStatus quest) {
         synchronized (quests) {
             quests.put(quest.getQuestID(), quest);
         }
-        switch(quest.getStatus()) {
+        switch (quest.getStatus()) {
             case STARTED:
                 announce(PacketCreator.UpdateQuest(quest, false));
                 if (quest.getQuest().getInfoNumber() > 0) {
                     announce(PacketCreator.UpdateQuest(quest, true));
                 }
-                announce(PacketCreator.UpdateQuestInfo((short) quest.getQuest().getId(), quest.getNpc()));
+                announce(
+                    PacketCreator.UpdateQuestInfo(
+                        (short) quest.getQuest().getId(),
+                        quest.getNpc()
+                    )
+                );
                 break;
             case COMPLETED:
-                announce(PacketCreator.CompleteQuest((short) quest.getQuest().getId(), quest.getCompletionTime()));
+                announce(
+                    PacketCreator.CompleteQuest(
+                        (short) quest.getQuest().getId(),
+                        quest.getCompletionTime()
+                    )
+                );
                 if (GameConstants.EARN_QUESTPOINT) {
-                    quest.setCompleted(quest.getCompleted() + GameConstants.QUESTPOINT_QTY);
+                    quest.setCompleted(
+                        quest.getCompleted() + GameConstants.QUESTPOINT_QTY
+                    );
                 }
                 break;
             case NOT_STARTED:
@@ -769,64 +879,110 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
                 break;
         }
     }
-    
+
     public void cancelExpirationTask() {
         if (expireTask != null) {
             expireTask.cancel(false);
             expireTask = null;
         }
     }
-    
+
     public void expirationTask() {
         if (expireTask == null) {
-            expireTask = CharacterTimer.getInstance().register(() -> {
-                long expiration, currenttime = System.currentTimeMillis();
-                synchronized (inventory) {
-                    List<Item> toberemove = new ArrayList<>();
-                    List<Integer> toadd = new ArrayList<>();
-                    for (Inventory inv : inventory) { 
-                        for (Item item : inv.list()) {
-                            expiration = item.getExpiration();
-                            if (expiration > -1 && expiration < currenttime) {
-                                boolean sendPetExpiration = false;
-                                if (item.getPet() != null) {
-                                    sendPetExpiration = true;
-                                    if (ItemInformationProvider.getInstance().cannotRevive(item.getItemId())) {
-                                        toberemove.add(item);
-                                    } else {
-                                        item.setExpiration(-1);
+            expireTask =
+                CharacterTimer
+                    .getInstance()
+                    .register(
+                        () -> {
+                            long expiration, currenttime = System.currentTimeMillis();
+                            synchronized (inventory) {
+                                List<Item> toberemove = new ArrayList<>();
+                                List<Integer> toadd = new ArrayList<>();
+                                for (Inventory inv : inventory) {
+                                    for (Item item : inv.list()) {
+                                        expiration = item.getExpiration();
+                                        if (
+                                            expiration > -1 &&
+                                            expiration < currenttime
+                                        ) {
+                                            boolean sendPetExpiration = false;
+                                            if (item.getPet() != null) {
+                                                sendPetExpiration = true;
+                                                if (
+                                                    ItemInformationProvider
+                                                        .getInstance()
+                                                        .cannotRevive(
+                                                            item.getItemId()
+                                                        )
+                                                ) {
+                                                    toberemove.add(item);
+                                                } else {
+                                                    item.setExpiration(-1);
+                                                }
+                                            } else {
+                                                toberemove.add(item);
+                                            }
+                                            Pair<Integer, String> replace = ItemInformationProvider
+                                                .getInstance()
+                                                .getReplaceOnExpire(
+                                                    item.getItemId()
+                                                );
+                                            if (
+                                                replace.left != null &&
+                                                replace.left > 0
+                                            ) {
+                                                toadd.add(replace.left);
+                                                if (
+                                                    replace.right != null
+                                                ) dropMessage(replace.right);
+                                            }
+                                            if (sendPetExpiration) {
+                                                announce(
+                                                    PetPackets.RemovePet(
+                                                        getId(),
+                                                        getPetIndex(
+                                                            item.getPet()
+                                                        ),
+                                                        (byte) 2
+                                                    )
+                                                );
+                                            }
+                                            announce(
+                                                PacketCreator.ItemExpired(
+                                                    item.getItemId()
+                                                )
+                                            );
+                                        }
                                     }
-                                } else {
-                                    toberemove.add(item);
+                                    for (Item item : toberemove) {
+                                        InventoryManipulator.removeFromSlot(
+                                            client,
+                                            inv.getType(),
+                                            item.getPosition(),
+                                            item.getQuantity(),
+                                            true
+                                        );
+                                    }
+                                    for (Integer itemid : toadd) {
+                                        InventoryManipulator.addById(
+                                            client,
+                                            itemid,
+                                            (short) 1,
+                                            ""
+                                        );
+                                    }
+                                    toberemove.clear();
                                 }
-                                Pair<Integer, String> replace = ItemInformationProvider.getInstance().getReplaceOnExpire(item.getItemId());
-                                if (replace.left != null && replace.left > 0) {
-                                    toadd.add(replace.left);
-                                    if (replace.right != null)
-                                        dropMessage(replace.right);
-                                }
-                                if (sendPetExpiration) {
-                                    announce(PetPackets.RemovePet(getId(), getPetIndex(item.getPet()), (byte) 2));
-                                }
-                                announce(PacketCreator.ItemExpired(item.getItemId()));
                             }
-                        }
-                        for (Item item : toberemove) {
-                            InventoryManipulator.removeFromSlot(client, inv.getType(), item.getPosition(), item.getQuantity(), true);
-                        }
-                        for (Integer itemid : toadd) {
-                            InventoryManipulator.addById(client, itemid, (short) 1, "");
-                        }
-                        toberemove.clear();
-                    }
-                }
-            }, 60000);
+                        },
+                        60000
+                    );
         }
     }
-    
-     public boolean isActiveBuffedValue(int skillid) {
+
+    public boolean isActiveBuffedValue(int skillid) {
         LinkedList<BuffStatValueHolder> allBuffs;
-        
+
         effLock.lock();
         chrLock.lock();
         try {
@@ -835,9 +991,11 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             chrLock.unlock();
             effLock.unlock();
         }
-        
+
         for (BuffStatValueHolder mbsvh : allBuffs) {
-            if (mbsvh.effect.isSkill() && mbsvh.effect.getSourceId() == skillid) {
+            if (
+                mbsvh.effect.isSkill() && mbsvh.effect.getSourceId() == skillid
+            ) {
                 return true;
             }
         }
@@ -867,7 +1025,10 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             if (mbsvh == null) {
                 return false;
             }
-            return mbsvh.effect.isSkill() && mbsvh.effect.getSourceId() == skill.getId();
+            return (
+                mbsvh.effect.isSkill() &&
+                mbsvh.effect.getSourceId() == skill.getId()
+            );
         } finally {
             chrLock.unlock();
             effLock.unlock();
@@ -888,15 +1049,23 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             effLock.unlock();
         }
     }
-    
+
     public int getItemQuantity(int itemid) {
-        return inventory[ItemInformationProvider.getInstance().getInventoryType(itemid).ordinal()].countById(itemid);
+        return inventory[ItemInformationProvider
+            .getInstance()
+            .getInventoryType(itemid)
+            .ordinal()].countById(itemid);
     }
 
     public int getItemQuantity(int itemid, boolean checkEquipped) {
-        int possesed = inventory[ItemInformationProvider.getInstance().getInventoryType(itemid).ordinal()].countById(itemid);
+        int possesed =
+            inventory[ItemInformationProvider
+                .getInstance()
+                .getInventoryType(itemid)
+                .ordinal()].countById(itemid);
         if (checkEquipped) {
-            possesed += inventory[InventoryType.EQUIPPED.ordinal()].countById(itemid);
+            possesed +=
+                inventory[InventoryType.EQUIPPED.ordinal()].countById(itemid);
         }
         return possesed;
     }
@@ -938,12 +1107,15 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         }
         return mbsvh.effect;
     }
-   
+
     private void prepareDragonBlood(final MapleStatEffect bloodEffect) {
         if (this.dragonBloodSchedule != null) {
             this.dragonBloodSchedule.cancel(false);
         }
-        this.dragonBloodSchedule = CharacterTimer.getInstance().register(new DragonBloodRunnable(bloodEffect), 4000, 4000);
+        this.dragonBloodSchedule =
+            CharacterTimer
+                .getInstance()
+                .register(new DragonBloodRunnable(bloodEffect), 4000, 4000);
     }
 
     public RockPaperScissors getRPS() {
@@ -952,12 +1124,12 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
 
     public void setRPS(RockPaperScissors rps) {
         this.rps = rps;
-    }  
+    }
 
-     public void setOwlSearch(int id) {
+    public void setOwlSearch(int id) {
         owlSearch = id;
     }
-    
+
     public int getOwlSearch() {
         return owlSearch;
     }
@@ -969,24 +1141,24 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public int getTargetHpBarHash() {
         return this.targetHpBarHash;
     }
-    
+
     public void setTargetHpBarHash(int mobHash) {
         this.targetHpBarHash = mobHash;
     }
-    
+
     public long getTargetHpBarTime() {
         return this.targetHpBarTime;
     }
-    
+
     public void setTargetHpBarTime(long timeNow) {
         this.targetHpBarTime = timeNow;
     }
-    
+
     public void setPlayerAggro(int mobHash) {
         setTargetHpBarHash(mobHash);
         setTargetHpBarTime(System.currentTimeMillis());
     }
-    
+
     public void resetPlayerAggro() {
         if (getChannelServer().unregisterDisabledServerMessage(id)) {
             client.announceServerMessage();
@@ -998,7 +1170,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public final ChannelServer getChannelServer() {
         return ChannelServer.getInstance(this.getClient().getChannel());
     }
-   
+
     private final class DragonBloodRunnable implements Runnable {
 
         private final MapleStatEffect effect;
@@ -1014,28 +1186,48 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             } else {
                 stats.addHP(-this.effect.getX());
                 final int bloodEffectSourceId = this.effect.getSourceId();
-                final OutPacket ownEffectPacket = EffectPackets.ShowOwnBuffEffect(bloodEffectSourceId, PlayerEffects.SKILL_SPECIAL.getEffect());
+                final OutPacket ownEffectPacket = EffectPackets.ShowOwnBuffEffect(
+                    bloodEffectSourceId,
+                    PlayerEffects.SKILL_SPECIAL.getEffect()
+                );
                 Player.this.client.write(ownEffectPacket);
-                final OutPacket otherEffectPacket = EffectPackets.BuffMapVisualEffect(Player.this.getId(), bloodEffectSourceId, 5);
-                Player.this.field.broadcastMessage(Player.this, otherEffectPacket, false);
+                final OutPacket otherEffectPacket = EffectPackets.BuffMapVisualEffect(
+                    Player.this.getId(),
+                    bloodEffectSourceId,
+                    5
+                );
+                Player.this.field.broadcastMessage(
+                        Player.this,
+                        otherEffectPacket,
+                        false
+                    );
             }
         }
     }
 
-   public void startMapTimeLimitTask(final Field from, final Field to) {
+    public void startMapTimeLimitTask(final Field from, final Field to) {
         if (to.getTimeLimit() > 0 && from != null) {
             final Player p = this;
-            mapTimeLimitTask = CharacterTimer.getInstance().register(() -> {
-                Portal pfrom = null;
-                if (MapConstants.isMiniDungeonMap(getMap().getId())) {
-                    pfrom = from.getPortal("MD00");
-                } else {
-                    pfrom = from.getPortal(0);
-                }
-                if (pfrom != null) {
-                    p.changeMap(from, pfrom);
-                }
-            }, from.getTimeLimit() * 1000, from.getTimeLimit() * 1000);
+            mapTimeLimitTask =
+                CharacterTimer
+                    .getInstance()
+                    .register(
+                        () -> {
+                            Portal pfrom = null;
+                            if (
+                                MapConstants.isMiniDungeonMap(getMap().getId())
+                            ) {
+                                pfrom = from.getPortal("MD00");
+                            } else {
+                                pfrom = from.getPortal(0);
+                            }
+                            if (pfrom != null) {
+                                p.changeMap(from, pfrom);
+                            }
+                        },
+                        from.getTimeLimit() * 1000,
+                        from.getTimeLimit() * 1000
+                    );
         }
     }
 
@@ -1044,133 +1236,202 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             mapTimeLimitTask.cancel(false);
         }
     }
-    
+
     public void toggleVisibility(boolean login) {
         setVisibility(!isHidden());
     }
-    
+
     public void setVisibility(boolean hide) {
         setVisibility(hide, false);
     }
-    
+
     public void setVisibility(boolean hide, boolean login) {
         if (isGameMaster() && hide != this.hidden) {
             if (!hide) {
                 this.hidden = false;
-                
+
                 announce(PacketCreator.StopHide());
-                
-                List<BuffStat> stat = Collections.singletonList(BuffStat.DARKSIGHT);
-                field.broadcastGMMessage(this,PacketCreator.CancelForeignBuff(id, stat), false);       
-                field.broadcastMessage(this, PacketCreator.SpawnPlayerMapObject(this), false);
-                
-                for (MapleSummon ms: this.getSummonsValues()) {
-                    field.broadcastNONGMMessage(this, PacketCreator.SpawnSpecialFieldObject(ms, false), false);
+
+                List<BuffStat> stat = Collections.singletonList(
+                    BuffStat.DARKSIGHT
+                );
+                field.broadcastGMMessage(
+                    this,
+                    PacketCreator.CancelForeignBuff(id, stat),
+                    false
+                );
+                field.broadcastMessage(
+                    this,
+                    PacketCreator.SpawnPlayerMapObject(this),
+                    false
+                );
+
+                for (MapleSummon ms : this.getSummonsValues()) {
+                    field.broadcastNONGMMessage(
+                        this,
+                        PacketCreator.SpawnSpecialFieldObject(ms, false),
+                        false
+                    );
                 }
-                
+
                 updatePartyMemberHP();
-                
             } else {
                 this.hidden = true;
                 announce(PacketCreator.ShowHide());
                 if (!login) {
-                    getMap().broadcastMessage(this, PacketCreator.RemovePlayerFromMap(getId()), false);
+                    getMap()
+                        .broadcastMessage(
+                            this,
+                            PacketCreator.RemovePlayerFromMap(getId()),
+                            false
+                        );
                 }
-                
-                field.broadcastGMMessage(this, PacketCreator.SpawnPlayerMapObject(this), false);
-                
-                List<Pair<BuffStat, Integer>> ldsstat = Collections.singletonList(new Pair<BuffStat, Integer>(BuffStat.DARKSIGHT, 0));
-                field.broadcastGMMessage(this, PacketCreator.BuffMapEffect(id, ldsstat, false), false);
+
+                field.broadcastGMMessage(
+                    this,
+                    PacketCreator.SpawnPlayerMapObject(this),
+                    false
+                );
+
+                List<Pair<BuffStat, Integer>> ldsstat = Collections.singletonList(
+                    new Pair<BuffStat, Integer>(BuffStat.DARKSIGHT, 0)
+                );
+                field.broadcastGMMessage(
+                    this,
+                    PacketCreator.BuffMapEffect(id, ldsstat, false),
+                    false
+                );
 
                 for (MapleMonster mon : this.getControlledMonsters()) {
                     mon.setController(null);
                     mon.setControllerHasAggro(false);
                     mon.setControllerKnowsAboutAggro(false);
                     mon.getMap().updateMonsterController(mon);
-               }
+                }
             }
-            showHint("You are currently " + (hidden ? "with " : "without ") + "hide.");
+            showHint(
+                "You are currently " + (hidden ? "with " : "without ") + "hide."
+            );
             announce(PacketCreator.EnableActions());
         }
     }
-    
-    public void registerEffect(MapleStatEffect effect, long starttime, ScheduledFuture<?> schedule) {
+
+    public void registerEffect(
+        MapleStatEffect effect,
+        long starttime,
+        ScheduledFuture<?> schedule
+    ) {
         registerEffect(effect, starttime, schedule, effect.getStatups());
     }
 
-    public void registerEffect(MapleStatEffect effect, long starttime, ScheduledFuture<?> schedule, List<Pair<BuffStat, Integer>> statups) {
-	if (effect.isHide()) {
-	    field.broadcastMessage(this, PacketCreator.RemovePlayerFromMap(getId()), false);
-	} else if (effect.isDragonBlood()) {
-	    prepareDragonBlood(effect);
-	} else if (effect.isBerserk()) {
-	    checkBerserk(isHidden());
-	} else if(effect.isMonsterRiding()) {
+    public void registerEffect(
+        MapleStatEffect effect,
+        long starttime,
+        ScheduledFuture<?> schedule,
+        List<Pair<BuffStat, Integer>> statups
+    ) {
+        if (effect.isHide()) {
+            field.broadcastMessage(
+                this,
+                PacketCreator.RemovePlayerFromMap(getId()),
+                false
+            );
+        } else if (effect.isDragonBlood()) {
+            prepareDragonBlood(effect);
+        } else if (effect.isBerserk()) {
+            checkBerserk(isHidden());
+        } else if (effect.isMonsterRiding()) {
             getMount().startSchedule();
         } else if (effect.isBeholder()) {
-	    prepareBeholderEffect();
-	} else if (effect.isRecovery()) {
+            prepareBeholderEffect();
+        } else if (effect.isRecovery()) {
             int healInterval = (GameConstants.USE_ULTRA_RECOVERY) ? 2000 : 5000;
             final byte heal = (byte) effect.getX();
-            
+
             chrLock.lock();
             try {
                 if (recoveryTask != null) {
                     recoveryTask.cancel(false);
                 }
-                
-                recoveryTask = CharacterTimer.getInstance().register(() -> {
-                    if (getBuffSource(BuffStat.RECOVERY) == -1) {
-                        chrLock.lock();
-                        try {
-                            if (recoveryTask != null) {
-                                recoveryTask.cancel(false);
-                                recoveryTask = null;
-                            }
-                        } finally {
-                            chrLock.unlock();
-                        }
-                        
-                        return;
-                    }
-                    
-                    getStat().addHP(heal);
-                    client.announce(PacketCreator.ShowOwnRecovery(heal));
-                    getMap().broadcastMessage(Player.this, PacketCreator.ShowRecovery(id, heal), false);
-                }, healInterval, healInterval);
+
+                recoveryTask =
+                    CharacterTimer
+                        .getInstance()
+                        .register(
+                            () -> {
+                                if (getBuffSource(BuffStat.RECOVERY) == -1) {
+                                    chrLock.lock();
+                                    try {
+                                        if (recoveryTask != null) {
+                                            recoveryTask.cancel(false);
+                                            recoveryTask = null;
+                                        }
+                                    } finally {
+                                        chrLock.unlock();
+                                    }
+
+                                    return;
+                                }
+
+                                getStat().addHP(heal);
+                                client.announce(
+                                    PacketCreator.ShowOwnRecovery(heal)
+                                );
+                                getMap()
+                                    .broadcastMessage(
+                                        Player.this,
+                                        PacketCreator.ShowRecovery(id, heal),
+                                        false
+                                    );
+                            },
+                            healInterval,
+                            healInterval
+                        );
             } finally {
                 chrLock.unlock();
             }
-            
         }
         effLock.lock();
         chrLock.lock();
         try {
             for (Pair<BuffStat, Integer> statup : statups) {
                 int value = statup.getRight().intValue();
-                effects.put(statup.getLeft(), new BuffStatValueHolder(effect, starttime, schedule, value));
+                effects.put(
+                    statup.getLeft(),
+                    new BuffStatValueHolder(effect, starttime, schedule, value)
+                );
             }
         } finally {
             chrLock.unlock();
             effLock.unlock();
         }
-	stats.recalcLocalStats();
+        stats.recalcLocalStats();
     }
-    
+
     public int getSlot() {
         return slots;
     }
 
     public byte getSlots(int type) {
-        return type == InventoryType.CASH.getType() ? 96 : inventory[type].getSlotLimit();
+        return type == InventoryType.CASH.getType()
+            ? 96
+            : inventory[type].getSlotLimit();
     }
 
-    private List<BuffStat> getBuffStats(MapleStatEffect effect, long startTime) {
+    private List<BuffStat> getBuffStats(
+        MapleStatEffect effect,
+        long startTime
+    ) {
         final List<BuffStat> bstats = new ArrayList<>();
-        final Map<BuffStat, BuffStatValueHolder> allBuffs = new EnumMap<>(effects);
+        final Map<BuffStat, BuffStatValueHolder> allBuffs = new EnumMap<>(
+            effects
+        );
         for (Entry<BuffStat, BuffStatValueHolder> stateffect : allBuffs.entrySet()) {
             final BuffStatValueHolder mbsvh = stateffect.getValue();
-            if (mbsvh.effect.sameSource(effect) && (startTime == -1 || startTime == mbsvh.startTime)) {
+            if (
+                mbsvh.effect.sameSource(effect) &&
+                (startTime == -1 || startTime == mbsvh.startTime)
+            ) {
                 bstats.add(stateffect.getKey());
             }
         }
@@ -1180,16 +1441,21 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     private void deregisterBuffStats(List<BuffStat> stats) {
         chrLock.lock();
         try {
-            List<BuffStatValueHolder> effectsToCancel = new ArrayList<>(stats.size());
+            List<BuffStatValueHolder> effectsToCancel = new ArrayList<>(
+                stats.size()
+            );
             for (BuffStat stat : stats) {
                 final BuffStatValueHolder mbsvh = effects.remove(stat);
                 if (mbsvh != null) {
                     boolean addMbsvh = true;
                     for (BuffStatValueHolder contained : effectsToCancel) {
-                        if (mbsvh.startTime == contained.startTime && contained.effect == mbsvh.effect) {
+                        if (
+                            mbsvh.startTime == contained.startTime &&
+                            contained.effect == mbsvh.effect
+                        ) {
                             addMbsvh = false;
                         }
-                     }
+                    }
                     if (addMbsvh) {
                         effectsToCancel.add(mbsvh);
                     }
@@ -1204,16 +1470,29 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
                             case SUMMON:
                             case PUPPET:
                                 final int summonId = mbsvh.effect.getSourceId();
-                                final MapleSummon summon = summons.get(summonId);
+                                final MapleSummon summon = summons.get(
+                                    summonId
+                                );
                                 if (summon != null) {
-                                    getMap().broadcastMessage(PacketCreator.RemoveSpecialMapObject(summon, true), summon.getPosition());
+                                    getMap()
+                                        .broadcastMessage(
+                                            PacketCreator.RemoveSpecialMapObject(
+                                                summon,
+                                                true
+                                            ),
+                                            summon.getPosition()
+                                        );
                                     getMap().removeMapObject(summon);
                                     removeVisibleMapObject(summon);
                                     summons.remove(summonId);
 
-                                    if (summon.getSkill() == DarkKnight.Beholder) {
+                                    if (
+                                        summon.getSkill() == DarkKnight.Beholder
+                                    ) {
                                         if (beholderHealingSchedule != null) {
-                                            beholderHealingSchedule.cancel(false);
+                                            beholderHealingSchedule.cancel(
+                                                false
+                                            );
                                             beholderHealingSchedule = null;
                                         }
                                         if (beholderBuffSchedule != null) {
@@ -1230,12 +1509,18 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
                                 break;
                             default:
                                 break;
-                        } 
-                    } 
+                        }
+                    }
                 }
             }
             for (BuffStatValueHolder cancelEffectCancelTasks : effectsToCancel) {
-                if (getBuffStats(cancelEffectCancelTasks.effect, cancelEffectCancelTasks.startTime).isEmpty()) {
+                if (
+                    getBuffStats(
+                        cancelEffectCancelTasks.effect,
+                        cancelEffectCancelTasks.startTime
+                    )
+                        .isEmpty()
+                ) {
                     if (cancelEffectCancelTasks.schedule != null) {
                         cancelEffectCancelTasks.schedule.cancel(false);
                     }
@@ -1245,7 +1530,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             chrLock.unlock();
         }
     }
-    
+
     public void cancelEffect(int itemId) {
         cancelEffect(ii.getItemEffect(itemId), false, -1);
     }
@@ -1255,7 +1540,11 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
      * @param overwrite when overwrite is set no data is sent and all the Buffstats in the StatEffect are deregistered
      * @param startTime
      */
-    public void cancelEffect(MapleStatEffect effect, boolean overwrite, long startTime) {
+    public void cancelEffect(
+        MapleStatEffect effect,
+        boolean overwrite,
+        long startTime
+    ) {
         List<BuffStat> buffstats;
         if (!overwrite) {
             buffstats = getBuffStats(effect, startTime);
@@ -1272,18 +1561,22 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         deregisterBuffStats(buffstats);
         if (effect.isMysticDoor()) {
             MapleDoor destroyDoor;
-            
+
             chrLock.lock();
             try {
                 destroyDoor = doors.remove(this.getId());
             } finally {
                 chrLock.unlock();
             }
-            
-           if (destroyDoor != null) {
-                destroyDoor.getTarget().removeMapObject(destroyDoor.getAreaDoor());
-                destroyDoor.getTown().removeMapObject(destroyDoor.getTownDoor());
-                
+
+            if (destroyDoor != null) {
+                destroyDoor
+                    .getTarget()
+                    .removeMapObject(destroyDoor.getAreaDoor());
+                destroyDoor
+                    .getTown()
+                    .removeMapObject(destroyDoor.getTownDoor());
+
                 for (Player chr : destroyDoor.getTarget().getCharacters()) {
                     destroyDoor.getAreaDoor().sendDestroyData(chr.getClient());
                 }
@@ -1293,7 +1586,8 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
                 prtLock.lock();
                 try {
                     if (party != null) {
-                        for (MaplePartyCharacter partyMembers : getParty().getMembers()) {
+                        for (MaplePartyCharacter partyMembers : getParty()
+                            .getMembers()) {
                             partyMembers.getPlayer().removeDoor(this.getId());
                             partyMembers.removeDoor(this.getId());
                         }
@@ -1303,8 +1597,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
                     prtLock.unlock();
                 }
             }
-        
-	} 
+        }
         if (effect.isMonsterRiding()) {
             if (effect.getSourceId() != Corsair.Battleship) {
                 this.getMount().cancelSchedule();
@@ -1315,13 +1608,23 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
                 this.setEnergyBar(0);
             }
         }
-        switch(effect.getSourceId()) {
+        switch (effect.getSourceId()) {
             case SpearMan.HyperBody:
             case Gm.HyperBody:
             case SuperGm.HyperBody:
                 List<Pair<PlayerStat, Integer>> statup = new ArrayList<>(4);
-                statup.add(new Pair<>(PlayerStat.HP, Math.min(stats.getHp(), stats.getCurrentMaxHp())));
-                statup.add(new Pair<>(PlayerStat.MP, Math.min(stats.getMp(), stats.getCurrentMaxMp())));
+                statup.add(
+                    new Pair<>(
+                        PlayerStat.HP,
+                        Math.min(stats.getHp(), stats.getCurrentMaxHp())
+                    )
+                );
+                statup.add(
+                    new Pair<>(
+                        PlayerStat.MP,
+                        Math.min(stats.getMp(), stats.getCurrentMaxMp())
+                    )
+                );
                 statup.add(new Pair<>(PlayerStat.MAXHP, stats.getMaxHp()));
                 statup.add(new Pair<>(PlayerStat.MAXMP, stats.getMaxMp()));
                 client.announce(PacketCreator.UpdatePlayerStats(statup));
@@ -1330,7 +1633,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
                 break;
         }
         if (!overwrite) {
-            cancelPlayerBuffs(buffstats);  
+            cancelPlayerBuffs(buffstats);
         }
     }
 
@@ -1355,20 +1658,31 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         }
     }
 
-     private void cancelPlayerBuffs(List<BuffStat> buffstats) {
-        if (client.getChannelServer().getPlayerStorage().getCharacterById(getId()) != null) {
+    private void cancelPlayerBuffs(List<BuffStat> buffstats) {
+        if (
+            client
+                .getChannelServer()
+                .getPlayerStorage()
+                .getCharacterById(getId()) !=
+            null
+        ) {
             stats.recalcLocalStats();
             stats.enforceMaxHpMp();
             client.announce(PacketCreator.CancelBuff(buffstats));
             if (buffstats.size() > 0) {
-                getMap().broadcastMessage(this, PacketCreator.CancelForeignBuff(getId(), buffstats), false);
+                getMap()
+                    .broadcastMessage(
+                        this,
+                        PacketCreator.CancelForeignBuff(getId(), buffstats),
+                        false
+                    );
             }
         }
     }
- 
+
     public void dispel() {
         List<BuffStatValueHolder> allBuffs;
-        
+
         chrLock.lock();
         try {
             allBuffs = new ArrayList<>(effects.values());
@@ -1377,14 +1691,18 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         }
         if (!isHidden()) {
             for (BuffStatValueHolder mbsvh : allBuffs) {
-                if (mbsvh.effect.isSkill() && mbsvh.schedule != null && !mbsvh.effect.isMorph()) {
+                if (
+                    mbsvh.effect.isSkill() &&
+                    mbsvh.schedule != null &&
+                    !mbsvh.effect.isMorph()
+                ) {
                     cancelEffect(mbsvh.effect, false, mbsvh.startTime);
                 }
             }
         }
     }
 
-   public void cancelAllBuffs(boolean disconnect) {
+    public void cancelAllBuffs(boolean disconnect) {
         if (disconnect) {
             effLock.lock();
             chrLock.lock();
@@ -1396,7 +1714,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             }
         } else {
             final List<BuffStatValueHolder> allBuffs;
-            
+
             effLock.lock();
             chrLock.lock();
             try {
@@ -1412,7 +1730,9 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     }
 
     public void cancelMorphs() {
-        LinkedList<BuffStatValueHolder> allBuffs = new LinkedList<>(effects.values());
+        LinkedList<BuffStatValueHolder> allBuffs = new LinkedList<>(
+            effects.values()
+        );
         for (BuffStatValueHolder mbsvh : allBuffs) {
             switch (mbsvh.effect.getSourceId()) {
                 case Marauder.Transformation:
@@ -1440,38 +1760,42 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         effLock.lock();
         chrLock.lock();
         try {
-         List<PlayerBuffValueHolder> ret = new ArrayList<>();
+            List<PlayerBuffValueHolder> ret = new ArrayList<>();
             for (BuffStatValueHolder mbsvh : effects.values()) {
-                ret.add(new PlayerBuffValueHolder(mbsvh.startTime, mbsvh.effect));
+                ret.add(
+                    new PlayerBuffValueHolder(mbsvh.startTime, mbsvh.effect)
+                );
             }
             return ret;
         } finally {
             chrLock.unlock();
             effLock.unlock();
-        }   
+        }
     }
 
     public void cancelMagicDoor() {
         final List<BuffStatValueHolder> mbsvhList;
-                
+
         chrLock.lock();
         try {
             mbsvhList = new ArrayList<>(effects.values());
         } finally {
             chrLock.unlock();
         }
-        
+
         for (BuffStatValueHolder mbsvh : mbsvhList) {
             if (mbsvh.effect.isMysticDoor()) {
                 cancelEffect(mbsvh.effect, false, mbsvh.startTime);
             }
         }
     }
-    
+
     public void handleOrbgain() {
         int orbCount = getBuffedValue(BuffStat.COMBO);
         PlayerSkill combo = PlayerSkillFactory.getSkill(Crusader.ComboAttack);
-        PlayerSkill advCombo = PlayerSkillFactory.getSkill(Hero.AdvancedComboAttack);
+        PlayerSkill advCombo = PlayerSkillFactory.getSkill(
+            Hero.AdvancedComboAttack
+        );
 
         MapleStatEffect cEffect = null;
         int advComboSkillLevel = getSkillLevel(advCombo);
@@ -1489,32 +1813,75 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
                 }
             }
 
-            List<Pair<BuffStat, Integer>> stat = Collections.singletonList(new Pair<>(BuffStat.COMBO, newOrbCount));
+            List<Pair<BuffStat, Integer>> stat = Collections.singletonList(
+                new Pair<>(BuffStat.COMBO, newOrbCount)
+            );
             setBuffedValue(BuffStat.COMBO, newOrbCount);
             int duration = cEffect.getDuration();
-            duration += (int) ((getBuffedStarttime(BuffStat.COMBO) - System.currentTimeMillis()));
+            duration +=
+                (int) (
+                    (
+                        getBuffedStarttime(BuffStat.COMBO) -
+                        System.currentTimeMillis()
+                    )
+                );
 
-            getClient().getSession().write(PacketCreator.GiveBuff(1111002, duration, stat));
-            getMap().broadcastMessage(this, PacketCreator.BuffMapEffect(getId(), stat, false), false);
+            getClient()
+                .getSession()
+                .write(PacketCreator.GiveBuff(1111002, duration, stat));
+            getMap()
+                .broadcastMessage(
+                    this,
+                    PacketCreator.BuffMapEffect(getId(), stat, false),
+                    false
+                );
         }
     }
 
     public void handleOrbconsume() {
         PlayerSkill combo = PlayerSkillFactory.getSkill(Crusader.ComboAttack);
         MapleStatEffect cEffect = combo.getEffect(getSkillLevel(combo));
-        List<Pair<BuffStat, Integer>> stat = Collections.singletonList(new Pair<>(BuffStat.COMBO, 1));
+        List<Pair<BuffStat, Integer>> stat = Collections.singletonList(
+            new Pair<>(BuffStat.COMBO, 1)
+        );
         setBuffedValue(BuffStat.COMBO, 1);
         int duration = cEffect.getDuration();
-        duration += (int) ((getBuffedStarttime(BuffStat.COMBO) - System.currentTimeMillis()));
+        duration +=
+            (int) (
+                (
+                    getBuffedStarttime(BuffStat.COMBO) -
+                    System.currentTimeMillis()
+                )
+            );
 
-        getClient().getSession().write(PacketCreator.GiveBuff(Crusader.ComboAttack, duration, stat, false, false, getMount()));
-        getMap().broadcastMessage(this, PacketCreator.BuffMapEffect(getId(), stat, false), false);
+        getClient()
+            .getSession()
+            .write(
+                PacketCreator.GiveBuff(
+                    Crusader.ComboAttack,
+                    duration,
+                    stat,
+                    false,
+                    false,
+                    getMount()
+                )
+            );
+        getMap()
+            .broadcastMessage(
+                this,
+                PacketCreator.BuffMapEffect(getId(), stat, false),
+                false
+            );
     }
 
     public boolean isLeader() {
-        return (getParty().getLeader().equals(new MaplePartyCharacter(client.getPlayer())));
+        return (
+            getParty()
+                .getLeader()
+                .equals(new MaplePartyCharacter(client.getPlayer()))
+        );
     }
-    
+
     /**
      * only for tests
      *
@@ -1534,7 +1901,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public int getInitialSpawnpoint() {
         return savedSpawnPoint;
     }
-    
+
     public Field getMap() {
         return field;
     }
@@ -1542,7 +1909,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public int getId() {
         return id;
     }
-    
+
     public String getName() {
         return name;
     }
@@ -1566,9 +1933,9 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public int getJobRankChange() {
         return jobRankingChange;
     }
-    
+
     public String getAccountName() {
-	return client.getAccountName();
+        return client.getAccountName();
     }
 
     public int getFame() {
@@ -1578,11 +1945,11 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public Client getClient() {
         return client;
     }
-    
+
     public void setClient(Client c) {
-	this.client = c;
+        this.client = c;
     }
-    
+
     public int getCurrentExp() {
         return exp.get();
     }
@@ -1610,64 +1977,72 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public int getFace() {
         return eyes;
     }
-    
+
     public boolean getChangedTrockLocations() {
         return this.changedTrockLocations;
     }
-    
+
     public boolean getChangedRegrockLocations() {
         return this.changedRegrockLocations;
     }
-    
+
     public boolean getChangedSavedLocations() {
         return this.changedSavedLocations;
     }
-    
+
     public boolean getChangedSkillMacros() {
         return this.changedSkillMacros;
     }
-    
+
     public boolean getChangedReports() {
         return this.changedReports;
     }
-    
+
     public void setChangedTrockLocations(boolean set) {
         this.changedTrockLocations = set;
     }
-    
+
     public void setChangedRegrockLocations(boolean set) {
         this.changedRegrockLocations = set;
     }
-    
+
     public void setChangedSavedLocations(boolean set) {
         this.changedSavedLocations = set;
     }
-    
+
     public void setChangedSkillMacros(boolean set) {
         this.changedSkillMacros = set;
     }
-    
+
     public void setChangedReports(boolean set) {
         this.changedReports = set;
     }
-    
+
     public final boolean hasEquipped(int itemid) {
-        return inventory[InventoryType.EQUIPPED.ordinal()].countById(itemid) >= 1;
+        return (
+            inventory[InventoryType.EQUIPPED.ordinal()].countById(itemid) >= 1
+        );
     }
-    
+
     public void setName(String name) {
         this.name = name;
     }
-    
+
     public void setName(String name, boolean changeName) {
         if (!changeName) {
             this.name = name;
         } else {
             Connection con = DatabaseConnection.getConnection();
             try {
-                con.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
+                con.setTransactionIsolation(
+                    Connection.TRANSACTION_READ_UNCOMMITTED
+                );
                 con.setAutoCommit(false);
-                try (PreparedStatement sn = con.prepareStatement("UPDATE characters SET name = ? WHERE id = ?")) {
+                try (
+                    PreparedStatement sn = con.prepareStatement(
+                        "UPDATE characters SET name = ? WHERE id = ?"
+                    )
+                ) {
                     sn.setString(1, name);
                     sn.setInt(2, id);
                     sn.execute();
@@ -1679,7 +2054,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             }
         }
     }
-   
+
     public void setExp(int exp) {
         this.exp.set(exp);
     }
@@ -1711,11 +2086,11 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public CheatTracker getCheatTracker() {
         return antiCheat;
     }
-   
+
     public MapleBuddyList getBuddylist() {
         return buddyList;
     }
-    
+
     public void addPirateSummon(MapleSummon summon) {
         summon.lockSummon();
         try {
@@ -1736,8 +2111,8 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             summon.unlockSummon();
         }
     }
-    
-   public void setChalkboard(String text) {
+
+    public void setChalkboard(String text) {
         this.chalkBoardText = text;
         if (chalkBoardText == null) {
             getMap().broadcastMessage(PacketCreator.UseChalkBoard(this, true));
@@ -1763,43 +2138,67 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     }
 
     public void removeItem(int id, int quantity) {
-        InventoryManipulator.removeById(client, ItemConstants.getInventoryType(id), id, -quantity, true, false);
-        client.getSession().write(PacketCreator.GetShowItemGain(id, (short) quantity, true));
+        InventoryManipulator.removeById(
+            client,
+            ItemConstants.getInventoryType(id),
+            id,
+            -quantity,
+            true,
+            false
+        );
+        client
+            .getSession()
+            .write(PacketCreator.GetShowItemGain(id, (short) quantity, true));
     }
 
     public void removeAll(int id) {
         removeAll(id, true);
     }
-   
+
     public void removeAll(int id, boolean show) {
         InventoryType type = ItemConstants.getInventoryType(id);
         int possessed = getInventory(type).countById(id);
 
         if (possessed > 0) {
-            InventoryManipulator.removeById(getClient(), type, id, possessed, true, false);
+            InventoryManipulator.removeById(
+                getClient(),
+                type,
+                id,
+                possessed,
+                true,
+                false
+            );
             if (show) {
-                getClient().getSession().write(PacketCreator.GetShowItemGain(id, (short) -possessed, true));
+                getClient()
+                    .getSession()
+                    .write(
+                        PacketCreator.GetShowItemGain(
+                            id,
+                            (short) -possessed,
+                            true
+                        )
+                    );
             }
         }
     }
-    
+
     public void changeMap(int map) {
         Field warpMap;
         EventInstanceManager eim = getEventInstance();
-        
+
         if (eim != null) {
             warpMap = eim.getMapInstance(map);
         } else {
             warpMap = client.getChannelServer().getMapFactory().getMap(map);
         }
-        
+
         changeMap(warpMap, warpMap.getRandomPlayerSpawnpoint());
     }
-    
+
     public void changeMap(int map, int portal) {
         Field warpMap;
         EventInstanceManager eim = getEventInstance();
-        
+
         if (eim != null) {
             warpMap = eim.getMapInstance(map);
         } else {
@@ -1807,11 +2206,11 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         }
         changeMap(warpMap, warpMap.getPortal(portal));
     }
-    
+
     public void changeMap(int map, String portal) {
         Field warpMap;
         EventInstanceManager eim = getEventInstance();
-        
+
         if (eim != null) {
             warpMap = eim.getMapInstance(map);
         } else {
@@ -1820,11 +2219,11 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
 
         changeMap(warpMap, warpMap.getPortal(portal));
     }
-    
+
     public void changeMap(int map, Portal portal) {
         Field warpMap;
         EventInstanceManager eim = getEventInstance();
-        
+
         if (eim != null) {
             warpMap = eim.getMapInstance(map);
         } else {
@@ -1834,40 +2233,42 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         changeMap(warpMap, portal);
     }
 
-    
     public void changeMap(Field to) {
         changeMap(to, to.getPortal(0));
     }
-       
+
     public void changeMap(final Field target, final Portal pto) {
         canWarpCounter++;
-        
-        eventChangedMap(target.getId()); 
+
+        eventChangedMap(target.getId());
         Field to = getWarpMap(target.getId());
-        
-        changeMapInternal(to, pto.getPosition(), PacketCreator.GetWarpToMap(to, pto.getId(), this));
+
+        changeMapInternal(
+            to,
+            pto.getPosition(),
+            PacketCreator.GetWarpToMap(to, pto.getId(), this)
+        );
         canWarpMap = false;
-        
+
         canWarpCounter--;
         if (canWarpCounter == 0) canWarpMap = true;
-        
+
         eventAfterChangedMap(this.getMapId());
     }
-    
+
     public void changeMap(final Field target, final Point pos) {
         canWarpCounter++;
-        
+
         eventChangedMap(target.getId());
         Field to = getWarpMap(target.getId());
         changeMapInternal(to, pos, PacketCreator.GetWarpToMap(to, 0x80, this));
         canWarpMap = false;
-        
+
         canWarpCounter--;
-        if(canWarpCounter == 0) canWarpMap = true;
-        
+        if (canWarpCounter == 0) canWarpMap = true;
+
         eventAfterChangedMap(this.getMapId());
     }
-   
 
     public void changeMapBanish(int mapid, String portal, String msg) {
         dropMessage(5, msg);
@@ -1875,7 +2276,11 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         changeMap(map_, map_.getPortal(portal));
     }
 
-    private void changeMapInternal(final Field to, final Point pos, OutPacket warpPacket) {
+    private void changeMapInternal(
+        final Field to,
+        final Point pos,
+        OutPacket warpPacket
+    ) {
         if (!canWarpMap || to == null) return;
 
         this.closePlayerInteractions();
@@ -1886,7 +2291,13 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             field.removePlayer(Player.this);
         }
 
-        if (client.getChannelServer().getPlayerStorage().getCharacterById(getId()) != null) {
+        if (
+            client
+                .getChannelServer()
+                .getPlayerStorage()
+                .getCharacterById(getId()) !=
+            null
+        ) {
             field = to;
             setPosition(pos);
             to.addPlayer(Player.this);
@@ -1898,7 +2309,14 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
                 if (party != null) {
                     mpc.setMapId(to.getId());
                     silentPartyUpdate();
-                    client.announce(PartyPackets.UpdateParty(client.getChannel(), party, MaplePartyOperation.SILENT_UPDATE, null));
+                    client.announce(
+                        PartyPackets.UpdateParty(
+                            client.getChannel(),
+                            party,
+                            MaplePartyOperation.SILENT_UPDATE,
+                            null
+                        )
+                    );
                     updatePartyMemberHP();
                 }
             } finally {
@@ -1910,7 +2328,14 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
                 }
             }
         } else {
-            FileLogger.printError(FileLogger.FIELD, "Character " + this.getName() + " got stuck when moving to map " + field.getId() + ".");
+            FileLogger.printError(
+                FileLogger.FIELD,
+                "Character " +
+                this.getName() +
+                " got stuck when moving to map " +
+                field.getId() +
+                "."
+            );
         }
         if (newWarpMap != -1) {
             canWarpMap = true;
@@ -1920,13 +2345,13 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             changeMap(temp);
         } else {
             EventInstanceManager eim = getEventInstance();
-            if(eim != null) {
+            if (eim != null) {
                 eim.recoverOpenedGate(this, field.getId());
             }
         }
         client.getSession().write(PacketCreator.EnableActions());
     }
-    
+
     public void closePlayerInteractions() {
         closeNpcShop();
         closeTrade();
@@ -1935,30 +2360,35 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         closeHiredMerchant(false);
         closeMessenger();
     }
-    
+
     public void closeNpcShop() {
         setShop(null);
     }
-    
+
     public void closeTrade() {
         if (getTrade() != null) Trade.cancelTrade(getTrade(), this);
     }
-    
+
     public void closeMessenger() {
         if (getMessenger() != null) {
-            MapleMessengerCharacter messengerplayer = new MapleMessengerCharacter(this);
-            MessengerService.leaveMessenger(getMessenger().getId(), messengerplayer);
+            MapleMessengerCharacter messengerplayer = new MapleMessengerCharacter(
+                this
+            );
+            MessengerService.leaveMessenger(
+                getMessenger().getId(),
+                messengerplayer
+            );
         }
     }
-  
+
     public void setMapId(int mapid) {
         this.mapId = mapid;
     }
 
     public final Map<Integer, PlayerKeyBinding> getKeyLayout() {
-	return this.keymap;
+        return this.keymap;
     }
-   
+
     public int getRingRequested() {
         return this.ringRequest;
     }
@@ -1966,7 +2396,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public void setRingRequested(int set) {
         ringRequest = set;
     }
-    
+
     public void leaveMap() {
         visibleMapObjectsLock.writeLock().lock();
         try {
@@ -1979,7 +2409,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             chair = 0;
         }
     }
-    
+
     public void changeJob(PlayerJob newJob) {
         if (newJob == null) {
             return;
@@ -1990,13 +2420,16 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             if (newJob.getId() % 10 == 2) {
                 stats.remainingSp += 2;
             }
-            
-            stats.updateSingleStat(PlayerStat.AVAILABLESP, stats.getRemainingSp());
+
+            stats.updateSingleStat(
+                PlayerStat.AVAILABLESP,
+                stats.getRemainingSp()
+            );
             stats.updateSingleStat(PlayerStat.JOB, newJob.getId());
-            
+
             int maxHP = stats.getMaxHp();
             int maxMP = stats.getMaxMp();
-            
+
             if (job.getId() == 100) {
                 maxHP += Randomizer.rand(200, 250);
             } else if (job.getId() == 200) {
@@ -2018,26 +2451,45 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             if (maxMP >= 30000) {
                 maxMP = 30000;
             }
-            
+
             stats.hp = maxHP;
             stats.mp = maxMP;
-            
+
             List<Pair<PlayerStat, Integer>> statup = new ArrayList<>(7);
             statup.add(new Pair<>(PlayerStat.MAXHP, Integer.valueOf(maxHP)));
             statup.add(new Pair<>(PlayerStat.MAXMP, Integer.valueOf(maxMP)));
             statup.add(new Pair<>(PlayerStat.HP, Integer.valueOf(maxHP)));
             statup.add(new Pair<>(PlayerStat.MP, Integer.valueOf(maxMP)));
-            statup.add(new Pair<>(PlayerStat.AVAILABLEAP, stats.getRemainingAp()));
-            statup.add(new Pair<>(PlayerStat.AVAILABLESP, stats.getRemainingSp()));
-            statup.add(new Pair<>(PlayerStat.JOB, Integer.valueOf(job.getId())));
-            
+            statup.add(
+                new Pair<>(PlayerStat.AVAILABLEAP, stats.getRemainingAp())
+            );
+            statup.add(
+                new Pair<>(PlayerStat.AVAILABLESP, stats.getRemainingSp())
+            );
+            statup.add(
+                new Pair<>(PlayerStat.JOB, Integer.valueOf(job.getId()))
+            );
+
             stats.recalcLocalStats();
-            
-            getClient().getSession().write(PacketCreator.UpdatePlayerStats(statup));
-            getMap().broadcastMessage(this, PacketCreator.ShowThirdPersonEffect(getId(), PlayerEffects.JOB_ADVANCEMENT.getEffect()), false);
+
+            getClient()
+                .getSession()
+                .write(PacketCreator.UpdatePlayerStats(statup));
+            getMap()
+                .broadcastMessage(
+                    this,
+                    PacketCreator.ShowThirdPersonEffect(
+                        getId(),
+                        PlayerEffects.JOB_ADVANCEMENT.getEffect()
+                    ),
+                    false
+                );
 
             if (!isGameMaster() && GameConstants.SHOW_JOB_UPDATE) {
-                broadcastChangeJob(SkillConstants.getJobNameById(getJob().getId()), PlayerJob.getAdvancement(getJob().getId()));
+                broadcastChangeJob(
+                    SkillConstants.getJobNameById(getJob().getId()),
+                    PlayerJob.getAdvancement(getJob().getId())
+                );
             }
             if (getParty() != null) {
                 silentPartyUpdate();
@@ -2046,17 +2498,29 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
                 guildUpdate();
             }
         } catch (Exception ex) {
-            FileLogger.printError(FileLogger.PLAYER_STUCK, ex); 
+            FileLogger.printError(FileLogger.PLAYER_STUCK, ex);
         }
     }
 
-    public void changeSkillLevel(PlayerSkill skill, int newLevel, int newMasterlevel) {
+    public void changeSkillLevel(
+        PlayerSkill skill,
+        int newLevel,
+        int newMasterlevel
+    ) {
         skills.put(skill, new PlayerSkillEntry(newLevel, newMasterlevel));
-        this.getClient().getSession().write(PacketCreator.UpdateSkill(skill.getId(), newLevel, newMasterlevel));
+        this.getClient()
+            .getSession()
+            .write(
+                PacketCreator.UpdateSkill(
+                    skill.getId(),
+                    newLevel,
+                    newMasterlevel
+                )
+            );
     }
-    
-    public void cancelAllBuffs(){
-        for(BuffStatValueHolder mbsvh : new ArrayList<>(effects.values())){
+
+    public void cancelAllBuffs() {
+        for (BuffStatValueHolder mbsvh : new ArrayList<>(effects.values())) {
             cancelEffect(mbsvh.effect, false, mbsvh.startTime);
         }
     }
@@ -2065,20 +2529,20 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         if (getEventInstance() != null) {
             getEventInstance().playerKilled(this);
         }
-        
+
         dispelSkill();
-        cancelMorphs(); 
+        cancelMorphs();
         cancelAllBuffs(false);
         dispelDebuffs();
-        
-        if (getBuffedValue(BuffStat.MORPH) != null){
-           cancelEffectFromBuffStat(BuffStat.MORPH);
+
+        if (getBuffedValue(BuffStat.MORPH) != null) {
+            cancelEffectFromBuffStat(BuffStat.MORPH);
         }
-        
+
         if (getBuffedValue(BuffStat.MONSTER_RIDING) != null) {
             cancelEffectFromBuffStat(BuffStat.MONSTER_RIDING);
         }
-        
+
         int possesed = 0;
         int i;
         for (i = 0; i < ItemConstants.CHARM_ITEM.length; i++) {
@@ -2090,17 +2554,43 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         }
         if (possesed > 0) {
             possesed -= 1;
-            getClient().getSession().write(EffectPackets.SelfCharmEffect((short) Math.min(0xFF, possesed), (short) 90));
-            InventoryManipulator.removeById(getClient(), ItemInformationProvider.getInstance().getInventoryType(ItemConstants.CHARM_ITEM[i]), ItemConstants.CHARM_ITEM[i], 1, true, false);
+            getClient()
+                .getSession()
+                .write(
+                    EffectPackets.SelfCharmEffect(
+                        (short) Math.min(0xFF, possesed),
+                        (short) 90
+                    )
+                );
+            InventoryManipulator.removeById(
+                getClient(),
+                ItemInformationProvider
+                    .getInstance()
+                    .getInventoryType(ItemConstants.CHARM_ITEM[i]),
+                ItemConstants.CHARM_ITEM[i],
+                1,
+                true,
+                false
+            );
         } else {
             if (this.getJob() != PlayerJob.BEGINNER) {
-                int diePercentage = ExperienceConstants.getExpNeededForLevel(this.getLevel() + 1);
-                if (this.getMap().isTown() || FieldLimit.REGULAREXPLOSS.check(field.getFieldLimit())) {
+                int diePercentage = ExperienceConstants.getExpNeededForLevel(
+                    this.getLevel() + 1
+                );
+                if (
+                    this.getMap().isTown() ||
+                    FieldLimit.REGULAREXPLOSS.check(field.getFieldLimit())
+                ) {
                     diePercentage *= 0.01;
                 } else if (MonsterCarnival.isBattlefieldMap(this.getMapId())) {
                     diePercentage = 0;
-                } 
-                if (diePercentage == ExperienceConstants.getExpNeededForLevel(this.getLevel() + 1)) {
+                }
+                if (
+                    diePercentage ==
+                    ExperienceConstants.getExpNeededForLevel(
+                        this.getLevel() + 1
+                    )
+                ) {
                     if (stats.getLuk() <= 100 && stats.getLuk() > 8) {
                         diePercentage *= 0.10 - (stats.getLuk() * 0.0005);
                     } else if (stats.getLuk() < 8) {
@@ -2125,10 +2615,25 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             if (party != null) {
                 int channel = client.getChannel();
                 for (MaplePartyCharacter partychar : party.getMembers()) {
-                    if (partychar.getMapId() == getMapId() && partychar.getChannel() == channel) {
-                        Player other = ChannelServer.getInstance(channel).getPlayerStorage().getCharacterByName(partychar.getName());
+                    if (
+                        partychar.getMapId() == getMapId() &&
+                        partychar.getChannel() == channel
+                    ) {
+                        Player other = ChannelServer
+                            .getInstance(channel)
+                            .getPlayerStorage()
+                            .getCharacterByName(partychar.getName());
                         if (other != null) {
-                            other.getClient().getSession().write(PartyPackets.UpdatePartyMemberHP(getId(), stats.getHp(), stats.getCurrentMaxHp()));
+                            other
+                                .getClient()
+                                .getSession()
+                                .write(
+                                    PartyPackets.UpdatePartyMemberHP(
+                                        getId(),
+                                        stats.getHp(),
+                                        stats.getCurrentMaxHp()
+                                    )
+                                );
                         }
                     }
                 }
@@ -2137,77 +2642,89 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             prtLock.unlock();
         }
     }
-     
+
     public void receivePartyMemberHP() {
         if (party != null) {
             int channel = client.getChannel();
             for (MaplePartyCharacter partychar : party.getMembers()) {
-                if (partychar.getMapId() == getMapId() && partychar.getChannel() == channel) {
-                    Player other = ChannelServer.getInstance(channel).getPlayerStorage().getCharacterByName(partychar.getName());
+                if (
+                    partychar.getMapId() == getMapId() &&
+                    partychar.getChannel() == channel
+                ) {
+                    Player other = ChannelServer
+                        .getInstance(channel)
+                        .getPlayerStorage()
+                        .getCharacterByName(partychar.getName());
                     if (other != null) {
-                        client.announce(PartyPackets.UpdatePartyMemberHP(other.getId(), other.getStat().getHp(), other.getStat().getCurrentMaxHp()));
+                        client.announce(
+                            PartyPackets.UpdatePartyMemberHP(
+                                other.getId(),
+                                other.getStat().getHp(),
+                                other.getStat().getCurrentMaxHp()
+                            )
+                        );
                     }
                 }
             }
         }
     }
-    
+
     public final PlayerStatsManager getStat() {
         return stats;
     }
-    
+
     public int getMp() {
         return getStat().getMp();
     }
-    
+
     public int getHp() {
         return getStat().getHp();
     }
-    
+
     public int getStr() {
         return getStat().getStr();
     }
-    
+
     public int getInt() {
         return getStat().getInt();
     }
-    
+
     public int getDex() {
         return getStat().getDex();
     }
-    
+
     public int getRemainingAp() {
         return getStat().getRemainingAp();
     }
-    
+
     public int getRemainingSp() {
         return getStat().getRemainingSp();
     }
-    
+
     public int getLuk() {
         return getStat().getLuk();
     }
-    
+
     public int getMaxMp() {
         return getStat().getMaxMp();
     }
-    
+
     public int getMaxHp() {
         return getStat().getMaxHp();
     }
-    
+
     public boolean hasMerchant() {
         return hasMerchant;
     }
-    
+
     public boolean haveItem(int itemid) {
         return haveItem(itemid, 1, false, true);
     }
-    
-     public boolean haveItemEquiped(int itemid) {
+
+    public boolean haveItemEquiped(int itemid) {
         return haveItem(itemid, 1, true, false);
     }
-            
+
     public int hasEXPCard() {
         Inventory iv = getInventory(InventoryType.CASH);
         ItemInformationProvider ii = ItemInformationProvider.getInstance();
@@ -2220,7 +2737,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         }
         return 1;
     }
-    
+
     public int hasDropCard() {
         Inventory iv = getInventory(InventoryType.CASH);
         ItemInformationProvider ii = ItemInformationProvider.getInstance();
@@ -2233,7 +2750,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         }
         return 1;
     }
-    
+
     public void incrementMonsterKills() {
         if (GameConstants.THIRD_KILL_EVENT) {
             mobKills.incrementAndGet();
@@ -2266,25 +2783,25 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         }
         return mod;
     }
-    
-    public int getMonsterkills () {
+
+    public int getMonsterkills() {
         return mobKills.get();
     }
-    
-    public void resetMonsterkills () {
+
+    public void resetMonsterkills() {
         mobKills.set(0);
     }
-    
+
     public void gainExpRiche() {
-       int gainFirst = ExperienceConstants.getExpNeededForLevel(level);
-       double realgain = gainFirst * 0.05;
-       this.gainExp((int) realgain, 0, true, false, true);
-    } 
-    
+        int gainFirst = ExperienceConstants.getExpNeededForLevel(level);
+        double realgain = gainFirst * 0.05;
+        this.gainExp((int) realgain, 0, true, false, true);
+    }
+
     public void gainExperience(int gain, boolean show, boolean inChat) {
         gainExp(gain, show, inChat);
     }
-    
+
     public void gainExp(int gain) {
         gainExp(gain, true, true);
     }
@@ -2292,68 +2809,101 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public void gainExp(int gain, boolean show, boolean inChat) {
         gainExp(gain, show, inChat, true);
     }
-    
+
     public void gainExp(int gain, boolean show, boolean inChat, boolean white) {
         gainExp(gain, 0, show, inChat, white);
     }
 
-    public void gainExp(int gain, int party, boolean show, boolean inChat, boolean white) {
+    public void gainExp(
+        int gain,
+        int party,
+        boolean show,
+        boolean inChat,
+        boolean white
+    ) {
         if (hasDisease(Disease.CURSE)) {
             gain *= 0.5;
             party *= 0.5;
         }
-	
+
         if (gain < 0) {
             gain = Integer.MAX_VALUE;
-        }   
+        }
         if (party < 0) {
             party = Integer.MAX_VALUE;
-        }   
-        
-        incrementMonsterKills();
-        
-        /*
-        * After 1 hour of login until 2 hours:	Bonus 30% EXP at every 3rd mob hunted
-        * 2 hours to 3 hours: Bonus 100% EXP at every 3rd mob hunted
-        * 3 hours to 4 hours: Bonus 150% EXP at every 3rd mob hunted
-        * 4 hours to 5 hours: Bonus 180% EXP at every 3rd mob hunted
-        * 5 hours and above: Bonus 200% EXP at every 3rd mob hunted
-        */
+        }
 
-//        int hours = 1;
-//        int thirdKillBonus = 0;
-//        int thirdKillBonusPercentage = 0;
-//        
-//        if (getMonsterkills() > 2 && hours > 0 && GameConstants.THIRD_KILL_EVENT) {
-//            thirdKillBonus = (int) (getThirdKillPercentage(hours) / 100f * gain);
-//            thirdKillBonusPercentage = getThirdKillPercentage(hours);
-//            resetMonsterkills();
-//        }
-//        
-//        System.out.println("thirdKillBonus: " + thirdKillBonus);
-        
+        incrementMonsterKills();
+
+        /*
+         * After 1 hour of login until 2 hours:	Bonus 30% EXP at every 3rd mob hunted
+         * 2 hours to 3 hours: Bonus 100% EXP at every 3rd mob hunted
+         * 3 hours to 4 hours: Bonus 150% EXP at every 3rd mob hunted
+         * 4 hours to 5 hours: Bonus 180% EXP at every 3rd mob hunted
+         * 5 hours and above: Bonus 200% EXP at every 3rd mob hunted
+         */
+
+        //        int hours = 1;
+        //        int thirdKillBonus = 0;
+        //        int thirdKillBonusPercentage = 0;
+        //
+        //        if (getMonsterkills() > 2 && hours > 0 && GameConstants.THIRD_KILL_EVENT) {
+        //            thirdKillBonus = (int) (getThirdKillPercentage(hours) / 100f * gain);
+        //            thirdKillBonusPercentage = getThirdKillPercentage(hours);
+        //            resetMonsterkills();
+        //        }
+        //
+        //        System.out.println("thirdKillBonus: " + thirdKillBonus);
+
         //int total = gain + party + thirdKillBonus;
         int total = gain + party;
-        
-        gainExpInternal(total, party, /*thirdKillBonusPercentage, hours,*/ show, inChat, white);
+
+        gainExpInternal(
+            total,
+            party,
+            /*thirdKillBonusPercentage, hours,*/show,
+            inChat,
+            white
+        );
     }
-    
-    public void gainExpInternal(int gain, int party, /*int thirdKillBonusPercentage, int hours, */ boolean show, boolean inChat, boolean white) {
+
+    public void gainExpInternal(
+        int gain,
+        int party,
+        /*int thirdKillBonusPercentage, int hours, */boolean show,
+        boolean inChat,
+        boolean white
+    ) {
         if (level < 200) {
-            if ((long) this.exp.get() + (long) gain > (long) Integer.MAX_VALUE) {
-                int gainFirst = ExperienceConstants.getExpNeededForLevel(level) - this.exp.get();
+            if (
+                (long) this.exp.get() + (long) gain > (long) Integer.MAX_VALUE
+            ) {
+                int gainFirst =
+                    ExperienceConstants.getExpNeededForLevel(level) -
+                    this.exp.get();
                 gain -= gainFirst + 1;
                 this.gainExp(gainFirst + 1, false, inChat, white);
             }
             stats.updateSingleStat(PlayerStat.EXP, this.exp.addAndGet(gain));
             if (show && gain != 0) {
-                client.announce(PacketCreator.GetShowExpGain(gain, party != 0 ? (party - 100) : 0, /*thirdKillBonusPercentage, hours,*/ inChat, white));
+                client.announce(
+                    PacketCreator.GetShowExpGain(
+                        gain,
+                        party != 0 ? (party - 100) : 0,
+                        /*thirdKillBonusPercentage, hours,*/inChat,
+                        white
+                    )
+                );
             }
             if (gm > 0) {
-                while (exp.get() >= ExperienceConstants.getExpNeededForLevel(level)) {
+                while (
+                    exp.get() >= ExperienceConstants.getExpNeededForLevel(level)
+                ) {
                     levelUp(true);
                 }
-            } else if (exp.get() >= ExperienceConstants.getExpNeededForLevel(level)) {
+            } else if (
+                exp.get() >= ExperienceConstants.getExpNeededForLevel(level)
+            ) {
                 levelUp(true);
                 int need = ExperienceConstants.getExpNeededForLevel(level);
                 if (exp.get() >= need) {
@@ -2363,50 +2913,78 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             }
         }
     }
-    
-    public void energyChargeGain() {
 
-        PlayerSkill energyCharge = PlayerSkillFactory.getSkill(Marauder.EnergyCharge);
-        MapleStatEffect effect = energyCharge.getEffect(getSkillLevel(energyCharge));
+    public void energyChargeGain() {
+        PlayerSkill energyCharge = PlayerSkillFactory.getSkill(
+            Marauder.EnergyCharge
+        );
+        MapleStatEffect effect = energyCharge.getEffect(
+            getSkillLevel(energyCharge)
+        );
         List<Pair<BuffStat, Integer>> stat;
-        
-        if (!isActiveBuffedValue(energyCharge.getId()) &&  getSkillLevel(energyCharge) > 0) {
+
+        if (
+            !isActiveBuffedValue(energyCharge.getId()) &&
+            getSkillLevel(energyCharge) > 0
+        ) {
             boolean showEffect = false;
             if (getEnergy() < 10000) {
-                
                 gainEnergy(102); // Todo: Corrigir formula de ganho de energia
-                
-                if (this.getEnergy() > 9999)  showEffect = true;
-                
-                
-                stat = Collections.singletonList(new Pair<>(BuffStat.ENERGY_CHARGE, getEnergy()));
+
+                if (this.getEnergy() > 9999) showEffect = true;
+
+                stat =
+                    Collections.singletonList(
+                        new Pair<>(BuffStat.ENERGY_CHARGE, getEnergy())
+                    );
                 setBuffedValue(BuffStat.ENERGY_CHARGE, getEnergy());
 
-                client.getSession().write(PacketCreator.UsePirateSkill(stat, 0, 0, (short) 0)); 
-                field.broadcastMessage(this, PacketCreator.BuffMapPirateEffect(this, stat, 0, 0));
+                client
+                    .getSession()
+                    .write(PacketCreator.UsePirateSkill(stat, 0, 0, (short) 0));
+                field.broadcastMessage(
+                    this,
+                    PacketCreator.BuffMapPirateEffect(this, stat, 0, 0)
+                );
 
-                client.getSession().write(EffectPackets.ShowOwnBuffEffect(energyCharge.getId(), PlayerEffects.SKILL_USE.getEffect()));    
-                field.broadcastMessage(this, EffectPackets.BuffMapVisualEffect(getId(), energyCharge.getId(), PlayerEffects.SKILL_USE.getEffect()));
+                client
+                    .getSession()
+                    .write(
+                        EffectPackets.ShowOwnBuffEffect(
+                            energyCharge.getId(),
+                            PlayerEffects.SKILL_USE.getEffect()
+                        )
+                    );
+                field.broadcastMessage(
+                    this,
+                    EffectPackets.BuffMapVisualEffect(
+                        getId(),
+                        energyCharge.getId(),
+                        PlayerEffects.SKILL_USE.getEffect()
+                    )
+                );
+            }
 
-            } 
-            
             if (showEffect) {
                 setEnergyBar(0);
                 setBuffedValue(BuffStat.ENERGY_CHARGE, 10000);
-                stat = Collections.singletonList(new Pair<>(BuffStat.ENERGY_CHARGE, 10000));
+                stat =
+                    Collections.singletonList(
+                        new Pair<>(BuffStat.ENERGY_CHARGE, 10000)
+                    );
                 effect.applyEnergyBuff(this, energyCharge.getId(), stat);
             }
         }
     }
-    
+
     public int getEnergy() {
         return energyBar;
     }
-    
+
     public void gainEnergy(int gain) {
         energyBar += gain;
     }
-    
+
     public void setEnergyBar(int set) {
         energyBar = set;
     }
@@ -2418,19 +2996,23 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public void setWorld(int world) {
         this.world = world;
     }
-    
+
     public void silentPartyUpdate() {
         prtLock.lock();
         try {
             mpc = new MaplePartyCharacter(this);
             if (party != null) {
-                PartyService.updateParty(party.getId(), MaplePartyOperation.SILENT_UPDATE, getMPC());
+                PartyService.updateParty(
+                    party.getId(),
+                    MaplePartyOperation.SILENT_UPDATE,
+                    getMPC()
+                );
             }
         } finally {
             prtLock.unlock();
         }
     }
-    
+
     public MaplePartyCharacter getMPC() {
         if (mpc == null) {
             mpc = new MaplePartyCharacter(this);
@@ -2469,7 +3051,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public int getSavedLocation(SavedLocationType type) {
         return savedLocations[type.ordinal()];
     }
-    
+
     public int getSavedLocation(String type) {
         return savedLocations[SavedLocationType.fromString(type).ordinal()];
     }
@@ -2478,9 +3060,10 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         savedLocations[type.ordinal()] = getMapId();
         changedSavedLocations = true;
     }
-    
+
     public void saveLocation(String type) {
-        savedLocations[SavedLocationType.fromString(type).ordinal()] = getMapId();
+        savedLocations[SavedLocationType.fromString(type).ordinal()] =
+            getMapId();
         changedSavedLocations = true;
     }
 
@@ -2488,7 +3071,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         savedLocations[type.ordinal()] = -1;
         changedSavedLocations = true;
     }
-    
+
     public void clearSavedLocation(String type) {
         savedLocations[SavedLocationType.fromString(type).ordinal()] = -1;
         changedSavedLocations = true;
@@ -2502,7 +3085,12 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         gainMeso(gain, show, enableActions, false);
     }
 
-    public void gainMeso(int gain, boolean show, boolean enableActions, boolean inChat) {
+    public void gainMeso(
+        int gain,
+        boolean show,
+        boolean enableActions,
+        boolean inChat
+    ) {
         if (meso.get() + gain <= 0) {
             client.write(PacketCreator.EnableActions());
             return;
@@ -2510,7 +3098,9 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         int newVal = meso.addAndGet(gain);
         stats.updateSingleStat(PlayerStat.MESO, newVal, enableActions);
         if (show) {
-            client.getSession().write(PacketCreator.GetShowMesoGain(gain, inChat));
+            client
+                .getSession()
+                .write(PacketCreator.GetShowMesoGain(gain, inChat));
         }
     }
 
@@ -2524,7 +3114,9 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public void controlMonster(MapleMonster monster, boolean aggro) {
         monster.setController(this);
         controlled.add(monster);
-        client.getSession().write(MonsterPackets.ControlMonster(monster, false, aggro));
+        client
+            .getSession()
+            .write(MonsterPackets.ControlMonster(monster, false, aggro));
     }
 
     public void uncontrolMonster(MapleMonster monster) {
@@ -2548,7 +3140,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public int getNumControlledMonsters() {
         return controlled.size();
     }
-    
+
     public Set<MapleMonster> getControlled() {
         return controlled;
     }
@@ -2561,14 +3153,18 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public int getAccountID() {
         return accountid;
     }
-    
+
     public void dispelDebuff(Disease debuff) {
         if (hasDisease(debuff)) {
             long mask = debuff.getValue();
-            
+
             this.announce(PacketCreator.CancelDebuff(mask));
-            field.broadcastMessage(this, PacketCreator.CancelForeignDebuff(id, mask), false);
-            
+            field.broadcastMessage(
+                this,
+                PacketCreator.CancelForeignDebuff(id, mask),
+                false
+            );
+
             chrLock.lock();
             try {
                 diseases.remove(debuff);
@@ -2577,13 +3173,18 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             }
         }
     }
-    
+
     public void dispelDebuffs() {
-        diseases.keySet().stream().forEach((d) -> {
-            dispelDebuff(d);
-        });
+        diseases
+            .keySet()
+            .stream()
+            .forEach(
+                d -> {
+                    dispelDebuff(d);
+                }
+            );
     }
-    
+
     public void kill() {
         stats.setHp(0);
         stats.setMp(0);
@@ -2591,17 +3192,24 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         stats.updateSingleStat(PlayerStat.MP, 0);
     }
 
-   public void updateQuestMobCount(int id) {
-	int lastQuestProcessed = 0;
+    public void updateQuestMobCount(int id) {
+        int lastQuestProcessed = 0;
         try {
             synchronized (quests) {
                 for (MapleQuestStatus q : quests.values()) {
                     lastQuestProcessed = q.getQuest().getId();
-                    if (q.getStatus() == MapleQuestStatus.Status.COMPLETED || q.getQuest().canComplete(this, null)) {
+                    if (
+                        q.getStatus() == MapleQuestStatus.Status.COMPLETED ||
+                        q.getQuest().canComplete(this, null)
+                    ) {
                         continue;
                     }
                     String progress = q.getProgress(id);
-                    if (!progress.isEmpty() && Integer.parseInt(progress) >= q.getQuest().getMobAmountNeeded(id)) {
+                    if (
+                        !progress.isEmpty() &&
+                        Integer.parseInt(progress) >=
+                        q.getQuest().getMobAmountNeeded(id)
+                    ) {
                         continue;
                     }
                     if (q.progress(id)) {
@@ -2610,11 +3218,18 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
                 }
             }
         } catch (NumberFormatException e) {
-	    FileLogger.printError(FileLogger.EXCEPTION_CAUGHT, e, "MapleCharacter.mobKilled. CID: " + this.id + " last Quest Processed: " + lastQuestProcessed);
+            FileLogger.printError(
+                FileLogger.EXCEPTION_CAUGHT,
+                e,
+                "MapleCharacter.mobKilled. CID: " +
+                this.id +
+                " last Quest Processed: " +
+                lastQuestProcessed
+            );
         }
     }
-   
-   public final byte getQuestStatus(final int quest) {
+
+    public final byte getQuestStatus(final int quest) {
         synchronized (quests) {
             for (final MapleQuestStatus q : quests.values()) {
                 if (q.getQuest().getId() == quest) {
@@ -2624,7 +3239,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             return 0;
         }
     }
-    
+
     public final MapleQuestStatus getMapleQuestStatus(final int quest) {
         synchronized (quests) {
             for (final MapleQuestStatus q : quests.values()) {
@@ -2635,22 +3250,29 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             return null;
         }
     }
- 
+
     public MapleQuestStatus getQuest(MapleQuest quest) {
         synchronized (quests) {
             if (!quests.containsKey(quest.getId())) {
-                return new MapleQuestStatus(quest, MapleQuestStatus.Status.NOT_STARTED);
+                return new MapleQuestStatus(
+                    quest,
+                    MapleQuestStatus.Status.NOT_STARTED
+                );
             }
             return quests.get(quest.getId());
         }
     }
-    
+
     public boolean needQuestItem(int questid, int itemid) {
         if (questid <= 0) {
             return true;
         }
         MapleQuest quest = MapleQuest.getInstance(questid);
-        return getInventory(ItemConstants.getInventoryType(itemid)).countById(itemid) < quest.getItemAmountNeeded(itemid);
+        return (
+            getInventory(ItemConstants.getInventoryType(itemid))
+                .countById(itemid) <
+            quest.getItemAmountNeeded(itemid)
+        );
     }
 
     public final List<MapleQuestStatus> getStartedQuests() {
@@ -2686,7 +3308,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
                     ret.add(q);
                 }
             }
-            
+
             return Collections.unmodifiableList(ret);
         }
     }
@@ -2698,11 +3320,11 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public void setPlayerShop(PlayerShop playerShop) {
         this.playerShop = playerShop;
     }
-    
+
     public Merchant getHiredMerchant() {
         return hiredMerchant;
     }
-    
+
     public void setHiredMerchant(Merchant merchant) {
         this.hiredMerchant = merchant;
     }
@@ -2712,12 +3334,14 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     }
 
     public void removeBuffs() {
-        LinkedList<BuffStatValueHolder> allBuffs = new LinkedList<>(effects.values());
+        LinkedList<BuffStatValueHolder> allBuffs = new LinkedList<>(
+            effects.values()
+        );
         for (BuffStatValueHolder mbsvh : allBuffs) {
             cancelEffect(mbsvh.effect, false, mbsvh.startTime);
         }
     }
-    
+
     public void dispelSkill() {
         dispelSkill(0);
     }
@@ -2750,14 +3374,17 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
                     }
                 }
             } else {
-                if (mbsvh.effect.isSkill() && mbsvh.effect.getSourceId() == skillId) {
+                if (
+                    mbsvh.effect.isSkill() &&
+                    mbsvh.effect.getSourceId() == skillId
+                ) {
                     cancelEffect(mbsvh.effect, false, mbsvh.startTime);
                     break;
                 }
             }
         }
     }
-   
+
     public int getSkillLevel(PlayerSkill skill) {
         PlayerSkillEntry ret = skills.get(skill);
         if (ret == null) {
@@ -2765,7 +3392,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         }
         return ret.skillevel;
     }
-    
+
     public int getSkillLevel(int skill) {
         PlayerSkillEntry ret = skills.get(PlayerSkillFactory.getSkill(skill));
         if (ret == null) {
@@ -2781,7 +3408,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         }
         return ret.masterlevel;
     }
-    
+
     public boolean isRingEquipped(int ringId) {
         for (Item item : getInventory(InventoryType.EQUIPPED)) {
             Equip equip = (Equip) item;
@@ -2791,19 +3418,28 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         }
         return false;
     }
-    
+
     public int getEquippedRing(int type) {
         for (Item item : getInventory(InventoryType.EQUIPPED)) {
             Equip equip = (Equip) item;
             if (equip.getRing() != null) {
                 int itemId = equip.getItemId();
-                if (ItemConstants.isCrushRing(itemId) && type == ItemRingType.CRUSH_RING.getType()) {
+                if (
+                    ItemConstants.isCrushRing(itemId) &&
+                    type == ItemRingType.CRUSH_RING.getType()
+                ) {
                     return equip.getRing().getRingDatabaseId();
                 }
-                if (ItemConstants.isFriendshipRing(itemId) && type == ItemRingType.FRIENDSHIP_RING.getType()) {
+                if (
+                    ItemConstants.isFriendshipRing(itemId) &&
+                    type == ItemRingType.FRIENDSHIP_RING.getType()
+                ) {
                     return equip.getRing().getRingDatabaseId();
                 }
-                if (ItemConstants.isWeddingRing(itemId) && type == ItemRingType.WEDDING_RING.getType()) {
+                if (
+                    ItemConstants.isWeddingRing(itemId) &&
+                    type == ItemRingType.WEDDING_RING.getType()
+                ) {
                     return equip.getRing().getRingDatabaseId();
                 }
             }
@@ -2838,35 +3474,41 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             }
         }
     }
-    
+
     public void levelUp(boolean takeExp) {
         PlayerSkill improvingMaxHP = null;
         PlayerSkill improvingMaxMP = null;
-        
+
         int improvingMaxHPLevel = 0;
         int improvingMaxMPLevel = 0;
-        
+
         stats.remainingAp += 5;
-        
+
         int maxHP = stats.maxHP;
         int maxMP = stats.maxMP;
-        
+
         if (job == PlayerJob.BEGINNER) {
             maxHP += Randomizer.rand(12, 16);
             maxMP += Randomizer.rand(10, 12);
         } else if (job.isA(PlayerJob.WARRIOR)) {
-            improvingMaxHP = PlayerSkillFactory.getSkill(Swordman.ImprovedMaxHpIncrease);
+            improvingMaxHP =
+                PlayerSkillFactory.getSkill(Swordman.ImprovedMaxHpIncrease);
             improvingMaxHPLevel = getSkillLevel(improvingMaxHP);
             maxHP += Randomizer.rand(24, 28);
             maxMP += Randomizer.rand(4, 6);
             stats.remainingSp += 3;
         } else if (job.isA(PlayerJob.MAGICIAN)) {
-            improvingMaxMP = PlayerSkillFactory.getSkill(Magician.ImprovedMaxMpIncrease);
+            improvingMaxMP =
+                PlayerSkillFactory.getSkill(Magician.ImprovedMaxMpIncrease);
             improvingMaxMPLevel = getSkillLevel(improvingMaxMP);
             maxHP += Randomizer.rand(10, 14);
             maxMP += Randomizer.rand(22, 24);
             stats.remainingSp += 3;
-        } else if (job.isA(PlayerJob.BOWMAN) || job.isA(PlayerJob.THIEF) || job.isA(PlayerJob.GM)) {
+        } else if (
+            job.isA(PlayerJob.BOWMAN) ||
+            job.isA(PlayerJob.THIEF) ||
+            job.isA(PlayerJob.GM)
+        ) {
             maxHP += Randomizer.rand(20, 24);
             maxMP += Randomizer.rand(14, 16);
             stats.remainingSp += 3;
@@ -2887,7 +3529,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
                 maxMP += improvingMaxMP.getEffect(improvingMaxMPLevel).getX();
             }
         }
-        
+
         maxMP += stats.getTotalInt() / 10;
         if (takeExp) {
             exp.addAndGet(-ExperienceConstants.getExpNeededForLevel(level));
@@ -2896,63 +3538,84 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             }
         }
         level++;
-        
+
         if (level >= 200) {
             exp.set(0);
             level = 200;
         }
-        
+
         stats.maxHP = (Math.min(30000, maxHP));
         stats.maxMP = (Math.min(30000, maxMP));
-        
+
         if (level == 200) {
             exp.set(0);
         }
-        
+
         stats.recalcLocalStats();
-        
+
         stats.hp = maxHP;
         stats.mp = maxMP;
-        
+
         List<Pair<PlayerStat, Integer>> statup = new ArrayList<>(8);
         statup.add(new Pair<>(PlayerStat.AVAILABLEAP, stats.getRemainingAp()));
-        
+
         statup.add(new Pair<>(PlayerStat.HP, getStat().getCurrentMaxHp()));
         statup.add(new Pair<>(PlayerStat.MP, getStat().getCurrentMaxMp()));
-        
+
         statup.add(new Pair<>(PlayerStat.MAXHP, stats.getMaxHp()));
         statup.add(new Pair<>(PlayerStat.MAXMP, stats.getMaxMp()));
-        
+
         statup.add(new Pair<>(PlayerStat.EXP, Integer.valueOf(exp.get())));
         statup.add(new Pair<>(PlayerStat.LEVEL, level));
         statup.add(new Pair<>(PlayerStat.AVAILABLESP, stats.getRemainingSp()));
-        
+
         this.announce(PacketCreator.UpdatePlayerStats(statup));
-        getMap().broadcastMessage(this, PacketCreator.ShowThirdPersonEffect(getId(), PlayerEffects.LEVEL_UP.getEffect()), false);
-        
+        getMap()
+            .broadcastMessage(
+                this,
+                PacketCreator.ShowThirdPersonEffect(
+                    getId(),
+                    PlayerEffects.LEVEL_UP.getEffect()
+                ),
+                false
+            );
+
         stats.recalcLocalStats();
-        
+
         if (getParty() != null) {
             silentPartyUpdate();
-        } 
+        }
         if (getGuild() != null) {
             guildUpdate();
         }
-        
+
         setLevelUpHistory(this, level);
-        
+
         if (level == 200 && !isGameMaster()) {
-            BroadcastService.broadcastMessage(PacketCreator.ServerNotice(6, String.format(GameConstants.REACHED_MAX_LEVEL, this.name, this.name)));
+            BroadcastService.broadcastMessage(
+                PacketCreator.ServerNotice(
+                    6,
+                    String.format(
+                        GameConstants.REACHED_MAX_LEVEL,
+                        this.name,
+                        this.name
+                    )
+                )
+            );
         }
     }
-    
+
     public void setLevelUpHistory(Player p, int level) {
         if (this.isGameMaster()) {
             return;
         }
         try {
             Connection con = DatabaseConnection.getConnection();
-            try (PreparedStatement ps = con.prepareStatement("INSERT INTO levelhistory (accountid, characterid, level, date) VALUES (?, ?, ?, ?)")) {
+            try (
+                PreparedStatement ps = con.prepareStatement(
+                    "INSERT INTO levelhistory (accountid, characterid, level, date) VALUES (?, ?, ?, ?)"
+                )
+            ) {
                 ps.setInt(1, this.accountid);
                 ps.setInt(2, this.id);
                 ps.setInt(3, level);
@@ -2965,25 +3628,40 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             e.printStackTrace();
         }
     }
-    
+
     public void resetBattleshipHp() {
-        this.battleShipHP = 4000 * getSkillLevel(PlayerSkillFactory.getSkill(Corsair.Battleship)) + ((getLevel() - 120) * 2000);
+        this.battleShipHP =
+            4000 *
+            getSkillLevel(PlayerSkillFactory.getSkill(Corsair.Battleship)) +
+            ((getLevel() - 120) * 2000);
     }
-    
+
     public int getCurrentBattleShipHP() {
         return battleShipHP;
     }
-    
+
     public final void sendBattleshipHP(int damage) {
         this.battleShipHP -= damage;
         if (battleShipHP <= 0) {
             this.battleShipHP = 0;
-            PlayerSkill battleship = PlayerSkillFactory.getSkill(Corsair.Battleship);
-            int cooldown = battleship.getEffect(getSkillLevel(battleship)).getCoolDown();
-            client.getSession().write(PacketCreator.SkillCooldown(Corsair.Battleship, cooldown));
-            addCoolDown(Corsair.Battleship, System.currentTimeMillis(), cooldown * 1000);
+            PlayerSkill battleship = PlayerSkillFactory.getSkill(
+                Corsair.Battleship
+            );
+            int cooldown = battleship
+                .getEffect(getSkillLevel(battleship))
+                .getCoolDown();
+            client
+                .getSession()
+                .write(
+                    PacketCreator.SkillCooldown(Corsair.Battleship, cooldown)
+                );
+            addCoolDown(
+                Corsair.Battleship,
+                System.currentTimeMillis(),
+                cooldown * 1000
+            );
             dispelSkill(Corsair.Battleship);
-        } 
+        }
     }
 
     public void changeKeybinding(int key, PlayerKeyBinding keybinding) {
@@ -2993,36 +3671,47 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             keymap.remove(Integer.valueOf(key));
         }
     }
-    
+
     public Field getWarpMap(int map) {
-	Field target;
+        Field target;
         EventInstanceManager eim = getEventInstance();
-	if (eim == null) {
+        if (eim == null) {
             target = client.getChannelServer().getMapFactory().getMap(map);
-	} else {
+        } else {
             target = eim.getMapInstance(map);
-	}
-	return target;
+        }
+        return target;
     }
-    
+
     private void eventChangedMap(int map) {
         EventInstanceManager eim = getEventInstance();
         if (eim != null) eim.changedMap(this, map);
     }
-    
+
     private void eventAfterChangedMap(int map) {
         EventInstanceManager eim = getEventInstance();
         if (eim != null) eim.afterChangedMap(this, map);
     }
 
     public void broadcastChangeJob(String newJob, int typeJob) {
-        BroadcastService.broadcastMessage(PacketCreator.ServerNotice(6, "[" + typeJob + "st Job] Congratulations to <" + getName() + "> on becoming a < " + newJob + ">!"));
+        BroadcastService.broadcastMessage(
+            PacketCreator.ServerNotice(
+                6,
+                "[" +
+                typeJob +
+                "st Job] Congratulations to <" +
+                getName() +
+                "> on becoming a < " +
+                newJob +
+                ">!"
+            )
+        );
     }
 
     public void sendKeymap() {
         client.getSession().write(PacketCreator.GetKeyMap(keymap));
     }
-     
+
     public PlayerSkillMacro[] getMacros() {
         return skillMacros;
     }
@@ -3034,16 +3723,27 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
 
     public void tempban(String reason, Calendar duration, int greason) {
         if (lastMonthFameIDs == null) {
-            throw new RuntimeException("Trying to ban a non-loaded character (testhack)");
+            throw new RuntimeException(
+                "Trying to ban a non-loaded character (testhack)"
+            );
         }
         tempban(reason, duration, greason, client.getAccountID());
         client.getSession().close();
     }
 
-    public static boolean tempban(String reason, Calendar duration, int greason, int accountid) {
+    public static boolean tempban(
+        String reason,
+        Calendar duration,
+        int greason,
+        int accountid
+    ) {
         try {
             Connection con = DatabaseConnection.getConnection();
-            try (PreparedStatement ps = con.prepareStatement("UPDATE accounts SET tempban = ?, banreason = ?, greason = ? WHERE id = ?")) {
+            try (
+                PreparedStatement ps = con.prepareStatement(
+                    "UPDATE accounts SET tempban = ?, banreason = ?, greason = ? WHERE id = ?"
+                )
+            ) {
                 Timestamp TS = new Timestamp(duration.getTimeInMillis());
                 ps.setTimestamp(1, TS);
                 ps.setString(2, reason);
@@ -3062,14 +3762,20 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         try {
             getClient().banMacs();
             Connection con = DatabaseConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement("UPDATE accounts SET banned = 1, banreason = ? WHERE id = ?");
+            PreparedStatement ps = con.prepareStatement(
+                "UPDATE accounts SET banned = 1, banreason = ? WHERE id = ?"
+            );
             ps.setString(1, reason);
             ps.setInt(2, accountid);
             ps.executeUpdate();
             ps.close();
-            
+
             ps = con.prepareStatement("INSERT INTO ipbans VALUES (DEFAULT, ?)");
-            String[] ipSplit = client.getSession().getRemoteAddress().toString().split(":");
+            String[] ipSplit = client
+                .getSession()
+                .getRemoteAddress()
+                .toString()
+                .split(":");
             ps.setString(1, ipSplit[0]);
             ps.executeUpdate();
             ps.close();
@@ -3083,23 +3789,38 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         try {
             Connection con = DatabaseConnection.getConnection();
             if (id.matches("/[0-9]{1,3}\\..*")) {
-                ps = con.prepareStatement("INSERT INTO ipbans VALUES (DEFAULT, ?)");
+                ps =
+                    con.prepareStatement(
+                        "INSERT INTO ipbans VALUES (DEFAULT, ?)"
+                    );
                 ps.setString(1, id);
                 ps.executeUpdate();
                 ps.close();
                 return true;
             }
             if (accountId) {
-                ps = con.prepareStatement("SELECT id FROM accounts WHERE name = ?");
+                ps =
+                    con.prepareStatement(
+                        "SELECT id FROM accounts WHERE name = ?"
+                    );
             } else {
-                ps = con.prepareStatement("SELECT accountid FROM characters WHERE name = ?");
+                ps =
+                    con.prepareStatement(
+                        "SELECT accountid FROM characters WHERE name = ?"
+                    );
             }
 
             boolean ret = false;
             ps.setString(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    try (PreparedStatement psb = DatabaseConnection.getConnection().prepareStatement("UPDATE accounts SET banned = 1, banreason = ? WHERE id = ?")) {
+                    try (
+                        PreparedStatement psb = DatabaseConnection
+                            .getConnection()
+                            .prepareStatement(
+                                "UPDATE accounts SET banned = 1, banreason = ? WHERE id = ?"
+                            )
+                    ) {
                         psb.setString(1, reason);
                         psb.setInt(2, rs.getInt(1));
                         psb.executeUpdate();
@@ -3109,42 +3830,44 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             }
             ps.close();
             return ret;
-        } catch (SQLException ex) {
-        } finally {
+        } catch (SQLException ex) {} finally {
             try {
                 if (ps != null && !ps.isClosed()) {
                     ps.close();
                 }
-            } catch (SQLException e) {
-            }
+            } catch (SQLException e) {}
         }
         return false;
     }
-    
+
     public void ban(String reason, boolean dc) {
         try {
             client.banMacs();
-         //   client.banHWID();
+            //   client.banHWID();
             Connection con = DatabaseConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement("UPDATE accounts SET banned = 1, banreason = ? WHERE id = ?");
+            PreparedStatement ps = con.prepareStatement(
+                "UPDATE accounts SET banned = 1, banreason = ? WHERE id = ?"
+            );
             ps.setString(1, reason);
             ps.setInt(2, accountid);
             ps.executeUpdate();
             ps.close();
             ps = con.prepareStatement("INSERT INTO ipbans VALUES (DEFAULT, ?)");
-            ps.setString(1, client.getSession().getRemoteAddress().toString().split(":")[0]);
+            ps.setString(
+                1,
+                client.getSession().getRemoteAddress().toString().split(":")[0]
+            );
             ps.executeUpdate();
             ps.close();
-          } catch (SQLException e) {
-        }
+        } catch (SQLException e) {}
         if (dc) {
-            getClient().disconnect(true, true); 
+            getClient().disconnect(true, true);
         }
     }
 
     /**
      * Oid of players is always = the cid
-     * @return 
+     * @return
      */
     @Override
     public int getObjectId() {
@@ -3163,41 +3886,48 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public StorageKeeper getStorage() {
         return storage;
     }
-    
+
     public List<Player> getPartyMembers() {
         List<Player> list = new LinkedList<>();
-        
+
         prtLock.lock();
         try {
-            if(party != null) {
-                for(MaplePartyCharacter partyMembers: party.getMembers()) {
+            if (party != null) {
+                for (MaplePartyCharacter partyMembers : party.getMembers()) {
                     list.add(partyMembers.getPlayer());
                 }
             }
         } finally {
             prtLock.unlock();
         }
-        
+
         return list;
     }
-    
+
     public int getAriantPoints() {
         return this.ariantPoints;
     }
-    
-    public void gainAriantPoints(int gain){
-       this.ariantPoints += gain;
-       dropMessage(5, "You " + (gain > 0 ? "gained" : "lost") + " (" + gain + ") point(s).");
-    }
-   
-    public void gainVotePoints(int gain){
-      this.votePoints += gain;
+
+    public void gainAriantPoints(int gain) {
+        this.ariantPoints += gain;
+        dropMessage(
+            5,
+            "You " +
+            (gain > 0 ? "gained" : "lost") +
+            " (" +
+            gain +
+            ") point(s)."
+        );
     }
 
-    public int getvotePoints(){
+    public void gainVotePoints(int gain) {
+        this.votePoints += gain;
+    }
+
+    public int getvotePoints() {
         return this.votePoints;
     }
-    
+
     public boolean allowedMapChange() {
         return this.allowMapChange;
     }
@@ -3205,7 +3935,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public void setallowedMapChange(boolean allowed) {
         this.allowMapChange = allowed;
     }
-    
+
     public void addVisibleMapObject(FieldObject mo) {
         visibleMapObjects.add(mo);
     }
@@ -3217,11 +3947,11 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public boolean isMapObjectVisible(FieldObject mo) {
         return visibleMapObjects.contains(mo);
     }
-    
+
     public Collection<FieldObject> getVisibleMapObjects() {
         return Collections.unmodifiableCollection(visibleMapObjects);
     }
-    
+
     public String getPartyQuestItems() {
         return dataString;
     }
@@ -3232,7 +3962,11 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
 
     public void removePartyQuestItem(String letter) {
         if (gotPartyQuestItem(letter)) {
-            dataString = dataString.substring(0, dataString.indexOf(letter)) + dataString.substring(dataString.indexOf(letter) + letter.length());
+            dataString =
+                dataString.substring(0, dataString.indexOf(letter)) +
+                dataString.substring(
+                    dataString.indexOf(letter) + letter.length()
+                );
         }
     }
 
@@ -3249,29 +3983,45 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public void setSlot(int slotid) {
         slots = slotid;
     }
-    
+
     public boolean allowedToTarget(Player other) {
-        return other != null && !other.isHidden() || this.getAdministrativeLevel() >= 3;
+        return (
+            other != null &&
+            !other.isHidden() ||
+            this.getAdministrativeLevel() >= 3
+        );
     }
 
     @Override
     public void sendDestroyData(Client client) {
-        client.getSession().write(PacketCreator.RemovePlayerFromMap(this.getObjectId()));
+        client
+            .getSession()
+            .write(PacketCreator.RemovePlayerFromMap(this.getObjectId()));
     }
 
     @Override
     public void sendSpawnData(Client client) {
-        if (!this.isHidden() || client.getPlayer().getAdministrativeLevel() > 1) {
+        if (
+            !this.isHidden() || client.getPlayer().getAdministrativeLevel() > 1
+        ) {
             client.getSession().write(PacketCreator.SpawnPlayerMapObject(this));
         }
         if (this.isHidden()) {
-            List<Pair<BuffStat, Integer>> stat = Collections.singletonList(new Pair<>(BuffStat.DARKSIGHT, 0));
-            field.broadcastGMMessage(this, PacketCreator.BuffMapEffect(getId(), stat, false), false);
+            List<Pair<BuffStat, Integer>> stat = Collections.singletonList(
+                new Pair<>(BuffStat.DARKSIGHT, 0)
+            );
+            field.broadcastGMMessage(
+                this,
+                PacketCreator.BuffMapEffect(getId(), stat, false),
+                false
+            );
         }
 
-        for (final ItemPet pet : pets){
-            if (pet.getSummoned()){
-                client.getSession().write(PetPackets.ShowPet(this, pet, false, false));
+        for (final ItemPet pet : pets) {
+            if (pet.getSummoned()) {
+                client
+                    .getSession()
+                    .write(PetPackets.ShowPet(this, pet, false, false));
             }
         }
         if (chalkBoardText != null) {
@@ -3280,7 +4030,11 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
 
         if (summons != null) {
             for (final MapleSummon summon : summons.values()) {
-                client.getSession().write(PacketCreator.SpawnSpecialFieldObject(summon, false));
+                client
+                    .getSession()
+                    .write(
+                        PacketCreator.SpawnSpecialFieldObject(summon, false)
+                    );
             }
         }
     }
@@ -3288,35 +4042,35 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public void setLastSelectNPCTime(long time) {
         this.lastSelectNPCTime = System.currentTimeMillis();
     }
-    
+
     public long getLastSelectNPCTime() {
         return lastSelectNPCTime;
     }
-    
+
     public void setLastTalkTime(long time) {
         lastSelectNPCTime = time;
     }
-    
+
     public long getLastAttackTime() {
         return lastAttackTime;
     }
-    
+
     public void setLastAttackTime(long time) {
         lastAttackTime = time;
     }
-    
+
     public long getLastHitTime() {
         return lastHitTime;
     }
-    
+
     public void setLastHitTime(long time) {
         lastHitTime = time;
     }
-    
+
     public boolean canAction() {
-        if (System.currentTimeMillis() > (lastHitTime+5000)) {
+        if (System.currentTimeMillis() > (lastHitTime + 5000)) {
             return true;
-        } else if (System.currentTimeMillis() < (lastHitTime+5000)) {
+        } else if (System.currentTimeMillis() < (lastHitTime + 5000)) {
             return false;
         }
         return true;
@@ -3329,13 +4083,18 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public TamingMob getMount() {
         return tamingMob;
     }
-    
+
     public void equipChanged() {
-        getMap().broadcastMessage(this, PacketCreator.UpdateCharLook(this), false);
+        getMap()
+            .broadcastMessage(this, PacketCreator.UpdateCharLook(this), false);
         stats.recalcLocalStats();
         stats.enforceMaxHpMp();
         if (getMessenger() != null) {
-            MessengerService.updateMessenger(getMessenger().getId(), getName(), client.getChannel());
+            MessengerService.updateMessenger(
+                getMessenger().getId(),
+                getName(),
+                client.getChannel()
+            );
         }
     }
 
@@ -3354,7 +4113,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         }
         return null;
     }
-    
+
     public final ItemPet getPetByUID(final int uid) {
         if (pets == null) {
             return null;
@@ -3379,12 +4138,12 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         }
         pets.add(pet);
     }
-    
-     public void removePet(ItemPet pet, boolean shiftLeft) {
+
+    public void removePet(ItemPet pet, boolean shiftLeft) {
         pet.setSummoned(0);
     }
 
-   public final byte getPetIndex(final ItemPet petz) {
+    public final byte getPetIndex(final ItemPet petz) {
         byte count = 0;
         for (final ItemPet pet : pets) {
             if (pet.getSummoned()) {
@@ -3410,7 +4169,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         }
         return ret;
     }
-    
+
     public final byte getPetIndex(final int petId) {
         byte count = 0;
         for (final ItemPet pet : pets) {
@@ -3423,7 +4182,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         }
         return -1;
     }
-    
+
     public final byte getPetById(final int petId) {
         byte count = 0;
         for (final ItemPet pet : pets) {
@@ -3436,7 +4195,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         }
         return -1;
     }
-     
+
     public final List<ItemPet> getPets() {
         return pets;
     }
@@ -3448,15 +4207,19 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             }
         }
     }
-    
+
     public void unequipPet(ItemPet pet, boolean shiftLeft, boolean hunger) {
         if (pet.getSummoned()) {
             pet.saveDatabase();
-            
-           client.getSession().write(PetPackets.PetStatUpdate(this));
-           
+
+            client.getSession().write(PetPackets.PetStatUpdate(this));
+
             if (field != null) {
-                field.broadcastMessage(this, PetPackets.ShowPet(this, pet, true, hunger), true);
+                field.broadcastMessage(
+                    this,
+                    PetPackets.ShowPet(this, pet, true, hunger),
+                    true
+                );
             }
             removePet(pet, shiftLeft);
             if (GameConstants.GMS) {
@@ -3465,20 +4228,25 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             client.write(PacketCreator.EnableActions());
         }
     }
-    
+
     public int getActivePets() {
         Connection con = DatabaseConnection.getConnection();
         try {
-            try (PreparedStatement ps = con.prepareStatement("SELECT `pets` FROM characters WHERE id = ?")) {
+            try (
+                PreparedStatement ps = con.prepareStatement(
+                    "SELECT `pets` FROM characters WHERE id = ?"
+                )
+            ) {
                 ps.setInt(1, getId());
                 try (ResultSet rs = ps.executeQuery()) {
-                    while(rs.next()) {
+                    while (rs.next()) {
                         final String[] petss = rs.getString("pets").split(",");
                         List<Integer> pet_data = new ArrayList<>();
                         for (int i = 0; i < 3; i++) {
                             int v1 = Integer.parseInt(petss[i]);
-                            if (v1 != -1)
-                                pet_data.add(Integer.parseInt(petss[i]));
+                            if (v1 != -1) pet_data.add(
+                                Integer.parseInt(petss[i])
+                            );
                         }
                         return pet_data.size();
                     }
@@ -3486,19 +4254,22 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
                 }
             }
         } catch (SQLException e) {
-            System.out.println("Player was not added to the map due to a pet error!\r\nError: " + e.getMessage());
+            System.out.println(
+                "Player was not added to the map due to a pet error!\r\nError: " +
+                e.getMessage()
+            );
         }
         return 0;
     }
-    
+
     public void spawnPet(byte slot) {
         spawnPet(slot, false, true);
     }
-    
+
     public void spawnPet(byte slot, boolean lead) {
         spawnPet(slot, lead, true);
     }
-    
+
     public void spawnPet(byte slot, boolean lead, boolean broadcast) {
         final Item item = getInventory(InventoryType.CASH).getItem(slot);
         if (item == null) {
@@ -3506,72 +4277,133 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         }
         switch (item.getItemId()) {
             case 5000047:
-            case 5000028: {
-                final ItemPet pet = ItemPet.createPet(item.getItemId() + 1, InventoryIdentifier.getInstance());
-                if (pet != null) {
-                    InventoryManipulator.addById(client, item.getItemId() + 1, (short) 1, item.getOwner(), "", pet);
-                    InventoryManipulator.removeFromSlot(client, InventoryType.CASH, slot, (short) 1, false);
+            case 5000028:
+                {
+                    final ItemPet pet = ItemPet.createPet(
+                        item.getItemId() + 1,
+                        InventoryIdentifier.getInstance()
+                    );
+                    if (pet != null) {
+                        InventoryManipulator.addById(
+                            client,
+                            item.getItemId() + 1,
+                            (short) 1,
+                            item.getOwner(),
+                            "",
+                            pet
+                        );
+                        InventoryManipulator.removeFromSlot(
+                            client,
+                            InventoryType.CASH,
+                            slot,
+                            (short) 1,
+                            false
+                        );
+                    }
+                    break;
                 }
-                break;
-            }
-            default: {
-                final ItemPet pet = item.getPet();
-                if (FieldLimit.CANNOTUSEPET.check(field.getFieldLimit())) {
-                    announce(PetPackets.RemovePet(this.getId(), getPetIndex(pet), (byte) 3));
-                    return;
-                } 
-                if (pet != null && (item.getItemId() != 5000054 || pet.getSecondsLeft() > 0) && (item.getExpiration() == -1 || item.getExpiration() > System.currentTimeMillis())) {
-                    if (pet.getSummoned()) { 
-                        unequipPet(pet, true, false);
-                    } else {
-                        if (getSkillLevel(PlayerSkillFactory.getSkill(Beginner.FollowTheLead)) == 0 && getPet(0) != null) {
-                            unequipPet(getPet(0), false, false);
-                        }
-                        final Point pos = getPosition();
-                        pos.y -= 12;
-                        pet.setPosition(pos);
-                        MapleFoothold fh = field.getFootholds().findBelow(pet.getPosition());
-                        pet.setFoothold(fh != null ? fh.getId() : 0);
-                        pet.setStance(0);
-                        pet.setSummoned(1);
-                        addPet(pet);
-                        pet.setSummoned(getPetIndex(pet) + 1); 
-                        if (broadcast && getMap() != null) {
-                            field.broadcastMessage(this, PetPackets.ShowPet(this, pet, false, false), true);
-                            if (!pet.getExceptionList().isEmpty()) {
-                                client.getSession().write(PetPackets.PetExceptionListResult(this, pet));
+            default:
+                {
+                    final ItemPet pet = item.getPet();
+                    if (FieldLimit.CANNOTUSEPET.check(field.getFieldLimit())) {
+                        announce(
+                            PetPackets.RemovePet(
+                                this.getId(),
+                                getPetIndex(pet),
+                                (byte) 3
+                            )
+                        );
+                        return;
+                    }
+                    if (
+                        pet != null &&
+                        (
+                            item.getItemId() != 5000054 ||
+                            pet.getSecondsLeft() > 0
+                        ) &&
+                        (
+                            item.getExpiration() == -1 ||
+                            item.getExpiration() > System.currentTimeMillis()
+                        )
+                    ) {
+                        if (pet.getSummoned()) {
+                            unequipPet(pet, true, false);
+                        } else {
+                            if (
+                                getSkillLevel(
+                                    PlayerSkillFactory.getSkill(
+                                        Beginner.FollowTheLead
+                                    )
+                                ) ==
+                                0 &&
+                                getPet(0) != null
+                            ) {
+                                unequipPet(getPet(0), false, false);
                             }
-                            if (GameConstants.GMS) {
-                               client.write(PetPackets.PetStatUpdate(this));
+                            final Point pos = getPosition();
+                            pos.y -= 12;
+                            pet.setPosition(pos);
+                            MapleFoothold fh = field
+                                .getFootholds()
+                                .findBelow(pet.getPosition());
+                            pet.setFoothold(fh != null ? fh.getId() : 0);
+                            pet.setStance(0);
+                            pet.setSummoned(1);
+                            addPet(pet);
+                            pet.setSummoned(getPetIndex(pet) + 1);
+                            if (broadcast && getMap() != null) {
+                                field.broadcastMessage(
+                                    this,
+                                    PetPackets.ShowPet(this, pet, false, false),
+                                    true
+                                );
+                                if (!pet.getExceptionList().isEmpty()) {
+                                    client
+                                        .getSession()
+                                        .write(
+                                            PetPackets.PetExceptionListResult(
+                                                this,
+                                                pet
+                                            )
+                                        );
+                                }
+                                if (GameConstants.GMS) {
+                                    client.write(
+                                        PetPackets.PetStatUpdate(this)
+                                    );
+                                }
                             }
                         }
                     }
-                } 
-                break;
-            }
+                    break;
+                }
         }
         client.getSession().write(PetPackets.EmptyStatUpdate());
     }
-    
+
     public void updatePetAuto() {
         if (getAutoHpPot() > 0) {
             client.getSession().write(PetPackets.AutoHpPot(getAutoHpPot()));
-        } 
+        }
         if (getAutoMpPot() > 0) {
             client.getSession().write(PetPackets.AutoMpPot(getAutoMpPot()));
         }
     }
-    
+
     public void expireOnLogout() {
-        for(Inventory inv : this.inventory) {
+        for (Inventory inv : this.inventory) {
             for (Item item : inv.list()) {
-                if (ItemInformationProvider.getInstance().isExpireOnLogout(item.getItemId())) {
+                if (
+                    ItemInformationProvider
+                        .getInstance()
+                        .isExpireOnLogout(item.getItemId())
+                ) {
                     inv.removeItem(item.getPosition());
                 }
             }
         }
     }
-    
+
     public boolean isChallenged() {
         return challenged;
     }
@@ -3579,11 +4411,15 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public void setChallenged(boolean challenged) {
         this.challenged = challenged;
     }
-    
+
     public FameStatus canGiveFame(Player from) {
         if (gm > 0) {
             return FameStatus.OK;
-        } else if (from == null || lastMonthFameIDs == null || lastMonthFameIDs.contains(Integer.valueOf(from.getId()))) {
+        } else if (
+            from == null ||
+            lastMonthFameIDs == null ||
+            lastMonthFameIDs.contains(Integer.valueOf(from.getId()))
+        ) {
             return FameStatus.NOT_THIS_MONTH;
         } else {
             return FameStatus.OK;
@@ -3594,15 +4430,20 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         lastFameTime = System.currentTimeMillis();
         lastMonthFameIDs.add(Integer.valueOf(to.getId()));
         try {
-            try (PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement("INSERT INTO famelog (characterid, characterid_to) VALUES (?, ?)")) {
+            try (
+                PreparedStatement ps = DatabaseConnection
+                    .getConnection()
+                    .prepareStatement(
+                        "INSERT INTO famelog (characterid, characterid_to) VALUES (?, ?)"
+                    )
+            ) {
                 ps.setInt(1, getId());
                 ps.setInt(2, to.getId());
                 ps.executeUpdate();
             }
-        } catch (SQLException e) {
-        }
+        } catch (SQLException e) {}
     }
-    
+
     public MapleParty getParty() {
         prtLock.lock();
         try {
@@ -3647,11 +4488,11 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public EventInstanceManager getEventInstance() {
         return eventInstance;
     }
-    
+
     public void setEventInstance(EventInstanceManager eventInstance) {
         this.eventInstance = eventInstance;
     }
-  
+
     public void addDoor(Integer owner, MapleDoor door) {
         chrLock.lock();
         try {
@@ -3660,7 +4501,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             chrLock.unlock();
         }
     }
-    
+
     public void removeDoor(Integer owner) {
         chrLock.lock();
         try {
@@ -3669,12 +4510,12 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             chrLock.unlock();
         }
     }
-    
+
     public int getDoorSlot() {
-        if(doorSlot == -1) {
+        if (doorSlot == -1) {
             doorSlot = (party == null) ? 0 : party.getPartyDoor(this.getId());
         }
-        
+
         return doorSlot;
     }
 
@@ -3694,25 +4535,30 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public boolean canDoor() {
         return canDoor;
     }
-    
+
     public void fakeRelog() {
         client.getSession().write(PacketCreator.GetCharInfo(this));
         final Field mapp = getMap();
         mapp.removePlayer(this);
         mapp.addPlayer(this);
     }
-	    
+
     public void disableDoor() {
         canDoor = false;
-        CharacterTimer.getInstance().schedule(() -> {
-           canDoor = true;
-        }, 5000);
+        CharacterTimer
+            .getInstance()
+            .schedule(
+                () -> {
+                    canDoor = true;
+                },
+                5000
+            );
     }
 
     public Map<Integer, MapleSummon> getSummons() {
         return summons;
     }
-    
+
     public Collection<MapleSummon> getSummonsValues() {
         return summons.values();
     }
@@ -3741,15 +4587,15 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public FieldObjectType getType() {
         return FieldObjectType.PLAYER;
     }
-    
-    public boolean isGuildLeader() { 
+
+    public boolean isGuildLeader() {
         return guild > 0 && guildRank < 3;
     }
 
     public int getGuildId() {
         return guild;
     }
-       
+
     public int getGuildRank() {
         return guildRank;
     }
@@ -3777,15 +4623,15 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public MapleGuildCharacter getMGC() {
         return mgc;
     }
-    
+
     public Minigame getMiniGame() {
         return miniGame;
     }
-    
+
     public void setMiniGame(Minigame miniGame) {
         this.miniGame = miniGame;
     }
-    
+
     public int getMiniGamePoints(String type, boolean omok) {
         if (omok) {
             switch (type) {
@@ -3807,8 +4653,12 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             }
         }
     }
-    
-    public void setMiniGamePoints(Player visitor, int winnerslot, boolean omok) {
+
+    public void setMiniGamePoints(
+        Player visitor,
+        int winnerslot,
+        boolean omok
+    ) {
         if (omok) {
             switch (winnerslot) {
                 case 1:
@@ -3841,7 +4691,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             }
         }
     }
-    
+
     public void guildUpdate() {
         if (this.guild <= 0) {
             return;
@@ -3852,12 +4702,19 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     }
 
     public void genericGuildMessage(int code) {
-        this.client.getSession().write(GuildPackets.GenericGuildMessage((byte) code));
+        this.client.getSession()
+            .write(GuildPackets.GenericGuildMessage((byte) code));
     }
-    
+
     public void saveGuildStatus() {
         try {
-            try (PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement("UPDATE characters SET guildid = ?, guildrank = ?, allianceRank = ? WHERE id = ?")) {
+            try (
+                PreparedStatement ps = DatabaseConnection
+                    .getConnection()
+                    .prepareStatement(
+                        "UPDATE characters SET guildid = ?, guildrank = ?, allianceRank = ? WHERE id = ?"
+                    )
+            ) {
                 ps.setInt(1, this.guild);
                 ps.setInt(2, this.guildRank);
                 ps.setInt(3, this.allianceRank);
@@ -3868,10 +4725,16 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             System.err.println("SQL Error: " + se);
         }
     }
-    
+
     public void setHasMerchant(boolean set) {
         try {
-            try (PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement("UPDATE characters SET HasMerchant = ? WHERE id = ?")) {
+            try (
+                PreparedStatement ps = DatabaseConnection
+                    .getConnection()
+                    .prepareStatement(
+                        "UPDATE characters SET HasMerchant = ? WHERE id = ?"
+                    )
+            ) {
                 ps.setInt(1, set ? 1 : 0);
                 ps.setInt(2, getId());
                 ps.executeUpdate();
@@ -3881,10 +4744,16 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         }
         hasMerchant = set;
     }
-        
+
     public void empty() {
         try {
-            if (client.getChannelServer().getPlayerStorage().getCharacterByName(getName()) != null) {
+            if (
+                client
+                    .getChannelServer()
+                    .getPlayerStorage()
+                    .getCharacterByName(getName()) !=
+                null
+            ) {
                 client.getChannelServer().removePlayer(this);
             }
             if (getMount() != null) {
@@ -3956,28 +4825,38 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             this.summons = null;
             this.visibleMapObjects.clear();
             this.visibleMapObjects = null;
-            timers.forEach((sf) -> {
-                sf.cancel(false);
-            });
+            timers.forEach(
+                sf -> {
+                    sf.cancel(false);
+                }
+            );
             this.timers.clear();
         } catch (final Throwable e) {
-	    FileLogger.printError("Account_Empty.txt", e);
-	}
+            FileLogger.printError("Account_Empty.txt", e);
+        }
     }
-            
-    
+
     public boolean haveItemEquipped(int itemid) {
         return getInventory(InventoryType.EQUIPPED).findById(itemid) != null;
     }
-    
-    public boolean haveItem(int itemid, int quantity, boolean checkEquipped, boolean greaterOrEquals) {
-        int possesed = inventory[ItemInformationProvider.getInstance().getInventoryType(itemid).ordinal()].countById(itemid);
-        
-        if (checkEquipped)
-            possesed += inventory[InventoryType.EQUIPPED.ordinal()].countById(itemid);
+
+    public boolean haveItem(
+        int itemid,
+        int quantity,
+        boolean checkEquipped,
+        boolean greaterOrEquals
+    ) {
+        int possesed =
+            inventory[ItemInformationProvider
+                .getInstance()
+                .getInventoryType(itemid)
+                .ordinal()].countById(itemid);
+
+        if (checkEquipped) possesed +=
+            inventory[InventoryType.EQUIPPED.ordinal()].countById(itemid);
         return greaterOrEquals ? possesed >= quantity : possesed == quantity;
     }
-    
+
     public void setMeso(int set) {
         meso.set(set);
         stats.updateSingleStat(PlayerStat.MESO, set, false);
@@ -4012,30 +4891,65 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public void yellowMessage(String m) {
         announce(PacketCreator.SendYellowTip(m));
     }
-    
+
     public int getJobId() {
         return this.getJob().getId();
     }
-    
+
     public void checkBerserk(final boolean isHidden) {
         if (BerserkSchedule != null) {
             BerserkSchedule.cancel(false);
         }
         final Player p = this;
         if (job.equals(PlayerJob.DARKKNIGHT)) {
-            PlayerSkill BerserkX = PlayerSkillFactory.getSkill(DarkKnight.Berserk);
+            PlayerSkill BerserkX = PlayerSkillFactory.getSkill(
+                DarkKnight.Berserk
+            );
             final int skilllevel = getSkillLevel(BerserkX);
             if (skilllevel > 0) {
-                Berserk = p.getHp() * 100 / p.getStat().getMaxHp() < BerserkX.getEffect(skilllevel).getX();
-                BerserkSchedule = CharacterTimer.getInstance().register(() -> {
-                    getClient().getSession().write(PacketCreator.ShowOwnBerserk(skilllevel, Berserk));
-                    if (!isHidden) field.broadcastMessage(Player.this, PacketCreator.ShowBerserk(getId(), skilllevel, Berserk), false);
-                    else field.broadcastGMMessage(Player.this, PacketCreator.ShowBerserk(getId(), skilllevel, Berserk), false);
-                }, 5000, 3000);
+                Berserk =
+                    p.getHp() *
+                    100 /
+                    p.getStat().getMaxHp() <
+                    BerserkX.getEffect(skilllevel).getX();
+                BerserkSchedule =
+                    CharacterTimer
+                        .getInstance()
+                        .register(
+                            () -> {
+                                getClient()
+                                    .getSession()
+                                    .write(
+                                        PacketCreator.ShowOwnBerserk(
+                                            skilllevel,
+                                            Berserk
+                                        )
+                                    );
+                                if (!isHidden) field.broadcastMessage(
+                                    Player.this,
+                                    PacketCreator.ShowBerserk(
+                                        getId(),
+                                        skilllevel,
+                                        Berserk
+                                    ),
+                                    false
+                                ); else field.broadcastGMMessage(
+                                    Player.this,
+                                    PacketCreator.ShowBerserk(
+                                        getId(),
+                                        skilllevel,
+                                        Berserk
+                                    ),
+                                    false
+                                );
+                            },
+                            5000,
+                            3000
+                        );
             }
         }
     }
-   
+
     public void setGMLevel(int level) {
         if (level >= 5) {
             this.gm = 5;
@@ -4050,20 +4964,29 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         return useTime;
     }
 
-    public void sendPolice(String text) {
-    }
-    
+    public void sendPolice(String text) {}
+
     public void questTimeLimit(final MapleQuest quest, int time) {
-        ScheduledFuture<?> sf = CharacterTimer.getInstance().schedule(() -> {
-            announce(PacketCreator.QuestExpire(quest.getId()));
-            MapleQuestStatus newStatus = new MapleQuestStatus(quest, MapleQuestStatus.Status.NOT_STARTED);
-            newStatus.setForfeited(getQuest(quest).getForfeited() + 1);
-            updateQuest(newStatus);
-        }, time * 60 * 1000);
-        announce(PacketCreator.AddQuestTimeLimit(quest.getId(), time * 60 * 1000));
+        ScheduledFuture<?> sf = CharacterTimer
+            .getInstance()
+            .schedule(
+                () -> {
+                    announce(PacketCreator.QuestExpire(quest.getId()));
+                    MapleQuestStatus newStatus = new MapleQuestStatus(
+                        quest,
+                        MapleQuestStatus.Status.NOT_STARTED
+                    );
+                    newStatus.setForfeited(getQuest(quest).getForfeited() + 1);
+                    updateQuest(newStatus);
+                },
+                time * 60 * 1000
+            );
+        announce(
+            PacketCreator.AddQuestTimeLimit(quest.getId(), time * 60 * 1000)
+        );
         timers.add(sf);
     }
-    
+
     public void setMPC(MaplePartyCharacter mpc) {
         this.mpc = mpc;
     }
@@ -4083,7 +5006,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             effLock.unlock();
         }
     }
-    
+
     public int getJobType() {
         return job.getId() / 1000;
     }
@@ -4093,21 +5016,21 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     }
 
     public final Inventory[] getInventorys() {
-	return inventory;
+        return inventory;
     }
-     
+
     public final long getLastFameTime() {
-	return lastFameTime;
+        return lastFameTime;
     }
 
     public final List<Integer> getFamedCharacters() {
-	return lastMonthFameIDs;
+        return lastMonthFameIDs;
     }
 
     public final int[] getSavedLocations() {
-	return savedLocations;
+        return savedLocations;
     }
-    
+
     public final void spawnSavedPets() {
         spawnSavedPets(false, false);
     }
@@ -4121,7 +5044,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         if (GameConstants.GMS) {
             client.getSession().write(PetPackets.PetStatUpdate(this));
         }
-        petStore = new byte[]{-1, -1, -1};
+        petStore = new byte[] { -1, -1, -1 };
     }
 
     public final byte[] getPetStores() {
@@ -4130,17 +5053,22 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
 
     public void changeChannel(final int channel) {
         final ChannelServer toch = ChannelServer.getInstance(channel);
-        if (channel == client.getChannel() || toch == null || toch.isShutdown()) {
+        if (
+            channel == client.getChannel() || toch == null || toch.isShutdown()
+        ) {
             return;
         }
-        
+
         if (this.getTrade() != null) {
             Trade.cancelTrade(getTrade(), this);
         }
-        
+
         final ChannelServer ch = ChannelServer.getInstance(client.getChannel());
         if (getMessenger() != null) {
-            MessengerService.silentLeaveMessenger(getMessenger().getId(), new MapleMessengerCharacter(this));
+            MessengerService.silentLeaveMessenger(
+                getMessenger().getId(),
+                new MapleMessengerCharacter(this)
+            );
         }
         Merchant merchant = this.getHiredMerchant();
         if (merchant != null) {
@@ -4150,35 +5078,42 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
                 merchant.removeVisitor(this);
             }
         }
-        
+
         PlayerBuffStorage.addBuffsToStorage(getId(), getAllBuffs());
         PlayerBuffStorage.addCooldownsToStorage(getId(), getAllCooldowns());
         PlayerBuffStorage.addDiseaseToStorage(getId(), getAllDiseases());
-        
+
         this.cancelAllBuffs(true);
         this.cancelAllDebuffs();
-        
+
         if (this.getBuffedValue(BuffStat.PUPPET) != null) {
             this.cancelEffectFromBuffStat(BuffStat.PUPPET);
         }
         if (this.getBuffedValue(BuffStat.COMBO) != null) {
             this.cancelEffectFromBuffStat(BuffStat.COMBO);
         }
-        
-        
+
         this.getMap().removePlayer(this);
         ch.removePlayer(this);
-        
-        client.updateLoginState(ClientLoginState.CHANGE_CHANNEL, client.getSessionIPAddress());
+
+        client.updateLoginState(
+            ClientLoginState.CHANGE_CHANNEL,
+            client.getSessionIPAddress()
+        );
         String[] socket = ChannelServer.getInstance(channel).getIP().split(":");
         try {
-            announce(PacketCreator.GetChannelChange(InetAddress.getByName(socket[0]), Integer.parseInt(socket[1])));
+            announce(
+                PacketCreator.GetChannelChange(
+                    InetAddress.getByName(socket[0]),
+                    Integer.parseInt(socket[1])
+                )
+            );
         } catch (UnknownHostException ex) {
             FileLogger.printError(FileLogger.PLAYER_STUCK, ex);
         }
-        
+
         saveDatabase();
-        client.setPlayer(null); 
+        client.setPlayer(null);
     }
 
     public int getAutoHpPot() {
@@ -4196,8 +5131,8 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public void setAutoMpPot(int itemId) {
         petAutoMP = itemId;
     }
-    
-    public long getPlaytime(){
+
+    public long getPlaytime() {
         long time = Calendar.getInstance().getTimeInMillis();
         playtime += time - playtimeStart;
         playtimeStart = time;
@@ -4207,9 +5142,19 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public void spawnBomb() {
         final MapleMonster bomb = MapleLifeFactory.getMonster(9300166);
         getMap().spawnMonsterOnGroudBelow(bomb, getPosition());
-        EventTimer.getInstance().schedule(() -> {
-            field.killMonster(bomb, client.getPlayer(), false, (byte) 1);
-        }, 10 * 1000);
+        EventTimer
+            .getInstance()
+            .schedule(
+                () -> {
+                    field.killMonster(
+                        bomb,
+                        client.getPlayer(),
+                        false,
+                        (byte) 1
+                    );
+                },
+                10 * 1000
+            );
     }
 
     public int[] getRocks() {
@@ -4303,19 +5248,31 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         if (mps == null) {
             return;
         }
-        
+
         if (mps.isOwner(this)) {
             mps.setOpen(false);
-            
+
             client.getChannelServer().unregisterPlayerShop(mps);
-            
+
             for (PlayerShopItem mpsi : mps.getItems()) {
                 if (mpsi.getBundles() >= 2) {
                     Item iItem = mpsi.getItem().copy();
-                    iItem.setQuantity((short) (mpsi.getBundles() * iItem.getQuantity()));
-                    InventoryManipulator.addFromDrop(this.getClient(), iItem, "", false);
+                    iItem.setQuantity(
+                        (short) (mpsi.getBundles() * iItem.getQuantity())
+                    );
+                    InventoryManipulator.addFromDrop(
+                        this.getClient(),
+                        iItem,
+                        "",
+                        false
+                    );
                 } else if (mpsi.isExist()) {
-                    InventoryManipulator.addFromDrop(this.getClient(), mpsi.getItem(), "", true);
+                    InventoryManipulator.addFromDrop(
+                        this.getClient(),
+                        mpsi.getItem(),
+                        "",
+                        true
+                    );
                 }
             }
             mps.closeShop();
@@ -4330,7 +5287,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         if (game == null) {
             return;
         }
-        
+
         this.setMiniGame(null);
         if (game.isOwner(this)) {
             this.getMap().broadcastMessage(MinigamePackets.RemoveCharBox(this));
@@ -4340,17 +5297,16 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         }
     }
 
-   public void closeHiredMerchant(boolean closeMerchant) {
+    public void closeHiredMerchant(boolean closeMerchant) {
         Merchant merchant = this.getHiredMerchant();
         if (merchant == null) {
             return;
         }
-        
+
         if (closeMerchant) {
             merchant.removeVisitor(this);
             this.setHiredMerchant(null);
-        }
-        else {
+        } else {
             if (merchant.isOwner(this)) {
                 merchant.setOpen(true);
             } else {
@@ -4386,7 +5342,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         }
         return false;
     }
-    
+
     public long getLastHPTime() {
         return lastHPTime;
     }
@@ -4405,13 +5361,16 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     }
 
     public boolean hasEmptySlot(byte invType) {
-        return getInventory(InventoryType.getByType(invType)).getNextFreeSlot() > -1;
+        return (
+            getInventory(InventoryType.getByType(invType)).getNextFreeSlot() >
+            -1
+        );
     }
 
     public long getNpcCooldown() {
         return npcCd;
     }
-    
+
     public void setNpcCooldown(long d) {
         npcCd = d;
     }
@@ -4419,19 +5378,21 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public long getLastUsedCashItem() {
         return lastUsedCashItem;
     }
-    
+
     public void setLastUsedCashItem(long time) {
         this.lastUsedCashItem = time;
     }
 
     public enum FameStatus {
-        OK, NOT_TODAY, NOT_THIS_MONTH
+        OK,
+        NOT_TODAY,
+        NOT_THIS_MONTH,
     }
-    
+
     public long getLastRequestTime() {
         return lastRequestTime;
     }
-    
+
     public void setLastRequestTime(long time) {
         lastRequestTime = time;
     }
@@ -4452,10 +5413,10 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public void setMessenger(MapleMessenger messenger) {
         this.messenger = messenger;
     }
-    
+
     public int getFh() {
         Point pos = this.getPosition();
-	pos.y -= 6;
+        pos.y -= 6;
         if (getMap().getFootholds().findBelow(pos) == null) {
             return 0;
         } else {
@@ -4463,8 +5424,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         }
     }
 
-    public void setMatchCardPoints(Player visitor, int winnerslot) {
-    }
+    public void setMatchCardPoints(Player visitor, int winnerslot) {}
 
     public void setHasCheat(boolean cheat) {
         this.hasCheat = cheat;
@@ -4472,8 +5432,8 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
 
     public boolean isHasCheat() {
         return this.hasCheat;
-    }     
-    
+    }
+
     public void addCoolDown(int skillId, long startTime, long length) {
         effLock.lock();
         chrLock.lock();
@@ -4481,7 +5441,10 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             if (this.coolDowns.containsKey(Integer.valueOf(skillId))) {
                 this.coolDowns.remove(Integer.valueOf(skillId));
             }
-            coolDowns.put(Integer.valueOf(skillId), new PlayerCoolDownValueHolder(skillId, startTime, length));
+            coolDowns.put(
+                Integer.valueOf(skillId),
+                new PlayerCoolDownValueHolder(skillId, startTime, length)
+            );
         } finally {
             chrLock.unlock();
             effLock.unlock();
@@ -4498,7 +5461,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         } finally {
             chrLock.unlock();
             effLock.unlock();
-        }   
+        }
     }
 
     public boolean skillisCooling(int skillId) {
@@ -4511,11 +5474,11 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             effLock.unlock();
         }
     }
-    
-    public void giveCoolDowns(final int skillid, long starttime, long length) {  
+
+    public void giveCoolDowns(final int skillid, long starttime, long length) {
         addCoolDown(skillid, starttime, length);
     }
-    
+
     public void giveCoolDowns(final List<PlayerCoolDownValueHolder> cooldowns) {
         if (cooldowns != null) {
             for (PlayerCoolDownValueHolder cooldown : cooldowns) {
@@ -4525,59 +5488,86 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             try {
                 Connection con = DatabaseConnection.getConnection();
                 ResultSet rs;
-                try (PreparedStatement ps = con.prepareStatement("SELECT skillid, starttime, length FROM cooldowns WHERE charid = ?")) {
+                try (
+                    PreparedStatement ps = con.prepareStatement(
+                        "SELECT skillid, starttime, length FROM cooldowns WHERE charid = ?"
+                    )
+                ) {
                     ps.setInt(1, getId());
                     rs = ps.executeQuery();
                     while (rs.next()) {
                         final int skillid = rs.getInt("skillid");
-                        final long length = rs.getLong("length"), startTime = rs.getLong("starttime");
-                        if (skillid != 5221999 && (length + startTime < System.currentTimeMillis())) {
+                        final long length = rs.getLong(
+                            "length"
+                        ), startTime = rs.getLong("starttime");
+                        if (
+                            skillid != 5221999 &&
+                            (length + startTime < System.currentTimeMillis())
+                        ) {
                             continue;
                         }
-                        giveCoolDowns(rs.getInt("skillid"), rs.getLong("starttime"), rs.getLong("length"));
+                        giveCoolDowns(
+                            rs.getInt("skillid"),
+                            rs.getLong("starttime"),
+                            rs.getLong("length")
+                        );
                     }
                 }
                 rs.close();
-                
-                PlayerSaveFactory.DeleteType.SKILL_COOLDOWN.removeFromType(con, this.id);
 
+                PlayerSaveFactory.DeleteType.SKILL_COOLDOWN.removeFromType(
+                    con,
+                    this.id
+                );
             } catch (SQLException e) {
-                System.err.println("Error while retriving cooldown from SQL storage");
+                System.err.println(
+                    "Error while retriving cooldown from SQL storage"
+                );
             }
         }
     }
-    
+
     public int getCooldownSize() {
         return coolDowns.size();
     }
-    
+
     public List<PlayerCoolDownValueHolder> getAllCooldowns() {
         List<PlayerCoolDownValueHolder> ret = new ArrayList<>();
-        
+
         effLock.lock();
         chrLock.lock();
         try {
             for (PlayerCoolDownValueHolder mcdvh : coolDowns.values()) {
-                ret.add(new PlayerCoolDownValueHolder(mcdvh.skillId, mcdvh.startTime, mcdvh.length));
+                ret.add(
+                    new PlayerCoolDownValueHolder(
+                        mcdvh.skillId,
+                        mcdvh.startTime,
+                        mcdvh.length
+                    )
+                );
             }
         } finally {
             chrLock.unlock();
             effLock.unlock();
         }
-        
+
         return ret;
     }
-    
+
     public void removeAllCooldownsExcept(int id, boolean packet) {
         effLock.lock();
         chrLock.lock();
         try {
-            ArrayList<PlayerCoolDownValueHolder> list = new ArrayList<>(coolDowns.values());
+            ArrayList<PlayerCoolDownValueHolder> list = new ArrayList<>(
+                coolDowns.values()
+            );
             for (PlayerCoolDownValueHolder mcvh : list) {
                 if (mcvh.skillId != id) {
                     coolDowns.remove(mcvh.skillId);
                     if (packet) {
-                        client.announce(PacketCreator.SkillCooldown(mcvh.skillId, 0));
+                        client.announce(
+                            PacketCreator.SkillCooldown(mcvh.skillId, 0)
+                        );
                     }
                 }
             }
@@ -4591,9 +5581,13 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         chrLock.lock();
         try {
             if (ld != null) {
-                ld.stream().forEach((disease) -> {
-                    diseases.put(disease.disease, disease);
-                });
+                ld
+                    .stream()
+                    .forEach(
+                        disease -> {
+                            diseases.put(disease.disease, disease);
+                        }
+                    );
             }
         } finally {
             chrLock.unlock();
@@ -4601,44 +5595,89 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     }
 
     public String getMapName(int mapId) {
-        return client.getChannelServer().getMapFactory().getMap(mapId).getMapName();
+        return client
+            .getChannelServer()
+            .getMapFactory()
+            .getMap(mapId)
+            .getMapName();
     }
-    
+
     public int getDiseaseSize() {
         return diseases.size();
     }
-    
+
     public void giveDebuff(final Disease disease, MobSkill skill) {
-        giveDebuff(disease, skill.getX(), skill.getDuration(), skill.getSkillId(), skill.getSkillLevel());
+        giveDebuff(
+            disease,
+            skill.getX(),
+            skill.getDuration(),
+            skill.getSkillId(),
+            skill.getSkillLevel()
+        );
     }
 
-    public void giveDebuff(final Disease disease, int x, long duration, int skillid, int level) {
-        if (isAlive() && !isActiveBuffedValue(Bishop.HolyShield) && !hasDisease(disease) && diseases.size() < 2) {
-            if ((disease != Disease.SEDUCE) && (disease != Disease.STUN) && (getBuffedValue(BuffStat.HOLY_SHIELD) != null)) {
+    public void giveDebuff(
+        final Disease disease,
+        int x,
+        long duration,
+        int skillid,
+        int level
+    ) {
+        if (
+            isAlive() &&
+            !isActiveBuffedValue(Bishop.HolyShield) &&
+            !hasDisease(disease) &&
+            diseases.size() < 2
+        ) {
+            if (
+                (disease != Disease.SEDUCE) &&
+                (disease != Disease.STUN) &&
+                (getBuffedValue(BuffStat.HOLY_SHIELD) != null)
+            ) {
                 return;
-            }     
+            }
             chrLock.lock();
             try {
-                this.diseases.put(disease, new DiseaseValueHolder(disease, System.currentTimeMillis(), duration));
+                this.diseases.put(
+                        disease,
+                        new DiseaseValueHolder(
+                            disease,
+                            System.currentTimeMillis(),
+                            duration
+                        )
+                    );
             } finally {
                 chrLock.unlock();
-            } 
-            
-            final List<Pair<Disease, Integer>> debuff = Collections.singletonList(new Pair<>(disease, Integer.valueOf(x)));
-            this.announce(PacketCreator.GiveDebuff(debuff, skillid, level, (int) duration));
-            field.broadcastMessage(this, PacketCreator.GiveForeignDebuff(id, debuff, skillid, level), false);
+            }
+
+            final List<Pair<Disease, Integer>> debuff = Collections.singletonList(
+                new Pair<>(disease, Integer.valueOf(x))
+            );
+            this.announce(
+                    PacketCreator.GiveDebuff(
+                        debuff,
+                        skillid,
+                        level,
+                        (int) duration
+                    )
+                );
+            field.broadcastMessage(
+                this,
+                PacketCreator.GiveForeignDebuff(id, debuff, skillid, level),
+                false
+            );
         }
     }
-    
+
     public final boolean hasDisease(final Disease dis) {
         chrLock.lock();
         try {
             return diseases.containsKey(dis);
         } finally {
             chrLock.unlock();
-        }   
+        }
     }
-    
+
     public final int getDiseasesSize() {
         chrLock.lock();
         try {
@@ -4647,12 +5686,12 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             chrLock.unlock();
         }
     }
-    
-    public int getTeam() {   
+
+    public int getTeam() {
         if (this.MCPQTeam == null) {
             return -1;
         }
-      return this.MCPQTeam.code;
+        return this.MCPQTeam.code;
     }
 
     public MCField.MCTeam getMCPQTeam() {
@@ -4702,9 +5741,11 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
 
     public void loseCP(int cp) {
         this.availableCP -= cp;
-    }  
-    
-    public final ArrayList<DiseaseValueHolder> getAllDiseases(ArrayList<DiseaseValueHolder> ret) {
+    }
+
+    public final ArrayList<DiseaseValueHolder> getAllDiseases(
+        ArrayList<DiseaseValueHolder> ret
+    ) {
         chrLock.lock();
         try {
             ret.clear();
@@ -4727,7 +5768,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             chrLock.unlock();
         }
     }
-    
+
     public void cancelAllDebuffs() {
         chrLock.lock();
         try {
@@ -4744,40 +5785,104 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public void setMap(int PmapId) {
         this.mapId = PmapId;
     }
-    
+
     private void prepareBeholderEffect() {
-	if (beholderHealingSchedule != null) {
-	    beholderHealingSchedule.cancel(false);
-	}
-	if (beholderBuffSchedule != null) {
-	    beholderBuffSchedule.cancel(false);
-	}
-	PlayerSkill healing = PlayerSkillFactory.getSkill(DarkKnight.AuraOfBeholder);
-	int healingLevel = getSkillLevel(healing);
-	if (healingLevel > 0) {
-	    final MapleStatEffect healEffect = healing.getEffect(healingLevel);
-	    int healInterval = healEffect.getX() * 1000;
-	    beholderHealingSchedule = CharacterTimer.getInstance().register(() -> {
-                stats.addHP(healEffect.getHp());
-                client.getSession().write(EffectPackets.ShowOwnBuffEffect(DarkKnight.Beholder, PlayerEffects.SKILL_AFFECTED.getEffect()));
-                field.broadcastMessage(Player.this, PacketCreator.SummonSkill(getId(), DarkKnight.Beholder, 5), true);
-                field.broadcastMessage(Player.this, EffectPackets.BuffMapVisualEffect(getId(), DarkKnight.Beholder, PlayerEffects.SKILL_AFFECTED.getEffect()), false);
-            }, healInterval, healInterval);
-	}
-	PlayerSkill buff = PlayerSkillFactory.getSkill(DarkKnight.HexOfBeholder);
-	int buffLevel = getSkillLevel(buff);
-	if (buffLevel > 0) {
-	    final MapleStatEffect buffEffect = buff.getEffect(buffLevel);
-	    int buffInterval = buffEffect.getX() * 1000;
-	    beholderBuffSchedule = CharacterTimer.getInstance().register(() -> {
-                buffEffect.applyTo(Player.this);
-                client.getSession().write(EffectPackets.ShowOwnBuffEffect(DarkKnight.Beholder, PlayerEffects.SKILL_AFFECTED.getEffect()));
-                field.broadcastMessage(Player.this, PacketCreator.SummonSkill(getId(), DarkKnight.Beholder, (int) (Math.random() * 3) + 6), true);
-                field.broadcastMessage(Player.this, EffectPackets.BuffMapVisualEffect(getId(), DarkKnight.Beholder, PlayerEffects.SKILL_AFFECTED.getEffect()), false);
-            }, buffInterval, buffInterval);
-	}
+        if (beholderHealingSchedule != null) {
+            beholderHealingSchedule.cancel(false);
+        }
+        if (beholderBuffSchedule != null) {
+            beholderBuffSchedule.cancel(false);
+        }
+        PlayerSkill healing = PlayerSkillFactory.getSkill(
+            DarkKnight.AuraOfBeholder
+        );
+        int healingLevel = getSkillLevel(healing);
+        if (healingLevel > 0) {
+            final MapleStatEffect healEffect = healing.getEffect(healingLevel);
+            int healInterval = healEffect.getX() * 1000;
+            beholderHealingSchedule =
+                CharacterTimer
+                    .getInstance()
+                    .register(
+                        () -> {
+                            stats.addHP(healEffect.getHp());
+                            client
+                                .getSession()
+                                .write(
+                                    EffectPackets.ShowOwnBuffEffect(
+                                        DarkKnight.Beholder,
+                                        PlayerEffects.SKILL_AFFECTED.getEffect()
+                                    )
+                                );
+                            field.broadcastMessage(
+                                Player.this,
+                                PacketCreator.SummonSkill(
+                                    getId(),
+                                    DarkKnight.Beholder,
+                                    5
+                                ),
+                                true
+                            );
+                            field.broadcastMessage(
+                                Player.this,
+                                EffectPackets.BuffMapVisualEffect(
+                                    getId(),
+                                    DarkKnight.Beholder,
+                                    PlayerEffects.SKILL_AFFECTED.getEffect()
+                                ),
+                                false
+                            );
+                        },
+                        healInterval,
+                        healInterval
+                    );
+        }
+        PlayerSkill buff = PlayerSkillFactory.getSkill(
+            DarkKnight.HexOfBeholder
+        );
+        int buffLevel = getSkillLevel(buff);
+        if (buffLevel > 0) {
+            final MapleStatEffect buffEffect = buff.getEffect(buffLevel);
+            int buffInterval = buffEffect.getX() * 1000;
+            beholderBuffSchedule =
+                CharacterTimer
+                    .getInstance()
+                    .register(
+                        () -> {
+                            buffEffect.applyTo(Player.this);
+                            client
+                                .getSession()
+                                .write(
+                                    EffectPackets.ShowOwnBuffEffect(
+                                        DarkKnight.Beholder,
+                                        PlayerEffects.SKILL_AFFECTED.getEffect()
+                                    )
+                                );
+                            field.broadcastMessage(
+                                Player.this,
+                                PacketCreator.SummonSkill(
+                                    getId(),
+                                    DarkKnight.Beholder,
+                                    (int) (Math.random() * 3) + 6
+                                ),
+                                true
+                            );
+                            field.broadcastMessage(
+                                Player.this,
+                                EffectPackets.BuffMapVisualEffect(
+                                    getId(),
+                                    DarkKnight.Beholder,
+                                    PlayerEffects.SKILL_AFFECTED.getEffect()
+                                ),
+                                false
+                            );
+                        },
+                        buffInterval,
+                        buffInterval
+                    );
+        }
     }
-    
+
     public int getPartnerId() {
         return partner;
     }
@@ -4793,13 +5898,15 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public void setMarriageItemId(final int mi) {
         this.spouseItemId = mi;
     }
-    
+
     public String getPartner() {
         return PlayerQuery.getNameById(partner);
     }
-  
+
     public int countItem(int itemid) {
-        InventoryType type = ItemInformationProvider.getInstance().getInventoryType(itemid);
+        InventoryType type = ItemInformationProvider
+            .getInstance()
+            .getInventoryType(itemid);
         Inventory iv = inventory[type.ordinal()];
         int possesed = iv.countById(itemid);
         return possesed;
@@ -4830,7 +5937,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public void setLastCatch(long lastCatch) {
         this.lastCatch = lastCatch;
     }
-    
+
     public boolean hasShield() {
         return shield;
     }
@@ -4844,69 +5951,93 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             return;
         }
 
-        List<Pair<BuffStat, Integer>> stat = Collections.singletonList(new Pair<>(BuffStat.SHIELD, Integer.valueOf(1)));
-        
+        List<Pair<BuffStat, Integer>> stat = Collections.singletonList(
+            new Pair<>(BuffStat.SHIELD, Integer.valueOf(1))
+        );
+
         setBuffedValue(BuffStat.SHIELD, Integer.valueOf(1));
-        
-                
-        getClient().getSession().write(PacketCreator.GiveBuff(2022269, 60 * 1000, stat));
-        
-        getMap().broadcastMessage(this, PacketCreator.BuffMapEffect(getId(), stat, false), false);
-        
-        
-            
+
+        getClient()
+            .getSession()
+            .write(PacketCreator.GiveBuff(2022269, 60 * 1000, stat));
+
+        getMap()
+            .broadcastMessage(
+                this,
+                PacketCreator.BuffMapEffect(getId(), stat, false),
+                false
+            );
+
         this.shield = true;
-       
     }
 
     public void cancelShield() {
-        if (getClient().getChannelServer().getPlayerStorage().getCharacterById(getId()) != null) { 
+        if (
+            getClient()
+                .getChannelServer()
+                .getPlayerStorage()
+                .getCharacterById(getId()) !=
+            null
+        ) {
             if (!this.shield) {
                 return;
             }
             stats.recalcLocalStats();
             stats.enforceMaxHpMp();
-            
+
             List<BuffStat> stat = Collections.singletonList(BuffStat.SHIELD);
-               
+
             client.getSession().write(PacketCreator.CancelBuff(stat));
-            field.broadcastMessage(this, PacketCreator.CancelForeignBuff(getId(), stat), false);
-            
+            field.broadcastMessage(
+                this,
+                PacketCreator.CancelForeignBuff(getId(), stat),
+                false
+            );
+
             this.shield = false;
         }
     }
-    
+
     public void message(String m) {
         dropMessage(5, m);
     }
-    
+
     public void dropMessage(int a, String string) {
-        this.getClient().getSession().write(PacketCreator.ServerNotice(a, string));
+        this.getClient()
+            .getSession()
+            .write(PacketCreator.ServerNotice(a, string));
     }
 
     public void dropMessage(String string) {
         dropMessage(5, string);
     }
-    
+
     public void announce(OutPacket packet) {
         client.announce(packet);
     }
-    
+
     public final void showHint(String msg) {
         showHint(msg, (short) 500);
     }
-    
+
     public void showHint(String msg, short length) {
         client.announceHint(msg, (short) length);
     }
-    
+
     public int getMerchantMeso() {
         return merchantMesos;
     }
-    
+
     public void addMerchantMesos(int add) {
         try {
-            try (PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement("UPDATE characters SET merchantMesos = ? WHERE id = ?", Statement.RETURN_GENERATED_KEYS)) {
+            try (
+                PreparedStatement ps = DatabaseConnection
+                    .getConnection()
+                    .prepareStatement(
+                        "UPDATE characters SET merchantMesos = ? WHERE id = ?",
+                        Statement.RETURN_GENERATED_KEYS
+                    )
+            ) {
                 ps.setInt(1, merchantMesos + add);
                 ps.setInt(2, id);
                 ps.executeUpdate();
@@ -4919,7 +6050,14 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
 
     public void setMerchantMeso(int set) {
         try {
-            try (PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement("UPDATE characters SET merchantMesos = ? WHERE id = ?", Statement.RETURN_GENERATED_KEYS)) {
+            try (
+                PreparedStatement ps = DatabaseConnection
+                    .getConnection()
+                    .prepareStatement(
+                        "UPDATE characters SET merchantMesos = ? WHERE id = ?",
+                        Statement.RETURN_GENERATED_KEYS
+                    )
+            ) {
                 ps.setInt(1, set);
                 ps.setInt(2, id);
                 ps.executeUpdate();
@@ -4929,12 +6067,12 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
         }
         merchantMesos = set;
     }
-    
+
     public synchronized void withdrawMerchantMesos() {
         int merchantMeso = this.getMerchantMeso();
         if (merchantMeso > 0) {
             int possible = Integer.MAX_VALUE - merchantMeso;
-            
+
             if (possible > 0) {
                 if (possible < merchantMeso) {
                     this.gainMeso(possible, false);
@@ -4946,9 +6084,16 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
             }
         }
     }
-    
+
     public void updateAriantScore() {
-        this.getMap().broadcastMessage(PacketCreator.UpdateAriantPQRanking(this.getName(), this.countItem(ItemConstants.ARIANT_JEWEL), false));
+        this.getMap()
+            .broadcastMessage(
+                PacketCreator.UpdateAriantPQRanking(
+                    this.getName(),
+                    this.countItem(ItemConstants.ARIANT_JEWEL),
+                    false
+                )
+            );
     }
 
     public int getRandomage(Player player) {
@@ -4968,18 +6113,18 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     }
 
     public Date getTime() {
-	return time;
+        return time;
     }
 
     public void setTime(Date time) {
-	this.time = time;
+        this.time = time;
     }
-    
+
     public void removeAriantRoom(int room) {
         ariantRoomLeader[room] = "";
         ariantRoomSlot[room] = 0;
     }
-    
+
     public String getAriantRoomLeaderName(int room) {
         return ariantRoomLeader[room];
     }
@@ -4987,7 +6132,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public int getAriantSlotsRoom(int room) {
         return ariantRoomSlot[room];
     }
-    
+
     public void setAriantRoomLeader(int room, String charname) {
         ariantRoomLeader[room] = charname;
     }
@@ -4995,9 +6140,13 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public void setAriantSlotRoom(int room, int slot) {
         ariantRoomSlot[room] = slot;
     }
-    
+
     public boolean getInteractionsOpen() {
-        return trade != null || this.playerShop != null ||this.hiredMerchant != null; 
+        return (
+            trade != null ||
+            this.playerShop != null ||
+            this.hiredMerchant != null
+        );
     }
 
     public void setAllianceRank(int rank) {
@@ -5010,22 +6159,22 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     public int getAllianceRank() {
         return this.allianceRank;
     }
-    
+
     public SpeedQuiz getSpeedQuiz() {
         return sq;
     }
- 
+
     public void setSpeedQuiz(SpeedQuiz sq) {
         this.sq = sq;
     }
-    
+
     public long getLastSpeedQuiz() {
         return lastSpeedQuiz;
     }
-    
+
     public void setLastSpeedQuiz(final long t) {
         this.lastSpeedQuiz = t;
-    } 
+    }
 
     public MapleGuild getGuild() {
         if (getGuildId() < 1) {
@@ -5041,103 +6190,172 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
     }
 
     public void maxSkill(int skillid) {
-        if (Math.floor(skillid / 10000) == getJob().getId() || isGameMaster() || skillid < 2000) {  
+        if (
+            Math.floor(skillid / 10000) == getJob().getId() ||
+            isGameMaster() ||
+            skillid < 2000
+        ) {
             PlayerSkill skill = PlayerSkillFactory.getSkill(skillid);
-            int maxLevel = skill.getMaxLevel();  
+            int maxLevel = skill.getMaxLevel();
             changeSkillLevel(skill, maxLevel, maxLevel);
         }
     }
-    
+
     public int getAveragePartyLevel() {
         int averageLevel = 0, size = 0;
-            for (MaplePartyCharacter pl : getParty().getMembers()) {
-                averageLevel += pl.getLevel();
-                size++;
-            }
-            if (size <= 0) {
-                return level;
-            }
+        for (MaplePartyCharacter pl : getParty().getMembers()) {
+            averageLevel += pl.getLevel();
+            size++;
+        }
+        if (size <= 0) {
+            return level;
+        }
         return averageLevel /= size;
     }
-    
+
     public int getAverageMapLevel() {
         int averageLevel = 0, size = 0;
-            for (Player pl : getMap().getCharacters()) {
-                averageLevel += pl.getLevel();
-                size++;
-            }
-            if (size <= 0) {
-                return level;
-            }
+        for (Player pl : getMap().getCharacters()) {
+            averageLevel += pl.getLevel();
+            size++;
+        }
+        if (size <= 0) {
+            return level;
+        }
         return averageLevel /= size;
     }
-    
+
     public void autoban(String reason) {
         this.ban(reason);
-        announce(PacketCreator.SendPolice(String.format("You have been blocked by the#b %s Police for HACK reason.#k", ServerProperties.Login.SERVER_NAME)));
-        CharacterTimer.getInstance().schedule(() -> {
-            client.disconnect(false, false);
-        }, 9000);
-        
-        BroadcastService.broadcastGMMessage(PacketCreator.ServerNotice(6, PlayerStringUtil.makeMapleReadable(this.name) + " was autobanned for " + reason));
+        announce(
+            PacketCreator.SendPolice(
+                String.format(
+                    "You have been blocked by the#b %s Police for HACK reason.#k",
+                    ServerProperties.Login.SERVER_NAME
+                )
+            )
+        );
+        CharacterTimer
+            .getInstance()
+            .schedule(
+                () -> {
+                    client.disconnect(false, false);
+                },
+                9000
+            );
+
+        BroadcastService.broadcastGMMessage(
+            PacketCreator.ServerNotice(
+                6,
+                PlayerStringUtil.makeMapleReadable(this.name) +
+                " was autobanned for " +
+                reason
+            )
+        );
     }
-    
+
     public void gainItem(int id, short quantity, boolean showMessage) {
         gainItem(id, quantity, false, showMessage, -1);
     }
-    
-    public Item gainItem(int id, short quantity, boolean randomStats, boolean showMessage, long expires) {
+
+    public Item gainItem(
+        int id,
+        short quantity,
+        boolean randomStats,
+        boolean showMessage,
+        long expires
+    ) {
         Item item = null;
         if (quantity >= 0) {
             ItemInformationProvider ii = ItemInformationProvider.getInstance();
- 
-            if (ItemConstants.getInventoryType(id).equals(InventoryType.EQUIP)) {
+
+            if (
+                ItemConstants.getInventoryType(id).equals(InventoryType.EQUIP)
+            ) {
                 item = ii.getEquipById(id);
             } else {
                 item = new Item(id, (byte) 0, (short) quantity);
             }
-            
+
             long l = Long.valueOf(expires);
             long time = 1000L * 60L * 60L * 24L * l;
-            
+
             if (expires != -1) {
-                for (int cards: ItemConstants.CARDS_4HRS) {
+                for (int cards : ItemConstants.CARDS_4HRS) {
                     if (cards == item.getItemId()) {
-                        item.setExpiration(System.currentTimeMillis() + 1000L * 60L * 60L * 4L);
+                        item.setExpiration(
+                            System.currentTimeMillis() + 1000L * 60L * 60L * 4L
+                        );
                     } else {
-                        item.setExpiration(System.currentTimeMillis() + expires);
+                        item.setExpiration(
+                            System.currentTimeMillis() + expires
+                        );
                     }
                 }
-                if (item.getItemId() == 5211048 || item.getItemId() == 5360042) {
+                if (
+                    item.getItemId() == 5211048 || item.getItemId() == 5360042
+                ) {
                     time = 1000L * 60L * 60L * 4L;
                     item.setExpiration(System.currentTimeMillis() + time);
                 } else {
                     item.setExpiration(System.currentTimeMillis() + expires);
                 }
             }
-            if (!InventoryManipulator.checkSpace(getClient(), id, quantity, "")) {
-                this.getClient().getPlayer().dropMessage(1, "Your inventory is full. Please remove an item from your inventory and try again.");
+            if (
+                !InventoryManipulator.checkSpace(getClient(), id, quantity, "")
+            ) {
+                this.getClient()
+                    .getPlayer()
+                    .dropMessage(
+                        1,
+                        "Your inventory is full. Please remove an item from your inventory and try again."
+                    );
                 return null;
             }
-            if (ItemConstants.getInventoryType(id).equals(InventoryType.EQUIP) && !ItemConstants.isThrowingStar(id) && !ItemConstants.isBullet(id)) {
+            if (
+                ItemConstants
+                    .getInventoryType(id)
+                    .equals(InventoryType.EQUIP) &&
+                !ItemConstants.isThrowingStar(id) &&
+                !ItemConstants.isBullet(id)
+            ) {
                 if (randomStats) {
                     item = ii.randomizeStats((Equip) item);
-                    InventoryManipulator.addFromDrop(getClient(), ii.randomizeStats((Equip) item), "", true);
+                    InventoryManipulator.addFromDrop(
+                        getClient(),
+                        ii.randomizeStats((Equip) item),
+                        "",
+                        true
+                    );
                 } else {
-                    InventoryManipulator.addFromDrop(getClient(), (Equip) item, "", true);
+                    InventoryManipulator.addFromDrop(
+                        getClient(),
+                        (Equip) item,
+                        "",
+                        true
+                    );
                 }
             } else {
                 InventoryManipulator.addFromDrop(getClient(), item, "", true);
             }
         } else {
-            InventoryManipulator.removeById(getClient(), ItemConstants.getInventoryType(id), id, -quantity, true, false);
+            InventoryManipulator.removeById(
+                getClient(),
+                ItemConstants.getInventoryType(id),
+                id,
+                -quantity,
+                true,
+                false
+            );
         }
         if (showMessage) {
-            this.getClient().getSession().write(PacketCreator.GetShowItemGain(id, quantity, false));
+            this.getClient()
+                .getSession()
+                .write(PacketCreator.GetShowItemGain(id, quantity, false));
         }
         return item;
     }
-    
+
     public boolean gainSlots(int type, int slots, boolean update) {
         slots += inventory[type].getSlotLimit();
         if (slots <= 96) {
@@ -5145,7 +6363,9 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
 
             this.saveDatabase();
             if (update) {
-                client.announce(PacketCreator.UpdateInventorySlotLimit(type, slots));
+                client.announce(
+                    PacketCreator.UpdateInventorySlotLimit(type, slots)
+                );
             }
 
             return true;

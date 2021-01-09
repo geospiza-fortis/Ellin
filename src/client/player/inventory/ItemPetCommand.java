@@ -1,7 +1,7 @@
 package client.player.inventory;
 
 public class ItemPetCommand {
-   
+
     private final int petId;
     private final int skillId;
     private final int prob;
@@ -30,4 +30,3 @@ public class ItemPetCommand {
         return inc;
     }
 }
-

@@ -21,44 +21,44 @@
 
 package server.itens;
 
+import static client.player.inventory.types.WeaponType.*;
+
+import client.Client;
+import client.player.Player;
+import client.player.PlayerJob;
+import client.player.inventory.Equip;
+import client.player.inventory.Inventory;
+import client.player.inventory.Item;
+import client.player.inventory.types.InventoryType;
+import client.player.inventory.types.WeaponType;
+import client.player.skills.PlayerSkillFactory;
+import constants.GameConstants;
+import constants.ItemConstants;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.TimeZone;
-
-import client.Client;
-import client.player.PlayerJob;
-import constants.ItemConstants;
-import client.player.Player;
-import client.player.inventory.Equip;
-import client.player.inventory.Item;
-import client.player.inventory.Inventory;
-import client.player.inventory.types.InventoryType;
-import client.player.inventory.types.WeaponType;
-import static client.player.inventory.types.WeaponType.*;
-import client.player.skills.PlayerSkillFactory;
-import constants.GameConstants;
-import java.util.Collection;
 import provider.MapleData;
 import provider.MapleDataDirectoryEntry;
 import provider.MapleDataFileEntry;
 import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
 import provider.MapleDataTool;
-import tools.Pair;
 import server.MapleStatEffect;
+import tools.Pair;
 
 public class ItemInformationProvider {
-    
+
     private static ItemInformationProvider instance = null;
-    
+
     protected MapleDataProvider itemData;
     protected MapleDataProvider equipData;
     protected MapleDataProvider stringData;
@@ -68,7 +68,7 @@ public class ItemInformationProvider {
     protected MapleData etcStringData;
     protected MapleData insStringData;
     protected MapleData petStringData;
-    
+
     protected Map<Integer, InventoryType> inventoryTypeCache = new HashMap<>();
     protected Map<Integer, Short> slotMaxCache = new HashMap<>();
     protected Map<Integer, MapleStatEffect> itemEffects = new HashMap<>();
@@ -96,16 +96,25 @@ public class ItemInformationProvider {
     private static final Random rand = new Random();
 
     protected ItemInformationProvider() {
-        itemData = MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzpath") + "/Item"));
-        equipData = MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzpath") + "/Character"));
-        stringData = MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzpath") + "/String"));
+        itemData =
+            MapleDataProviderFactory.getDataProvider(
+                new File(System.getProperty("wzpath") + "/Item")
+            );
+        equipData =
+            MapleDataProviderFactory.getDataProvider(
+                new File(System.getProperty("wzpath") + "/Character")
+            );
+        stringData =
+            MapleDataProviderFactory.getDataProvider(
+                new File(System.getProperty("wzpath") + "/String")
+            );
         cashStringData = stringData.getData("Cash.img");
         consumeStringData = stringData.getData("Consume.img");
         eqpStringData = stringData.getData("Eqp.img");
         etcStringData = stringData.getData("Etc.img");
         insStringData = stringData.getData("Ins.img");
         petStringData = stringData.getData("Pet.img");
-        
+
         isQuestItemCache.put(0, false);
         isPartyQuestItemCache.put(0, false);
     }
@@ -130,7 +139,9 @@ public class ItemInformationProvider {
                     ret = InventoryType.getByWZName(topDir.getName());
                     inventoryTypeCache.put(itemId, ret);
                     return ret;
-                } else if (iFile.getName().equals(idStr.substring(1) + ".img")) {
+                } else if (
+                    iFile.getName().equals(idStr.substring(1) + ".img")
+                ) {
                     ret = InventoryType.getByWZName(topDir.getName());
                     inventoryTypeCache.put(itemId, ret);
                     return ret;
@@ -151,29 +162,34 @@ public class ItemInformationProvider {
         inventoryTypeCache.put(itemId, ret);
         return ret;
     }
-    
+
     public Equip expireItem(Equip equip, long period) {
         Calendar cal = Calendar.getInstance();
         cal.setTimeZone(TimeZone.getTimeZone(GameConstants.TIMEZONE));
         equip.setExpiration(period);
         return equip;
     }
-     
+
     public List<Pair<Integer, String>> getAllEtcItems() {
         if (!itemNameCache.isEmpty()) {
             return itemNameCache;
         }
-        
+
         List<Pair<Integer, String>> itemPairs = new ArrayList<>();
         MapleData itemsData;
-        
+
         itemsData = stringData.getData("Etc.img").getChildByPath("Etc");
         for (MapleData itemFolder : itemsData.getChildren()) {
-            itemPairs.add(new Pair<>(Integer.parseInt(itemFolder.getName()), MapleDataTool.getString("name", itemFolder, "NO-NAME")));
+            itemPairs.add(
+                new Pair<>(
+                    Integer.parseInt(itemFolder.getName()),
+                    MapleDataTool.getString("name", itemFolder, "NO-NAME")
+                )
+            );
         }
         return itemPairs;
     }
-    
+
     //since getAllItems has changed thus we have static itemIdAndName and it's initialized on server startup
     //plus the old one cannot get etc names, something to do with not traversing the child paths
     public String getName(int itemId) {
@@ -182,55 +198,55 @@ public class ItemInformationProvider {
         }
         return itemIdAndName.get(itemId);
     }
-    
-//    public String getName(int itemId) {
-//        if (nameCache.containsKey(itemId)) {
-//            return nameCache.get(itemId);
-//        }
-//        MapleData strings = getStringData(itemId);
-//        if (strings == null) {
-//            return null;
-//        }
-//        String ret = MapleDataTool.getString("name", strings, null);
-//        nameCache.put(itemId, ret);
-//        return ret;
-//    }
 
-//    public List<Pair<Integer, String>> getAllItems() {
-//        if (!itemNameCache.isEmpty()) {
-//            return itemNameCache;
-//        }
-//        List<Pair<Integer, String>> itemPairs = new ArrayList<>();
-//        MapleData itemsData;
-//        itemsData = stringData.getData("Cash.img");
-//        for (MapleData itemFolder : itemsData.getChildren()) {
-//            itemPairs.add(new Pair<>(Integer.parseInt(itemFolder.getName()), MapleDataTool.getString("name", itemFolder, "NO-NAME")));
-//        }
-//        itemsData = stringData.getData("Consume.img");
-//        for (MapleData itemFolder : itemsData.getChildren()) {
-//            itemPairs.add(new Pair<>(Integer.parseInt(itemFolder.getName()), MapleDataTool.getString("name", itemFolder, "NO-NAME")));
-//        }
-//        itemsData = stringData.getData("Eqp.img").getChildByPath("Eqp");
-//        for (MapleData eqpType : itemsData.getChildren()) {
-//            for (MapleData itemFolder : eqpType.getChildren()) {
-//                itemPairs.add(new Pair<>(Integer.parseInt(itemFolder.getName()), MapleDataTool.getString("name", itemFolder, "NO-NAME")));
-//            }
-//        }
-//        itemsData = stringData.getData("Etc.img").getChildByPath("Etc");
-//        for (MapleData itemFolder : itemsData.getChildren()) {
-//            itemPairs.add(new Pair<>(Integer.parseInt(itemFolder.getName()), MapleDataTool.getString("name", itemFolder, "NO-NAME")));
-//        }
-//        itemsData = stringData.getData("Ins.img");
-//        for (MapleData itemFolder : itemsData.getChildren()) {
-//            itemPairs.add(new Pair<>(Integer.parseInt(itemFolder.getName()), MapleDataTool.getString("name", itemFolder, "NO-NAME")));
-//        }
-//        itemsData = stringData.getData("Pet.img");
-//        for (MapleData itemFolder : itemsData.getChildren()) {
-//            itemPairs.add(new Pair<>(Integer.parseInt(itemFolder.getName()), MapleDataTool.getString("name", itemFolder, "NO-NAME")));
-//        }
-//        return itemPairs;
-//    }
-    
+    //    public String getName(int itemId) {
+    //        if (nameCache.containsKey(itemId)) {
+    //            return nameCache.get(itemId);
+    //        }
+    //        MapleData strings = getStringData(itemId);
+    //        if (strings == null) {
+    //            return null;
+    //        }
+    //        String ret = MapleDataTool.getString("name", strings, null);
+    //        nameCache.put(itemId, ret);
+    //        return ret;
+    //    }
+
+    //    public List<Pair<Integer, String>> getAllItems() {
+    //        if (!itemNameCache.isEmpty()) {
+    //            return itemNameCache;
+    //        }
+    //        List<Pair<Integer, String>> itemPairs = new ArrayList<>();
+    //        MapleData itemsData;
+    //        itemsData = stringData.getData("Cash.img");
+    //        for (MapleData itemFolder : itemsData.getChildren()) {
+    //            itemPairs.add(new Pair<>(Integer.parseInt(itemFolder.getName()), MapleDataTool.getString("name", itemFolder, "NO-NAME")));
+    //        }
+    //        itemsData = stringData.getData("Consume.img");
+    //        for (MapleData itemFolder : itemsData.getChildren()) {
+    //            itemPairs.add(new Pair<>(Integer.parseInt(itemFolder.getName()), MapleDataTool.getString("name", itemFolder, "NO-NAME")));
+    //        }
+    //        itemsData = stringData.getData("Eqp.img").getChildByPath("Eqp");
+    //        for (MapleData eqpType : itemsData.getChildren()) {
+    //            for (MapleData itemFolder : eqpType.getChildren()) {
+    //                itemPairs.add(new Pair<>(Integer.parseInt(itemFolder.getName()), MapleDataTool.getString("name", itemFolder, "NO-NAME")));
+    //            }
+    //        }
+    //        itemsData = stringData.getData("Etc.img").getChildByPath("Etc");
+    //        for (MapleData itemFolder : itemsData.getChildren()) {
+    //            itemPairs.add(new Pair<>(Integer.parseInt(itemFolder.getName()), MapleDataTool.getString("name", itemFolder, "NO-NAME")));
+    //        }
+    //        itemsData = stringData.getData("Ins.img");
+    //        for (MapleData itemFolder : itemsData.getChildren()) {
+    //            itemPairs.add(new Pair<>(Integer.parseInt(itemFolder.getName()), MapleDataTool.getString("name", itemFolder, "NO-NAME")));
+    //        }
+    //        itemsData = stringData.getData("Pet.img");
+    //        for (MapleData itemFolder : itemsData.getChildren()) {
+    //            itemPairs.add(new Pair<>(Integer.parseInt(itemFolder.getName()), MapleDataTool.getString("name", itemFolder, "NO-NAME")));
+    //        }
+    //        return itemPairs;
+    //    }
+
     public LinkedHashMap<Integer, String> getAllItems() {
         if (!itemIdAndName.isEmpty()) {
             return itemIdAndName;
@@ -241,25 +257,34 @@ public class ItemInformationProvider {
             stringData.getData("Cash.img"),
             stringData.getData("Consume.img"),
             stringData.getData("Etc.img").getChildByPath("Etc"),
-            stringData.getData("Ins.img"), stringData.getData("Pet.img")
+            stringData.getData("Ins.img"),
+            stringData.getData("Pet.img"),
         };
 
         for (int i = 0; i < itemsData.length; i++) { //get and map all item ids and names via their child paths
             for (MapleData itemFolder : itemsData[i].getChildren()) {
                 if (i == 0) { //eqp, needs to traverse its child paths
                     for (MapleData equipItemFolder : itemFolder.getChildren()) {
-                        itemIdAndName.put(Integer.parseInt(equipItemFolder.getName()),
-                                MapleDataTool.getString("name", equipItemFolder, "NO-NAME"));
+                        itemIdAndName.put(
+                            Integer.parseInt(equipItemFolder.getName()),
+                            MapleDataTool.getString(
+                                "name",
+                                equipItemFolder,
+                                "NO-NAME"
+                            )
+                        );
                     }
                 } else {
-                    itemIdAndName.put(Integer.parseInt(itemFolder.getName()),
-                            MapleDataTool.getString("name", itemFolder, "NO-NAME"));
+                    itemIdAndName.put(
+                        Integer.parseInt(itemFolder.getName()),
+                        MapleDataTool.getString("name", itemFolder, "NO-NAME")
+                    );
                 }
             }
         }
         return itemIdAndName;
     }
-     
+
     protected MapleData getStringData(int itemId) {
         String cat = "null";
         MapleData theData;
@@ -267,7 +292,12 @@ public class ItemInformationProvider {
             theData = cashStringData;
         } else if (itemId >= 2000000 && itemId < 3000000) {
             theData = consumeStringData;
-        } else if (itemId >= 1010000 && itemId < 1040000 || itemId >= 1122000 && itemId < 1123000) {
+        } else if (
+            itemId >= 1010000 &&
+            itemId < 1040000 ||
+            itemId >= 1122000 &&
+            itemId < 1123000
+        ) {
             theData = eqpStringData;
             cat = "Accessory";
         } else if (itemId >= 1000000 && itemId < 1010000) {
@@ -335,14 +365,21 @@ public class ItemInformationProvider {
         for (MapleDataDirectoryEntry topDir : root.getSubdirectories()) {
             for (MapleDataFileEntry iFile : topDir.getFiles()) {
                 if (iFile.getName().equals(idStr.substring(0, 4) + ".img")) {
-                    ret = itemData.getData(topDir.getName() + "/" + iFile.getName());
+                    ret =
+                        itemData.getData(
+                            topDir.getName() + "/" + iFile.getName()
+                        );
                     if (ret == null) {
                         return null;
                     }
                     ret = ret.getChildByPath(idStr);
                     return ret;
-                } else if (iFile.getName().equals(idStr.substring(1) + ".img")) {
-                    return itemData.getData(topDir.getName() + "/" + iFile.getName());
+                } else if (
+                    iFile.getName().equals(idStr.substring(1) + ".img")
+                ) {
+                    return itemData.getData(
+                        topDir.getName() + "/" + iFile.getName()
+                    );
                 }
             }
         }
@@ -350,19 +387,23 @@ public class ItemInformationProvider {
         for (MapleDataDirectoryEntry topDir : root.getSubdirectories()) {
             for (MapleDataFileEntry iFile : topDir.getFiles()) {
                 if (iFile.getName().equals(idStr + ".img")) {
-                    return equipData.getData(topDir.getName() + "/" + iFile.getName());
+                    return equipData.getData(
+                        topDir.getName() + "/" + iFile.getName()
+                    );
                 }
             }
         }
         return ret;
     }
-    
+
     public boolean isConsumeOnPickup(int itemId) {
         if (consumeOnPickupCache.containsKey(itemId)) {
             return consumeOnPickupCache.get(itemId);
         }
         MapleData data = getItemData(itemId);
-        boolean consume = MapleDataTool.getIntConvert("spec/consumeOnPickup", data, 0) == 1 || MapleDataTool.getIntConvert("specEx/consumeOnPickup", data, 0) == 1;
+        boolean consume =
+            MapleDataTool.getIntConvert("spec/consumeOnPickup", data, 0) == 1 ||
+            MapleDataTool.getIntConvert("specEx/consumeOnPickup", data, 0) == 1;
         consumeOnPickupCache.put(itemId, consume);
         return consume;
     }
@@ -376,7 +417,10 @@ public class ItemInformationProvider {
         if (item != null) {
             MapleData smEntry = item.getChildByPath("info/slotMax");
             if (smEntry == null) {
-                if (getInventoryType(itemId).getType() == InventoryType.EQUIP.getType()) {
+                if (
+                    getInventoryType(itemId).getType() ==
+                    InventoryType.EQUIP.getType()
+                ) {
                     ret = 1;
                 } else {
                     ret = 100;
@@ -384,9 +428,21 @@ public class ItemInformationProvider {
             } else {
                 ret = (short) MapleDataTool.getInt(smEntry);
                 if (isThrowingStar(itemId)) {
-                    ret += c.getPlayer().getSkillLevel(PlayerSkillFactory.getSkill(4100000)) * 10;
+                    ret +=
+                        c
+                            .getPlayer()
+                            .getSkillLevel(
+                                PlayerSkillFactory.getSkill(4100000)
+                            ) *
+                        10;
                 } else if (isBullet(itemId)) {
-                    ret += c.getPlayer().getSkillLevel(PlayerSkillFactory.getSkill(5200000)) * 10;
+                    ret +=
+                        c
+                            .getPlayer()
+                            .getSkillLevel(
+                                PlayerSkillFactory.getSkill(5200000)
+                            ) *
+                        10;
                 }
             }
         }
@@ -397,22 +453,20 @@ public class ItemInformationProvider {
     }
 
     public short getSlotMax(int itemId) {
-        if (slotMaxCache.containsKey(itemId))
-            return slotMaxCache.get(itemId);
+        if (slotMaxCache.containsKey(itemId)) return slotMaxCache.get(itemId);
         short ret = 0;
         MapleData item = getItemData(itemId);
         if (item != null) {
             MapleData smEntry = item.getChildByPath("info/slotMax");
             if (smEntry == null) {
-                if (getInventoryType(itemId).getType() == InventoryType.EQUIP.getType())
-                    ret = 1;
-                else
-                    ret = 100;
+                if (
+                    getInventoryType(itemId).getType() ==
+                    InventoryType.EQUIP.getType()
+                ) ret = 1; else ret = 100;
             } else {
-                if (isThrowingStar(itemId))
-                    ret = 1;
-                else if (MapleDataTool.getInt(smEntry) == 0)
-                    ret = 1;
+                if (isThrowingStar(itemId)) ret = 1; else if (
+                    MapleDataTool.getInt(smEntry) == 0
+                ) ret = 1;
                 ret = (short) MapleDataTool.getInt(smEntry);
             }
         }
@@ -424,7 +478,11 @@ public class ItemInformationProvider {
         if (getMesoCache.containsKey(itemId)) {
             return getMesoCache.get(itemId);
         }
-        final int triggerItem = MapleDataTool.getIntConvert("info/meso", getItemData(itemId), 0);
+        final int triggerItem = MapleDataTool.getIntConvert(
+            "info/meso",
+            getItemData(itemId),
+            0
+        );
         getMesoCache.put(itemId, triggerItem);
         return triggerItem;
     }
@@ -493,7 +551,10 @@ public class ItemInformationProvider {
         }
         for (MapleData data : info.getChildren()) {
             if (data.getName().startsWith("inc")) {
-                ret.put(data.getName().substring(3), MapleDataTool.getIntConvert(data));
+                ret.put(
+                    data.getName().substring(3),
+                    MapleDataTool.getIntConvert(data)
+                );
             }
             /*else if (data.getName().startsWith("req"))
              ret.put(data.getName(), MapleDataTool.getInt(data.getName(), info, 0));*/
@@ -506,7 +567,10 @@ public class ItemInformationProvider {
         ret.put("reqLUK", MapleDataTool.getInt("reqLUK", info, 0));
         ret.put("reqPOP", MapleDataTool.getInt("reqPOP", info, 0));
         ret.put("isCashItem", MapleDataTool.getInt("cash", info, 0));
-        ret.put("expireOnLogout", MapleDataTool.getInt("expireOnLogout", info, 0));
+        ret.put(
+            "expireOnLogout",
+            MapleDataTool.getInt("expireOnLogout", info, 0)
+        );
         ret.put("tuc", MapleDataTool.getInt("tuc", info, 0));
         ret.put("cursed", MapleDataTool.getInt("cursed", info, 0));
         ret.put("success", MapleDataTool.getInt("success", info, 0));
@@ -516,7 +580,6 @@ public class ItemInformationProvider {
         equipStatsCache.put(itemId, ret);
         return ret;
     }
-  
 
     public int getReqLevel(int itemId) {
         final Integer req = getEquipStats(itemId).get("reqLevel");
@@ -572,7 +635,6 @@ public class ItemInformationProvider {
                 return WeaponType.KNUCKLE;
             case 49:
                 return WeaponType.GUN;
-
         }
         return WeaponType.NOT_A_WEAPON;
     }
@@ -596,15 +658,24 @@ public class ItemInformationProvider {
                 return true;
         }
         return false;
-
     }
 
-    public Item scrollEquipWithId(Item equip, int scrollId, boolean usingWhiteScroll, boolean isGM) {
+    public Item scrollEquipWithId(
+        Item equip,
+        int scrollId,
+        boolean usingWhiteScroll,
+        boolean isGM
+    ) {
         if (equip instanceof Equip) {
             Equip nEquip = (Equip) equip;
             Map<String, Integer> stats = this.getEquipStats(scrollId);
-            Map<String, Integer> eqstats = this.getEquipStats(equip.getItemId());
-            if ((nEquip.getUpgradeSlots() > 0 || isCleanSlate(scrollId)) && Math.ceil(Math.random() * 100.0) <= stats.get("success") || isGM) {
+            Map<String, Integer> eqstats =
+                this.getEquipStats(equip.getItemId());
+            if (
+                (nEquip.getUpgradeSlots() > 0 || isCleanSlate(scrollId)) &&
+                Math.ceil(Math.random() * 100.0) <= stats.get("success") ||
+                isGM
+            ) {
                 switch (scrollId) {
                     case 2049000:
                     case 2049001:
@@ -612,8 +683,13 @@ public class ItemInformationProvider {
                     case 2049102: // Maple Syrup 100%
                     case 2049101: // Liar Tree Sap 100%
                     case 2049003:
-                        if (nEquip.getUpgradeSlots() <= eqstats.get("tuc") && nEquip.getLevel() != eqstats.get("tuc")) {
-                            byte newSlots = (byte) (nEquip.getUpgradeSlots() + 1);
+                        if (
+                            nEquip.getUpgradeSlots() <= eqstats.get("tuc") &&
+                            nEquip.getLevel() != eqstats.get("tuc")
+                        ) {
+                            byte newSlots = (byte) (
+                                nEquip.getUpgradeSlots() + 1
+                            );
                             nEquip.setUpgradeSlots(newSlots);
                             return equip;
                         }
@@ -624,104 +700,239 @@ public class ItemInformationProvider {
                             increase = increase * -1;
                         }
                         if (nEquip.getStr() > 0) {
-                            short newStat = (short) (nEquip.getStr() + Math.ceil(Math.random() * 5.0) * increase);
+                            short newStat = (short) (
+                                nEquip.getStr() +
+                                Math.ceil(Math.random() * 5.0) *
+                                increase
+                            );
                             nEquip.setStr(newStat);
                         }
                         if (nEquip.getDex() > 0) {
-                            short newStat = (short) (nEquip.getDex() + Math.ceil(Math.random() * 5.0) * increase);
+                            short newStat = (short) (
+                                nEquip.getDex() +
+                                Math.ceil(Math.random() * 5.0) *
+                                increase
+                            );
                             nEquip.setDex(newStat);
                         }
                         if (nEquip.getInt() > 0) {
-                            short newStat = (short) (nEquip.getInt() + Math.ceil(Math.random() * 5.0) * increase);
+                            short newStat = (short) (
+                                nEquip.getInt() +
+                                Math.ceil(Math.random() * 5.0) *
+                                increase
+                            );
                             nEquip.setInt(newStat);
                         }
                         if (nEquip.getLuk() > 0) {
-                            short newStat = (short) (nEquip.getLuk() + Math.ceil(Math.random() * 5.0) * increase);
+                            short newStat = (short) (
+                                nEquip.getLuk() +
+                                Math.ceil(Math.random() * 5.0) *
+                                increase
+                            );
                             nEquip.setLuk(newStat);
                         }
                         if (nEquip.getWatk() > 0) {
-                            short newStat = (short) (nEquip.getWatk() + Math.ceil(Math.random() * 5.0) * increase);
+                            short newStat = (short) (
+                                nEquip.getWatk() +
+                                Math.ceil(Math.random() * 5.0) *
+                                increase
+                            );
                             nEquip.setWatk(newStat);
                         }
                         if (nEquip.getWdef() > 0) {
-                            short newStat = (short) (nEquip.getWdef() + Math.ceil(Math.random() * 5.0) * increase);
+                            short newStat = (short) (
+                                nEquip.getWdef() +
+                                Math.ceil(Math.random() * 5.0) *
+                                increase
+                            );
                             nEquip.setWdef(newStat);
                         }
                         if (nEquip.getMatk() > 0) {
-                            short newStat = (short) (nEquip.getMatk() + Math.ceil(Math.random() * 5.0) * increase);
+                            short newStat = (short) (
+                                nEquip.getMatk() +
+                                Math.ceil(Math.random() * 5.0) *
+                                increase
+                            );
                             nEquip.setMatk(newStat);
                         }
                         if (nEquip.getMdef() > 0) {
-                            short newStat = (short) (nEquip.getMdef() + Math.ceil(Math.random() * 5.0) * increase);
+                            short newStat = (short) (
+                                nEquip.getMdef() +
+                                Math.ceil(Math.random() * 5.0) *
+                                increase
+                            );
                             nEquip.setMdef(newStat);
                         }
                         if (nEquip.getAcc() > 0) {
-                            short newStat = (short) (nEquip.getAcc() + Math.ceil(Math.random() * 5.0) * increase);
+                            short newStat = (short) (
+                                nEquip.getAcc() +
+                                Math.ceil(Math.random() * 5.0) *
+                                increase
+                            );
                             nEquip.setAcc(newStat);
                         }
                         if (nEquip.getAvoid() > 0) {
-                            short newStat = (short) (nEquip.getAvoid() + Math.ceil(Math.random() * 5.0) * increase);
+                            short newStat = (short) (
+                                nEquip.getAvoid() +
+                                Math.ceil(Math.random() * 5.0) *
+                                increase
+                            );
                             nEquip.setAvoid(newStat);
                         }
                         if (nEquip.getSpeed() > 0) {
-                            short newStat = (short) (nEquip.getSpeed() + Math.ceil(Math.random() * 5.0) * increase);
+                            short newStat = (short) (
+                                nEquip.getSpeed() +
+                                Math.ceil(Math.random() * 5.0) *
+                                increase
+                            );
                             nEquip.setSpeed(newStat);
                         }
                         if (nEquip.getJump() > 0) {
-                            short newStat = (short) (nEquip.getJump() + Math.ceil(Math.random() * 5.0) * increase);
+                            short newStat = (short) (
+                                nEquip.getJump() +
+                                Math.ceil(Math.random() * 5.0) *
+                                increase
+                            );
                             nEquip.setJump(newStat);
                         }
                         if (nEquip.getHp() > 0) {
-                            short newStat = (short) (nEquip.getHp() + Math.ceil(Math.random() * 5.0) * increase);
+                            short newStat = (short) (
+                                nEquip.getHp() +
+                                Math.ceil(Math.random() * 5.0) *
+                                increase
+                            );
                             nEquip.setHp(newStat);
                         }
                         if (nEquip.getMp() > 0) {
-                            short newStat = (short) (nEquip.getMp() + Math.ceil(Math.random() * 5.0) * increase);
+                            short newStat = (short) (
+                                nEquip.getMp() +
+                                Math.ceil(Math.random() * 5.0) *
+                                increase
+                            );
                             nEquip.setMp(newStat);
                         }
                         break;
                     default:
-                        stats.entrySet().forEach((stat) -> {
-                            if (stat.getKey().equals("STR")) {
-                                nEquip.setStr((short) (nEquip.getStr() + stat.getValue().intValue()));
-                            } else if (stat.getKey().equals("DEX")) {
-                                nEquip.setDex((short) (nEquip.getDex() + stat.getValue().intValue()));
-                            } else if (stat.getKey().equals("INT")) {
-                                nEquip.setInt((short) (nEquip.getInt() + stat.getValue().intValue()));
-                            } else if (stat.getKey().equals("LUK")) {
-                                nEquip.setLuk((short) (nEquip.getLuk() + stat.getValue().intValue()));
-                            } else if (stat.getKey().equals("PAD")) {
-                                nEquip.setWatk((short) (nEquip.getWatk() + stat.getValue().intValue()));
-                            } else if (stat.getKey().equals("PDD")) {
-                                nEquip.setWdef((short) (nEquip.getWdef() + stat.getValue().intValue()));
-                            } else if (stat.getKey().equals("MAD")) {
-                                nEquip.setMatk((short) (nEquip.getMatk() + stat.getValue().intValue()));
-                            } else if (stat.getKey().equals("MDD")) {
-                                nEquip.setMdef((short) (nEquip.getMdef() + stat.getValue().intValue()));
-                            } else if (stat.getKey().equals("ACC")) {
-                                nEquip.setAcc((short) (nEquip.getAcc() + stat.getValue().intValue()));
-                            } else if (stat.getKey().equals("EVA")) {
-                                nEquip.setAvoid((short) (nEquip.getAvoid() + stat.getValue().intValue()));
-                            } else if (stat.getKey().equals("Speed")) {
-                                nEquip.setSpeed((short) (nEquip.getSpeed() + stat.getValue().intValue()));
-                            } else if (stat.getKey().equals("Jump")) {
-                                nEquip.setJump((short) (nEquip.getJump() + stat.getValue().intValue()));
-                            } else if (stat.getKey().equals("MHP")) {
-                                nEquip.setHp((short) (nEquip.getHp() + stat.getValue().intValue()));
-                            } else if (stat.getKey().equals("MMP")) {
-                                nEquip.setMp((short) (nEquip.getMp() + stat.getValue().intValue()));
-                            } else if (stat.getKey().equals("afterImage")) {
-                            }
-                });
+                        stats
+                            .entrySet()
+                            .forEach(
+                                stat -> {
+                                    if (stat.getKey().equals("STR")) {
+                                        nEquip.setStr(
+                                            (short) (
+                                                nEquip.getStr() +
+                                                stat.getValue().intValue()
+                                            )
+                                        );
+                                    } else if (stat.getKey().equals("DEX")) {
+                                        nEquip.setDex(
+                                            (short) (
+                                                nEquip.getDex() +
+                                                stat.getValue().intValue()
+                                            )
+                                        );
+                                    } else if (stat.getKey().equals("INT")) {
+                                        nEquip.setInt(
+                                            (short) (
+                                                nEquip.getInt() +
+                                                stat.getValue().intValue()
+                                            )
+                                        );
+                                    } else if (stat.getKey().equals("LUK")) {
+                                        nEquip.setLuk(
+                                            (short) (
+                                                nEquip.getLuk() +
+                                                stat.getValue().intValue()
+                                            )
+                                        );
+                                    } else if (stat.getKey().equals("PAD")) {
+                                        nEquip.setWatk(
+                                            (short) (
+                                                nEquip.getWatk() +
+                                                stat.getValue().intValue()
+                                            )
+                                        );
+                                    } else if (stat.getKey().equals("PDD")) {
+                                        nEquip.setWdef(
+                                            (short) (
+                                                nEquip.getWdef() +
+                                                stat.getValue().intValue()
+                                            )
+                                        );
+                                    } else if (stat.getKey().equals("MAD")) {
+                                        nEquip.setMatk(
+                                            (short) (
+                                                nEquip.getMatk() +
+                                                stat.getValue().intValue()
+                                            )
+                                        );
+                                    } else if (stat.getKey().equals("MDD")) {
+                                        nEquip.setMdef(
+                                            (short) (
+                                                nEquip.getMdef() +
+                                                stat.getValue().intValue()
+                                            )
+                                        );
+                                    } else if (stat.getKey().equals("ACC")) {
+                                        nEquip.setAcc(
+                                            (short) (
+                                                nEquip.getAcc() +
+                                                stat.getValue().intValue()
+                                            )
+                                        );
+                                    } else if (stat.getKey().equals("EVA")) {
+                                        nEquip.setAvoid(
+                                            (short) (
+                                                nEquip.getAvoid() +
+                                                stat.getValue().intValue()
+                                            )
+                                        );
+                                    } else if (stat.getKey().equals("Speed")) {
+                                        nEquip.setSpeed(
+                                            (short) (
+                                                nEquip.getSpeed() +
+                                                stat.getValue().intValue()
+                                            )
+                                        );
+                                    } else if (stat.getKey().equals("Jump")) {
+                                        nEquip.setJump(
+                                            (short) (
+                                                nEquip.getJump() +
+                                                stat.getValue().intValue()
+                                            )
+                                        );
+                                    } else if (stat.getKey().equals("MHP")) {
+                                        nEquip.setHp(
+                                            (short) (
+                                                nEquip.getHp() +
+                                                stat.getValue().intValue()
+                                            )
+                                        );
+                                    } else if (stat.getKey().equals("MMP")) {
+                                        nEquip.setMp(
+                                            (short) (
+                                                nEquip.getMp() +
+                                                stat.getValue().intValue()
+                                            )
+                                        );
+                                    } else if (
+                                        stat.getKey().equals("afterImage")
+                                    ) {}
+                                }
+                            );
                         break;
                 }
                 nEquip.setUpgradeSlots((byte) (nEquip.getUpgradeSlots() - 1));
                 nEquip.setLevel((byte) (nEquip.getLevel() + 1));
             } else {
                 if (!usingWhiteScroll) {
-                    nEquip.setUpgradeSlots((byte) (nEquip.getUpgradeSlots() - 1));
+                    nEquip.setUpgradeSlots(
+                        (byte) (nEquip.getUpgradeSlots() - 1)
+                    );
                 }
-                if (Math.ceil(1.0 + Math.random() * 100.0) < stats.get("cursed")) {
+                if (
+                    Math.ceil(1.0 + Math.random() * 100.0) < stats.get("cursed")
+                ) {
                     // DESTROY :) (O.O!)
                     return null;
                 }
@@ -733,7 +944,7 @@ public class ItemInformationProvider {
     public Item getEquipById(int equipId) {
         return getEquipById(equipId, -1);
     }
-    
+
     public Item getEquipById(int equipId, int ringId) {
         Equip nEquip;
         nEquip = new Equip(equipId, (byte) 0, ringId);
@@ -785,13 +996,17 @@ public class ItemInformationProvider {
                         nEquip.setMp((short) stat.getValue().intValue());
                         break;
                     case "tuc":
-                        nEquip.setUpgradeSlots((byte) stat.getValue().intValue());
+                        nEquip.setUpgradeSlots(
+                            (byte) stat.getValue().intValue()
+                        );
                         break;
                     case "afterImage":
                         break;
                     case "expireOnLogout":
-                    	nEquip.setDisappearsAtLogout(stat.getValue().shortValue() == 1);
-                    	break;
+                        nEquip.setDisappearsAtLogout(
+                            stat.getValue().shortValue() == 1
+                        );
+                        break;
                     default:
                         break;
                 }
@@ -801,7 +1016,13 @@ public class ItemInformationProvider {
         if (ringId > 0) {
             Calendar cal = Calendar.getInstance();
             cal.setTimeZone(TimeZone.getTimeZone("GMT+3"));
-            cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 3, cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE));
+            cal.set(
+                cal.get(Calendar.YEAR),
+                cal.get(Calendar.MONTH) + 3,
+                cal.get(Calendar.DAY_OF_MONTH),
+                cal.get(Calendar.HOUR_OF_DAY),
+                cal.get(Calendar.MINUTE)
+            );
             nEquip.setExpiration(cal.getTimeInMillis());
         }
         return nEquip.copy();
@@ -812,7 +1033,10 @@ public class ItemInformationProvider {
             return 0;
         }
         int lMaxRange = (int) Math.min(Math.ceil(defaultValue * 0.1), maxRange);
-        return (short) ((defaultValue - lMaxRange) + Math.floor(rand.nextDouble() * (lMaxRange * 2 + 1)));
+        return (short) (
+            (defaultValue - lMaxRange) +
+            Math.floor(rand.nextDouble() * (lMaxRange * 2 + 1))
+        );
     }
 
     private short getRandStat1(short defaultValue, int maxRange) {
@@ -821,7 +1045,7 @@ public class ItemInformationProvider {
         }
         return (short) Math.round(defaultValue + Math.random() * maxRange);
     }
-	
+
     public boolean isGun(int itemId) {
         return itemId >= 1492000 && itemId <= 1492024;
     }
@@ -843,40 +1067,53 @@ public class ItemInformationProvider {
         equip.setMp(getRandStat(equip.getMp(), 10));
         return equip;
     }
-    
+
     public Equip randomizeStatsIncuba(Equip equip) {
-        if(equip.getStr() > 0) {
-        equip.gainStrPoints((int) (Math.random() * 10));
-        } if (equip.getDex() > 0) {
-        equip.gainDexPoints((int) (Math.random() * 10));
-        } if (equip.getInt() > 0) {
-        equip.gainIntPoints((int) (Math.random() * 10));
-        } if (equip.getLuk() > 0) {
-        equip.gainLukPoints((int) (Math.random() * 10));
-        } if (equip.getMatk() > 0) {
-        equip.gainMatkPoints((int) (Math.random() * 10));
-        } if (equip.getWatk() > 0) {
-        equip.gainWatkPoints((int) (Math.random() * 10));
-        } if (equip.getAcc() > 0) { 
-        equip.gainAccPoints((int) (Math.random() * 10));
-        } if (equip.getAvoid() > 0) { 
-        equip.gainAvoidPoints((int) (Math.random() * 10));
-        } if (equip.getJump() > 0) {
-        equip.gainJumpPoints((int) (Math.random() * 10));
-        } if (equip.getSpeed() > 0) {
-        equip.gainSpeedPoints((int) (Math.random() * 20));
-        } if (equip.getWdef() > 0) {
-        equip.gainWdefPoints((int) (Math.random() * 20));
-        } if (equip.getMdef() > 0) {
-        equip.gainMdefPoints((int) (Math.random() * 20));
-        } if (equip.getHp() > 0) {
-        equip.gainHpPoints((int) (Math.random() * 20));
-        } if (equip.getMp() > 0) {
-        equip.gainMpPoints((int) (Math.random() * 20));
+        if (equip.getStr() > 0) {
+            equip.gainStrPoints((int) (Math.random() * 10));
         }
-      return equip;
+        if (equip.getDex() > 0) {
+            equip.gainDexPoints((int) (Math.random() * 10));
+        }
+        if (equip.getInt() > 0) {
+            equip.gainIntPoints((int) (Math.random() * 10));
+        }
+        if (equip.getLuk() > 0) {
+            equip.gainLukPoints((int) (Math.random() * 10));
+        }
+        if (equip.getMatk() > 0) {
+            equip.gainMatkPoints((int) (Math.random() * 10));
+        }
+        if (equip.getWatk() > 0) {
+            equip.gainWatkPoints((int) (Math.random() * 10));
+        }
+        if (equip.getAcc() > 0) {
+            equip.gainAccPoints((int) (Math.random() * 10));
+        }
+        if (equip.getAvoid() > 0) {
+            equip.gainAvoidPoints((int) (Math.random() * 10));
+        }
+        if (equip.getJump() > 0) {
+            equip.gainJumpPoints((int) (Math.random() * 10));
+        }
+        if (equip.getSpeed() > 0) {
+            equip.gainSpeedPoints((int) (Math.random() * 20));
+        }
+        if (equip.getWdef() > 0) {
+            equip.gainWdefPoints((int) (Math.random() * 20));
+        }
+        if (equip.getMdef() > 0) {
+            equip.gainMdefPoints((int) (Math.random() * 20));
+        }
+        if (equip.getHp() > 0) {
+            equip.gainHpPoints((int) (Math.random() * 20));
+        }
+        if (equip.getMp() > 0) {
+            equip.gainMpPoints((int) (Math.random() * 20));
+        }
+        return equip;
     }
-    
+
     public Equip randomizeStatsMalady(Equip equip) {
         equip.setStr(getRandStat(equip.getStr(), 8));
         equip.setDex(getRandStat(equip.getDex(), 8));
@@ -932,8 +1169,10 @@ public class ItemInformationProvider {
         int theInt = data.getChildByPath("mob").getChildren().size();
         int[][] mobs2spawn = new int[theInt][2];
         for (int x = 0; x < theInt; x++) {
-            mobs2spawn[x][0] = MapleDataTool.getIntConvert("mob/" + x + "/id", data);
-            mobs2spawn[x][1] = MapleDataTool.getIntConvert("mob/" + x + "/prob", data);
+            mobs2spawn[x][0] =
+                MapleDataTool.getIntConvert("mob/" + x + "/id", data);
+            mobs2spawn[x][1] =
+                MapleDataTool.getIntConvert("mob/" + x + "/prob", data);
         }
         return mobs2spawn;
     }
@@ -941,8 +1180,8 @@ public class ItemInformationProvider {
     public boolean isWeapon(int itemId) {
         return itemId >= 1302000 && itemId < 1492024;
     }
-   
-     public boolean isThrowingStar(int itemId) {
+
+    public boolean isThrowingStar(int itemId) {
         return (itemId >= 2070000 && itemId < 2080000);
     }
 
@@ -981,9 +1220,9 @@ public class ItemInformationProvider {
                 return false;
         }
     }
-    
+
     public boolean isTownScroll(int itemId) {
-        return (itemId >= 2030000 && itemId < 2030020); 
+        return (itemId >= 2030000 && itemId < 2030020);
     }
 
     public int getWatkForProjectile(int itemId) {
@@ -1004,20 +1243,26 @@ public class ItemInformationProvider {
     }
 
     public boolean canEvolve(int petId) {
-    	MapleData data = itemData.getData("Pet/" + petId + ".img").getChildByPath("info").getChildByPath("evol");
-    	if (data == null) {
+        MapleData data = itemData
+            .getData("Pet/" + petId + ".img")
+            .getChildByPath("info")
+            .getChildByPath("evol");
+        if (data == null) {
             return false;
-    	}
-    	return MapleDataTool.getInt(data) == 1;
+        }
+        return MapleDataTool.getInt(data) == 1;
     }
 
     public boolean needsEvolutionItem(int petId) {
-    	MapleData data = itemData.getData("Pet/" + petId + ".img").getChildByPath("info").getChildByPath("evolReqItemID");
-    	if (data == null) {
+        MapleData data = itemData
+            .getData("Pet/" + petId + ".img")
+            .getChildByPath("info")
+            .getChildByPath("evolReqItemID");
+        if (data == null) {
             return false;
-    	}
-    	return MapleDataTool.getInt(data) == 1;
-    }  
+        }
+        return MapleDataTool.getInt(data) == 1;
+    }
 
     public String getDesc(int itemId) {
         if (descCache.containsKey(itemId)) {
@@ -1044,33 +1289,41 @@ public class ItemInformationProvider {
         msgCache.put(itemId, ret);
         return ret;
     }
-    
+
     public final boolean isCash(final int itemId) {
         if (getEquipStats(itemId) == null) {
             return ItemConstants.getInventoryType(itemId) == InventoryType.CASH;
         }
-        return ItemConstants.getInventoryType(itemId) == InventoryType.CASH || getEquipStats(itemId).get("isCashItem") > 0;
+        return (
+            ItemConstants.getInventoryType(itemId) == InventoryType.CASH ||
+            getEquipStats(itemId).get("isCashItem") > 0
+        );
     }
 
-   public boolean isDropRestricted(int itemId) {
+    public boolean isDropRestricted(int itemId) {
         if (dropRestrictionCache.containsKey(itemId)) {
             return dropRestrictionCache.get(itemId);
         }
         MapleData data = getItemData(itemId);
         boolean bRestricted = false;
-        if (MapleDataTool.getIntConvert("info/tradeBlock", data, 0) == 1 || MapleDataTool.getIntConvert("info/quest", data, 0) == 1 || MapleDataTool.getIntConvert("info/cash", data, 0) == 1) {
+        if (
+            MapleDataTool.getIntConvert("info/tradeBlock", data, 0) == 1 ||
+            MapleDataTool.getIntConvert("info/quest", data, 0) == 1 ||
+            MapleDataTool.getIntConvert("info/cash", data, 0) == 1
+        ) {
             bRestricted = true;
         }
         dropRestrictionCache.put(itemId, bRestricted);
         return bRestricted;
     }
-   
+
     public boolean isPickupRestricted(int itemId) {
         if (pickupRestrictionCache.containsKey(itemId)) {
             return pickupRestrictionCache.get(itemId);
         }
         MapleData data = getItemData(itemId);
-        boolean bRestricted = MapleDataTool.getIntConvert("info/only", data, 0) == 1;
+        boolean bRestricted =
+            MapleDataTool.getIntConvert("info/only", data, 0) == 1;
 
         pickupRestrictionCache.put(itemId, bRestricted);
         return bRestricted;
@@ -1088,17 +1341,23 @@ public class ItemInformationProvider {
         }
         for (MapleData data : info.getChildren()) {
             if (data.getName().startsWith("inc")) {
-                ret.put(data.getName().substring(3), MapleDataTool.getIntConvert(data));
+                ret.put(
+                    data.getName().substring(3),
+                    MapleDataTool.getIntConvert(data)
+                );
             }
         }
         ret.put("masterLevel", MapleDataTool.getInt("masterLevel", info, 0));
-        ret.put("reqSkillLevel", MapleDataTool.getInt("reqSkillLevel", info, 0));
+        ret.put(
+            "reqSkillLevel",
+            MapleDataTool.getInt("reqSkillLevel", info, 0)
+        );
         ret.put("success", MapleDataTool.getInt("success", info, 0));
 
         MapleData skill = info.getChildByPath("skill");
 
         int curskill;
- 	 for (int i = 0; i < skill.getChildren().size(); i++) {
+        for (int i = 0; i < skill.getChildren().size(); i++) {
             curskill = MapleDataTool.getInt(Integer.toString(i), skill, 0);
             if (curskill == 0) {
                 break;
@@ -1113,12 +1372,18 @@ public class ItemInformationProvider {
         }
         return ret;
     }
-    
+
     public boolean isExpireOnLogout(int itemId) {
         if (expireOnLogout.containsKey(itemId)) {
             return expireOnLogout.get(itemId);
         }
-        boolean expire = MapleDataTool.getIntConvert("info/expireOnLogout", getItemData(itemId), 0) > 0;
+        boolean expire =
+            MapleDataTool.getIntConvert(
+                "info/expireOnLogout",
+                getItemData(itemId),
+                0
+            ) >
+            0;
         expireOnLogout.put(itemId, expire);
         return expire;
     }
@@ -1148,27 +1413,35 @@ public class ItemInformationProvider {
         petsCanConsumeCache.put(itemId, ret);
         return ret;
     }
-    
-     public boolean isQuestItem(int itemId) {
+
+    public boolean isQuestItem(int itemId) {
         if (isQuestItemCache.containsKey(itemId)) {
             return isQuestItemCache.get(itemId);
         }
         MapleData data = getItemData(itemId);
-        boolean questItem = (data != null && MapleDataTool.getIntConvert("info/quest", data, 0) == 1);
+        boolean questItem =
+            (
+                data != null &&
+                MapleDataTool.getIntConvert("info/quest", data, 0) == 1
+            );
         isQuestItemCache.put(itemId, questItem);
         return questItem;
     }
-     
+
     public boolean isPartyQuestItem(int itemId) {
         if (isPartyQuestItemCache.containsKey(itemId)) {
             return isPartyQuestItemCache.get(itemId);
         }
         MapleData data = getItemData(itemId);
-        boolean partyquestItem = (data != null && MapleDataTool.getIntConvert("info/pquest", data, 0) == 1);
+        boolean partyquestItem =
+            (
+                data != null &&
+                MapleDataTool.getIntConvert("info/pquest", data, 0) == 1
+            );
         isPartyQuestItemCache.put(itemId, partyquestItem);
         return partyquestItem;
     }
-    
+
     public int getQuestIdFromItem(int itemId) {
         MapleData data = getItemData(itemId);
         int questItem = MapleDataTool.getIntConvert("info/quest", data, 0);
@@ -1183,11 +1456,19 @@ public class ItemInformationProvider {
         if (getExpCardTimes.containsKey(itemId)) {
             times = getExpCardTimes.get(itemId);
         } else {
-            List<MapleData> data = getItemData(itemId).getChildByPath("info").getChildByPath("time").getChildren();
+            List<MapleData> data = getItemData(itemId)
+                .getChildByPath("info")
+                .getChildByPath("time")
+                .getChildren();
             Map<String, String> hours = new HashMap<>();
-            data.stream().map((childdata) -> MapleDataTool.getString(childdata).split(":")).forEachOrdered((time) -> {
-                hours.put(time[0], time[1]);
-            });
+            data
+                .stream()
+                .map(childdata -> MapleDataTool.getString(childdata).split(":"))
+                .forEachOrdered(
+                    time -> {
+                        hours.put(time[0], time[1]);
+                    }
+                );
             times = hours;
             getExpCardTimes.put(itemId, hours);
             cal.get(Calendar.DAY_OF_WEEK);
@@ -1196,7 +1477,10 @@ public class ItemInformationProvider {
             String[] hourspan = times.get(day).split("-");
             int starthour = Integer.parseInt(hourspan[0]);
             int endhour = Integer.parseInt(hourspan[1]);
-            if (cal.get(Calendar.HOUR_OF_DAY) >= starthour && cal.get(Calendar.HOUR_OF_DAY) <= endhour) {
+            if (
+                cal.get(Calendar.HOUR_OF_DAY) >= starthour &&
+                cal.get(Calendar.HOUR_OF_DAY) <= endhour
+            ) {
                 return true;
             }
         }
@@ -1263,22 +1547,31 @@ public class ItemInformationProvider {
         return slot == comp;
     }
 
-    public Collection<Item> canWearEquipment(Player chr, Collection<Item> items) {
+    public Collection<Item> canWearEquipment(
+        Player chr,
+        Collection<Item> items
+    ) {
         Inventory inv = chr.getInventory(InventoryType.EQUIPPED);
         if (inv.checked()) {
             return items;
         }
         Collection<Item> itemz = new LinkedList<>();
         if (chr.getJob() == PlayerJob.SUPERGM || chr.getJob() == PlayerJob.GM) {
-            items.forEach((item) -> {
-                Equip equip = (Equip) item;
-                equip.wear(true);
-                itemz.add(item);
-            });
+            items.forEach(
+                item -> {
+                    Equip equip = (Equip) item;
+                    equip.wear(true);
+                    itemz.add(item);
+                }
+            );
             return itemz;
         }
         boolean highfivestamp = false;
-        int tdex = chr.getStat().getDex(), tstr = chr.getStat().getStr(), tint = chr.getStat().getInt(), tluk = chr.getStat().getLuk(), fame = chr.getFame();
+        int tdex = chr.getStat().getDex(), tstr = chr
+            .getStat()
+            .getStr(), tint = chr.getStat().getInt(), tluk = chr
+            .getStat()
+            .getLuk(), fame = chr.getFame();
         if (chr.getJob() != PlayerJob.SUPERGM || chr.getJob() != PlayerJob.GM) {
             for (Item item : inv.list()) {
                 Equip equip = (Equip) item;
@@ -1329,8 +1622,7 @@ public class ItemInformationProvider {
     }
 
     public boolean isItemValid(int itemId) {
-    	if (itemId / 1000000 < 1)
-    		return false;
+        if (itemId / 1000000 < 1) return false;
         getAllItems();
         return itemIdAndName.containsKey(itemId);
     }
@@ -1339,35 +1631,50 @@ public class ItemInformationProvider {
         if (triggerItemCache.containsKey(itemId)) {
             return triggerItemCache.get(itemId);
         } else {
-            int triggerItem = MapleDataTool.getIntConvert("info/stateChangeItem", getItemData(itemId), 0);
+            int triggerItem = MapleDataTool.getIntConvert(
+                "info/stateChangeItem",
+                getItemData(itemId),
+                0
+            );
             triggerItemCache.put(itemId, triggerItem);
             return triggerItem;
         }
     }
 
     public boolean cannotRevive(int petId) {
-    	MapleData data = itemData.getData("Pet/" + petId + ".img").getChildByPath("info").getChildByPath("noRevive");
-    	if (data == null) {
-    		return false;
-    	}
-    	return MapleDataTool.getInt(data) == 1;
+        MapleData data = itemData
+            .getData("Pet/" + petId + ".img")
+            .getChildByPath("info")
+            .getChildByPath("noRevive");
+        if (data == null) {
+            return false;
+        }
+        return MapleDataTool.getInt(data) == 1;
     }
-    
+
     public Pair<Integer, String> getReplaceOnExpire(int itemId) {
         if (replaceOnExpireCache.containsKey(itemId)) {
             return replaceOnExpireCache.get(itemId);
         }
 
-        int itemReplacement = MapleDataTool.getInt("info/replace/itemid", getItemData(itemId), 0);
-        String msg = MapleDataTool.getString("info/replace/msg", getItemData(itemId));
+        int itemReplacement = MapleDataTool.getInt(
+            "info/replace/itemid",
+            getItemData(itemId),
+            0
+        );
+        String msg = MapleDataTool.getString(
+            "info/replace/msg",
+            getItemData(itemId)
+        );
 
         Pair<Integer, String> ret = new Pair<>(itemReplacement, msg);
         replaceOnExpireCache.put(itemId, ret);
 
         return ret;
     }
-    
+
     public static class MapleDayInt {
+
         public static String getDayInt(int day) {
             switch (day) {
                 case 1:

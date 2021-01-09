@@ -12,5 +12,4 @@ public class DonorCommand {
     public static CoomandRank getPlayerLevelRequired() {
         return CoomandRank.DONOR;
     }
-
 }

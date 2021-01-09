@@ -1,10 +1,10 @@
 package server.minirooms;
 
+import client.Client;
+import client.player.Player;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import client.player.Player;
-import client.Client;
 import packet.creators.InteractionPackets;
 import packet.creators.MinigamePackets;
 import packet.transfer.write.OutPacket;
@@ -16,7 +16,7 @@ import server.maps.object.FieldObjectType;
  * @author Matze
  */
 public class Minigame extends AbstractMapleFieldObject {
-    
+
     private final Player owner;
     private Player visitor;
     private String password;
@@ -47,27 +47,51 @@ public class Minigame extends AbstractMapleFieldObject {
         return owner.equals(c);
     }
 
-     public void addVisitor(Player challenger) {
+    public void addVisitor(Player challenger) {
         visitor = challenger;
         if (GameType.equals("omok")) {
-            this.getOwner().getClient().announce(MinigamePackets.GetMiniGameNewVisitor(challenger, 1));
-            this.getOwner().getMap().broadcastMessage(MinigamePackets.AddBoxGame(owner, 2, 0, true));
+            this.getOwner()
+                .getClient()
+                .announce(MinigamePackets.GetMiniGameNewVisitor(challenger, 1));
+            this.getOwner()
+                .getMap()
+                .broadcastMessage(
+                    MinigamePackets.AddBoxGame(owner, 2, 0, true)
+                );
         }
         if (GameType.equals("matchcard")) {
-            this.getOwner().getClient().announce(MinigamePackets.GetMatchCardNewVisitor(challenger, 1));
-            this.getOwner().getMap().broadcastMessage(MinigamePackets.AddBoxGame(owner, 2, 0, false));
+            this.getOwner()
+                .getClient()
+                .announce(
+                    MinigamePackets.GetMatchCardNewVisitor(challenger, 1)
+                );
+            this.getOwner()
+                .getMap()
+                .broadcastMessage(
+                    MinigamePackets.AddBoxGame(owner, 2, 0, false)
+                );
         }
     }
 
-     public void removeVisitor(Player challenger) {
+    public void removeVisitor(Player challenger) {
         if (visitor == challenger) {
             visitor = null;
-            this.getOwner().getClient().announce(MinigamePackets.GetMiniGameRemoveVisitor());
+            this.getOwner()
+                .getClient()
+                .announce(MinigamePackets.GetMiniGameRemoveVisitor());
             if (GameType.equals("omok")) {
-                this.getOwner().getMap().broadcastMessage(MinigamePackets.AddBoxGame(owner, 1, 0, true));
+                this.getOwner()
+                    .getMap()
+                    .broadcastMessage(
+                        MinigamePackets.AddBoxGame(owner, 1, 0, true)
+                    );
             }
             if (GameType.equals("matchcard")) {
-                this.getOwner().getMap().broadcastMessage(MinigamePackets.AddBoxGame(owner, 1, 0, false));
+                this.getOwner()
+                    .getMap()
+                    .broadcastMessage(
+                        MinigamePackets.AddBoxGame(owner, 1, 0, false)
+                    );
             }
         }
     }
@@ -140,17 +164,20 @@ public class Minigame extends AbstractMapleFieldObject {
                     for (int i = 0; i < 6; i++) {
                         list4x3.add(i);
                         list4x3.add(i);
-                    }   break;
+                    }
+                    break;
                 case 10:
                     for (int i = 0; i < 10; i++) {
                         list5x4.add(i);
                         list5x4.add(i);
-                    }   break;
+                    }
+                    break;
                 default:
                     for (int i = 0; i < 15; i++) {
                         list6x5.add(i);
                         list6x5.add(i);
-                    }   break;
+                    }
+                    break;
             }
         }
     }
@@ -159,7 +186,7 @@ public class Minigame extends AbstractMapleFieldObject {
         return GameType;
     }
 
-   public void shuffleList() {
+    public void shuffleList() {
         switch (matchestowin) {
             case 6:
                 Collections.shuffle(list4x3);
@@ -200,24 +227,36 @@ public class Minigame extends AbstractMapleFieldObject {
     public int getLoser() {
         return loser;
     }
-    
+
     public void broadcast(OutPacket packet) {
-        if (owner.getClient() != null && owner.getClient().getSession() != null) {
+        if (
+            owner.getClient() != null && owner.getClient().getSession() != null
+        ) {
             owner.getClient().announce(packet);
         }
         broadcastToVisitor(packet);
     }
 
     public void chat(Client c, String chat) {
-        broadcast(InteractionPackets.GetPlayerShopChat(c.getPlayer(), chat, isOwner(c.getPlayer())));
+        broadcast(
+            InteractionPackets.GetPlayerShopChat(
+                c.getPlayer(),
+                chat,
+                isOwner(c.getPlayer())
+            )
+        );
     }
 
     public void sendOmok(Client c, int type) {
-        c.announce(MinigamePackets.GetMiniGame(c, this, isOwner(c.getPlayer()), type));
+        c.announce(
+            MinigamePackets.GetMiniGame(c, this, isOwner(c.getPlayer()), type)
+        );
     }
 
     public void sendMatchCard(Client c, int type) {
-        c.announce(MinigamePackets.GetMatchCard(c, this, isOwner(c.getPlayer()), type));
+        c.announce(
+            MinigamePackets.GetMatchCard(c, this, isOwner(c.getPlayer()), type)
+        );
     }
 
     public Player getOwner() {
@@ -227,27 +266,32 @@ public class Minigame extends AbstractMapleFieldObject {
     public Player getVisitor() {
         return visitor;
     }
-    
+
     public void setPiece(int move1, int move2, int type, Player chr) {
         int slot = ((move2 * 15) + (move1 + 1));
         if (piece[slot] == 0) {
             piece[slot] = type;
-            broadcast(MinigamePackets.GetMiniGameMoveOmok(this, move1, move2, type));
+            broadcast(
+                MinigamePackets.GetMiniGameMoveOmok(this, move1, move2, type)
+            );
             for (int y = 0; y < 15; y++) {
                 for (int x = 0; x < 11; x++) {
                     if (searchCombo(x, y, type)) {
                         if (isOwner(chr)) {
-                            broadcast(MinigamePackets.GetMiniGameOwnerWin(this));
+                            broadcast(
+                                MinigamePackets.GetMiniGameOwnerWin(this)
+                            );
                             setLoser(0);
                         } else {
-                            broadcast(MinigamePackets.GetMiniGameVisitorWin(this));
+                            broadcast(
+                                MinigamePackets.GetMiniGameVisitorWin(this)
+                            );
                             this.setLoser(1);
                         }
                         for (int y2 = 0; y2 < 15; y2++) {
                             for (int x2 = 0; x2 < 15; x2++) {
                                 int slot2 = ((y2 * 15) + (x2 + 1));
                                 piece[slot2] = 0;
-
                             }
                         }
                     }
@@ -257,27 +301,29 @@ public class Minigame extends AbstractMapleFieldObject {
                 for (int x = 4; x < 15; x++) {
                     if (searchCombo2(x, y, type)) {
                         if (isOwner(chr)) {
-                            broadcast(MinigamePackets.GetMiniGameOwnerWin(this));
+                            broadcast(
+                                MinigamePackets.GetMiniGameOwnerWin(this)
+                            );
                             setLoser(0);
                         } else {
-                            broadcast(MinigamePackets.GetMiniGameVisitorWin(this));
+                            broadcast(
+                                MinigamePackets.GetMiniGameVisitorWin(this)
+                            );
                             setLoser(1);
                         }
                         for (int y2 = 0; y2 < 15; y2++) {
                             for (int x2 = 0; x2 < 15; x2++) {
                                 int slot2 = ((y2 * 15) + (x2 + 1));
                                 piece[slot2] = 0;
-
                             }
                         }
                     }
                 }
             }
         }
-
     }
 
-   public boolean searchCombo(int x, int y, int type) {
+    public boolean searchCombo(int x, int y, int type) {
         boolean winner = false;
         int slot = ((y * 15) + (x + 1));
         if (piece[slot] == type) {
@@ -343,7 +389,7 @@ public class Minigame extends AbstractMapleFieldObject {
         }
         return winner;
     }
-    
+
     public String getPassword() {
         return this.password;
     }

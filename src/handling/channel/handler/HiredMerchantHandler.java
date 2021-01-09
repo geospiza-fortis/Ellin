@@ -5,14 +5,15 @@
  */
 package handling.channel.handler;
 
+import static handling.channel.handler.ChannelHeaders.HiredMerchantHeaders.*;
+
 import client.Client;
 import client.player.Player;
 import client.player.inventory.Inventory;
-import client.player.inventory.types.InventoryType;
 import client.player.inventory.Item;
 import client.player.inventory.ItemFactory;
+import client.player.inventory.types.InventoryType;
 import database.DatabaseConnection;
-import static handling.channel.handler.ChannelHeaders.HiredMerchantHeaders.*;
 import handling.mina.PacketReader;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -34,30 +35,53 @@ public class HiredMerchantHandler {
 
     public static void HiredMerchantRequest(PacketReader packet, Client c) {
         Player p = c.getPlayer();
-        if (p.getMap().getMapObjectsInRange(p.getPosition(), 23000, Arrays.asList(FieldObjectType.HIRED_MERCHANT)).isEmpty() && p.getMapId() > 910000000 && p.getMapId() < 910000023) {
+        if (
+            p
+                .getMap()
+                .getMapObjectsInRange(
+                    p.getPosition(),
+                    23000,
+                    Arrays.asList(FieldObjectType.HIRED_MERCHANT)
+                )
+                .isEmpty() &&
+            p.getMapId() > 910000000 &&
+            p.getMapId() < 910000023
+        ) {
             if (!p.hasMerchant()) {
                 try {
-                    if (ItemFactory.MERCHANT.loadItems(p.getId(), false).isEmpty() && p.getMerchantMeso() == 0) {
-                        c.getSession().write(InteractionPackets.HiredMerchantBox());
+                    if (
+                        ItemFactory.MERCHANT
+                            .loadItems(p.getId(), false)
+                            .isEmpty() &&
+                        p.getMerchantMeso() == 0
+                    ) {
+                        c
+                            .getSession()
+                            .write(InteractionPackets.HiredMerchantBox());
                     } else {
-                        c.getSession().write(InteractionPackets.RetrieveFirstMessage());
+                        c
+                            .getSession()
+                            .write(InteractionPackets.RetrieveFirstMessage());
                     }
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                 }
             } else {
-                p.dropMessage(1, "Please close the existing store and try again.");
+                p.dropMessage(
+                    1,
+                    "Please close the existing store and try again."
+                );
             }
         } else {
             p.dropMessage(1, "You can not open a store here.");
         }
     }
-    
+
     public static void FredrickRequest(PacketReader packet, Client c) {
         Player p = c.getPlayer();
         byte operation = packet.readByte();
         switch (operation) {
-            case UNKNOW: 
+            case UNKNOW:
                 break;
             case RETRIEVE_ITENS:
                 c.lockClient();
@@ -67,31 +91,59 @@ public class HiredMerchantHandler {
                     }
                     List<Pair<Item, InventoryType>> items;
                     try {
-                        items = ItemFactory.MERCHANT.loadItems(p.getId(), false);
+                        items =
+                            ItemFactory.MERCHANT.loadItems(p.getId(), false);
                         if (!canRetrieveFromFredrick(p, items)) {
-                            c.getSession().write(InteractionPackets.FredrickMessageSend((byte) 0x21));
+                            c
+                                .getSession()
+                                .write(
+                                    InteractionPackets.FredrickMessageSend(
+                                        (byte) 0x21
+                                    )
+                                );
                             return;
                         }
 
                         p.withdrawMerchantMesos();
 
-
                         if (deleteItemsFredrick(p)) {
-
                             Merchant merchant = p.getHiredMerchant();
 
                             if (merchant != null) {
                                 merchant.clearItems();
                             }
 
-                             for (Pair<Item, InventoryType> it : items) {
+                            for (Pair<Item, InventoryType> it : items) {
                                 Item item = it.getLeft();
-                                InventoryManipulator.addFromDrop(p.getClient(), item, "Return item from Fredrick", false);
-                                String itemName = ItemInformationProvider.getInstance().getName(item.getItemId());
-                                FileLogger.print(FileLogger.FREDRICK + p.getName() + ".txt", p.getName() + " gained " + item.getQuantity() + " " + itemName + " (" + item.getItemId() + ")\r\n");
+                                InventoryManipulator.addFromDrop(
+                                    p.getClient(),
+                                    item,
+                                    "Return item from Fredrick",
+                                    false
+                                );
+                                String itemName = ItemInformationProvider
+                                    .getInstance()
+                                    .getName(item.getItemId());
+                                FileLogger.print(
+                                    FileLogger.FREDRICK + p.getName() + ".txt",
+                                    p.getName() +
+                                    " gained " +
+                                    item.getQuantity() +
+                                    " " +
+                                    itemName +
+                                    " (" +
+                                    item.getItemId() +
+                                    ")\r\n"
+                                );
                             }
 
-                            c.getSession().write(InteractionPackets.FredrickMessageSend((byte) 0x1E));
+                            c
+                                .getSession()
+                                .write(
+                                    InteractionPackets.FredrickMessageSend(
+                                        (byte) 0x1E
+                                    )
+                                );
                         } else {
                             p.message("An unknown error has occured.");
                         }
@@ -103,24 +155,36 @@ public class HiredMerchantHandler {
                     c.unlockClient();
                 }
                 break;
-            case CLOSE_FREDRICK: 
+            case CLOSE_FREDRICK:
                 break;
             default:
                 System.out.println("Operation not found: " + operation);
                 break;
         }
     }
-    
-    private static boolean canRetrieveFromFredrick(Player p, List<Pair<Item, InventoryType>> items) {
-        if (p.getMeso() + p.getMerchantMeso() < 0 || p.getMeso() + p.getMerchantMeso() > Integer.MAX_VALUE) {
+
+    private static boolean canRetrieveFromFredrick(
+        Player p,
+        List<Pair<Item, InventoryType>> items
+    ) {
+        if (
+            p.getMeso() + p.getMerchantMeso() < 0 ||
+            p.getMeso() + p.getMerchantMeso() > Integer.MAX_VALUE
+        ) {
             return false;
         }
         return Inventory.checkSpotsAndOwnership(p, items);
     }
-    
+
     private static boolean deleteItemsFredrick(Player p) {
         try {
-            try (PreparedStatement ps = DatabaseConnection.getConnection().prepareStatement("DELETE FROM `inventoryitems` WHERE `type` = ? AND `characterid` = ?")) {
+            try (
+                PreparedStatement ps = DatabaseConnection
+                    .getConnection()
+                    .prepareStatement(
+                        "DELETE FROM `inventoryitems` WHERE `type` = ? AND `characterid` = ?"
+                    )
+            ) {
                 ps.setInt(1, ItemFactory.MERCHANT.getValue());
                 ps.setInt(2, p.getId());
                 ps.execute();

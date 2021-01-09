@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -23,37 +23,36 @@ package server.life;
 
 import constants.GameConstants;
 import constants.ItemConstants;
+import database.DatabaseConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import database.DatabaseConnection;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Set;
 import server.itens.ItemInformationProvider;
 import tools.Randomizer;
 
 public class MapleMonsterInformationProvider {
-    
+
     private static final MapleMonsterInformationProvider instance = new MapleMonsterInformationProvider();
-    
-    private final Map<Integer, List<MonsterDropEntry>> drops = new HashMap<>();        
+
+    private final Map<Integer, List<MonsterDropEntry>> drops = new HashMap<>();
     private final List<MonsterGlobalDropEntry> globaldrops = new ArrayList<>();
-        
-    private final Map<Integer, List<Integer>> dropsChancePool = new HashMap<>();   
+
+    private final Map<Integer, List<Integer>> dropsChancePool = new HashMap<>();
     private final Set<Integer> hasNoMultiEquipDrops = new HashSet<>();
     private final Map<Integer, List<MonsterDropEntry>> extraMultiEquipDrops = new HashMap<>();
-  
+
     protected MapleMonsterInformationProvider() {
         retrieveGlobal();
     }
-    
+
     public static MapleMonsterInformationProvider getInstance() {
         return instance;
     }
@@ -61,26 +60,31 @@ public class MapleMonsterInformationProvider {
     public final List<MonsterGlobalDropEntry> getGlobalDrop() {
         return globaldrops;
     }
-    
+
     private void retrieveGlobal() {
         PreparedStatement ps = null;
         ResultSet rs = null;
 
         try {
             final Connection con = DatabaseConnection.getConnection();
-            ps = con.prepareStatement("SELECT * FROM drop_data_global WHERE chance > 0");
+            ps =
+                con.prepareStatement(
+                    "SELECT * FROM drop_data_global WHERE chance > 0"
+                );
             rs = ps.executeQuery();
 
             while (rs.next()) {
                 globaldrops.add(
                     new MonsterGlobalDropEntry(
-                    rs.getInt("itemid"),
-                    rs.getInt("chance"),
-                    rs.getInt("continent"),
-                    rs.getByte("dropType"),
-                    rs.getInt("minimum_quantity"),
-                    rs.getInt("maximum_quantity"),
-                    rs.getShort("questid")));
+                        rs.getInt("itemid"),
+                        rs.getInt("chance"),
+                        rs.getInt("continent"),
+                        rs.getByte("dropType"),
+                        rs.getInt("minimum_quantity"),
+                        rs.getInt("maximum_quantity"),
+                        rs.getShort("questid")
+                    )
+                );
             }
             rs.close();
             ps.close();
@@ -94,18 +98,22 @@ public class MapleMonsterInformationProvider {
                 if (rs != null) {
                     rs.close();
                 }
-            } catch (SQLException ignore) {
-            }
+            } catch (SQLException ignore) {}
         }
     }
-    
+
     public List<MonsterDropEntry> retrieveEffectiveDrop(final int monsterId) {
         List<MonsterDropEntry> list = retrieveDrop(monsterId);
-        if (hasNoMultiEquipDrops.contains(monsterId) || !GameConstants.USE_MULTIPLE_SAME_EQUIP_DROP) {
+        if (
+            hasNoMultiEquipDrops.contains(monsterId) ||
+            !GameConstants.USE_MULTIPLE_SAME_EQUIP_DROP
+        ) {
             return list;
         }
 
-        List<MonsterDropEntry> multiDrops = extraMultiEquipDrops.get(monsterId), extra = new LinkedList<>();
+        List<MonsterDropEntry> multiDrops = extraMultiEquipDrops.get(
+            monsterId
+        ), extra = new LinkedList<>();
         if (multiDrops == null) {
             multiDrops = new LinkedList<>();
 
@@ -115,13 +123,14 @@ public class MapleMonsterInformationProvider {
 
                     int rnd = Randomizer.rand(mde.Minimum, mde.Maximum);
                     for (int i = 0; i < rnd - 1; i++) {
-                        extra.add(mde);  
+                        extra.add(mde);
                     }
                 }
             }
-            if (!multiDrops.isEmpty()) extraMultiEquipDrops.put(monsterId, multiDrops);
-            else hasNoMultiEquipDrops.add(monsterId);
-
+            if (!multiDrops.isEmpty()) extraMultiEquipDrops.put(
+                monsterId,
+                multiDrops
+            ); else hasNoMultiEquipDrops.add(monsterId);
         } else {
             for (MonsterDropEntry mde : multiDrops) {
                 int rnd = Randomizer.rand(mde.Minimum, mde.Maximum);
@@ -148,12 +157,24 @@ public class MapleMonsterInformationProvider {
         Connection con = null;
         try {
             con = DatabaseConnection.getConnection();
-            ps = con.prepareStatement("SELECT itemid, chance, minimum_quantity, maximum_quantity, questid FROM drop_data WHERE dropperid = ?");
+            ps =
+                con.prepareStatement(
+                    "SELECT itemid, chance, minimum_quantity, maximum_quantity, questid FROM drop_data WHERE dropperid = ?"
+                );
             ps.setInt(1, monsterId);
             rs = ps.executeQuery();
-            
+
             while (rs.next()) {
-                ret.add(new MonsterDropEntry(rs.getInt("itemid"), rs.getInt("chance"), rs.getInt("minimum_quantity"), rs.getInt("maximum_quantity"), rs.getShort("questid"), monsterId));
+                ret.add(
+                    new MonsterDropEntry(
+                        rs.getInt("itemid"),
+                        rs.getInt("chance"),
+                        rs.getInt("minimum_quantity"),
+                        rs.getInt("maximum_quantity"),
+                        rs.getShort("questid"),
+                        monsterId
+                    )
+                );
             }
             con.close();
         } catch (SQLException e) {
@@ -175,7 +196,7 @@ public class MapleMonsterInformationProvider {
         drops.put(monsterId, ret);
         return ret;
     }
-    
+
     public final List<Integer> retrieveDropPool(final int monsterId) {
         if (dropsChancePool.containsKey(monsterId)) {
             return dropsChancePool.get(monsterId);
@@ -188,7 +209,9 @@ public class MapleMonsterInformationProvider {
 
         int accProp = 0;
         for (MonsterDropEntry mde : dropList) {
-            if (!ii.isQuestItem(mde.itemId) && !ii.isPartyQuestItem(mde.itemId)) {
+            if (
+                !ii.isQuestItem(mde.itemId) && !ii.isPartyQuestItem(mde.itemId)
+            ) {
                 accProp += mde.chance;
             }
 
@@ -197,12 +220,12 @@ public class MapleMonsterInformationProvider {
 
         if (accProp == 0) {
             ret.clear();
-        }   
+        }
 
         dropsChancePool.put(monsterId, ret);
         return ret;
     }
-    
+
     public final void clearDrops() {
         drops.clear();
         hasNoMultiEquipDrops.clear();

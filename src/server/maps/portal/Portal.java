@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -21,37 +21,35 @@
 
 package server.maps.portal;
 
+import client.Client;
 import java.awt.Point;
 
-import client.Client;
-
 public interface Portal {
-    
     public final int MAP_PORTAL = 2;
     public final int DOOR_PORTAL = 6;
-    
+
     public static final boolean OPEN = true;
     public static final boolean CLOSE = false;
 
     int getType();
-    
+
     int getId();
-    
+
     Point getPosition();
-    
+
     String getName();
-    
+
     String getTarget();
-    
+
     String getScriptName();
-    
+
     void setScriptName(String newName);
-    
+
     int getTargetMapId();
-    
+
     void enterPortal(Client c);
-    
+
     void setPortalState(boolean state);
-    
+
     boolean getPortalState();
 }

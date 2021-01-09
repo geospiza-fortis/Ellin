@@ -20,14 +20,13 @@ import constants.SkillConstants.Sniper;
 import constants.SkillConstants.SuperGm;
 import java.util.ArrayList;
 import java.util.List;
-
 import provider.MapleData;
 import provider.MapleDataTool;
 import server.MapleStatEffect;
 import server.life.Element;
 
 public class PlayerSkill {
-    
+
     public int job;
     private final int id;
     private Element element;
@@ -64,7 +63,9 @@ public class PlayerSkill {
             MapleData hit = data.getChildByPath("hit");
             MapleData ball = data.getChildByPath("ball");
             isBuff = effect != null && hit == null && ball == null;
-            isBuff |= action != null && MapleDataTool.getString("0", action, "").equals("alert2");
+            isBuff |=
+                action != null &&
+                MapleDataTool.getString("0", action, "").equals("alert2");
             switch (id) {
                 case 1121006: // rush
                 case 1221007: // rush
@@ -75,23 +76,23 @@ public class PlayerSkill {
                 case ILArchMage.BigBang:
                 case Bishop.BigBang:
                 case FPMage.Explosion:
-                case FPMage.PoisonMist: 
-                case Cleric.Heal: 
-                case Ranger.MortalBlow: 
-                case Sniper.MortalBlow: 
+                case FPMage.PoisonMist:
+                case Cleric.Heal:
+                case Ranger.MortalBlow:
+                case Sniper.MortalBlow:
                 case Assassin.Drain:
-                case Hermit.ShadowWeb: 
-                case Bandit.Steal: 
-                case Shadower.Smokescreen: 
-                case SuperGm.HealnDispel: 
+                case Hermit.ShadowWeb:
+                case Bandit.Steal:
+                case Shadower.Smokescreen:
+                case SuperGm.HealnDispel:
                 case Hero.MonsterMagnet:
-                case Paladin.MonsterMagnet: 
-                case DarkKnight.MonsterMagnet: 
+                case Paladin.MonsterMagnet:
+                case DarkKnight.MonsterMagnet:
                 case Marauder.EnergyCharge:
-                    isBuff = false; 
+                    isBuff = false;
                     break;
                 case 1001: // recovery
-                case 1002: // nimble feet 
+                case 1002: // nimble feet
                 case 1004: // monster riding
                 case 1005: // echo of hero
                 case 1001003: // iron body
@@ -100,7 +101,7 @@ public class PlayerSkill {
                 case 1101005: // axe booster
                 case 1201005: // bw booster
                 case 1301004: // spear booster
-                case 1301005: // polearm booster 
+                case 1301005: // polearm booster
                 case 3101002: // bow booster
                 case 3201002: // crossbow booster
                 case 4101003: // claw booster
@@ -204,39 +205,45 @@ public class PlayerSkill {
                 case 1111007: // armor crash
                 case 1211009: // magic crash
                 case 1311007: // power crash
-                case 2311005: // doom 
+                case 2311005: // doom
                 case 2121002: // mana reflection
                 case 2221002: // mana reflection
                 case 2321002: // mana reflection
                 case 2311001: // dispel
-                case 1201006: // threaten 
+                case 1201006: // threaten
                 case 4121004: // ninja ambush
                 case 4221004: // ninja ambush
                 case 5121009: // [PIRATE] Speed Infusion
                 case 5221010: // [PIRATE] Speed Infusion
                     isBuff = true;
-                break;
+                    break;
             }
         }
-        
+
         ret.chargeskill = data.getChildByPath("keydown") != null;
-        
+
         for (MapleData level : data.getChildByPath("level")) {
-            MapleStatEffect statEffect = MapleStatEffect.loadSkillEffectFromData(level, id, isBuff,  Byte.parseByte(level.getName()));
+            MapleStatEffect statEffect = MapleStatEffect.loadSkillEffectFromData(
+                level,
+                id,
+                isBuff,
+                Byte.parseByte(level.getName())
+            );
             ret.effects.add(statEffect);
         }
         ret.animationTime = 0;
         if (effect != null) {
             for (MapleData effectEntry : effect) {
-                ret.animationTime += MapleDataTool.getIntConvert("delay", effectEntry, 0);
+                ret.animationTime +=
+                    MapleDataTool.getIntConvert("delay", effectEntry, 0);
             }
         }
-     return ret;
+        return ret;
     }
 
     public MapleStatEffect getEffect(final int level) {
         if (effects.size() < level) {
-            if (effects.size() > 0) { 
+            if (effects.size() > 0) {
                 return effects.get(effects.size() - 1);
             }
             return null;
@@ -251,7 +258,7 @@ public class PlayerSkill {
     }
 
     public boolean canBeLearnedBy(PlayerJob job) {
-	int jid = job.getId();
+        int jid = job.getId();
         int skillForJob = id / 10000;
         if (jid / 100 != skillForJob / 100 && skillForJob / 100 != 0) {
             return false;
@@ -279,7 +286,13 @@ public class PlayerSkill {
 
     public boolean isBeginnerSkill() {
         int jobId = id / 10000;
-        return jobId == 0 || jobId == 1000 || jobId == 2000 || jobId == 2001 || jobId == 3000;
+        return (
+            jobId == 0 ||
+            jobId == 1000 ||
+            jobId == 2000 ||
+            jobId == 2001 ||
+            jobId == 3000
+        );
     }
 
     public boolean isGMSkill() {
@@ -289,12 +302,12 @@ public class PlayerSkill {
     public boolean getAction() {
         return action;
     }
-    
+
     public boolean isChargeSkill() {
         return chargeskill;
     }
 
     public boolean isActiveSkill() {
-    	return (id % 10000) / 1000 == 1;
+        return (id % 10000) / 1000 == 1;
     }
 }

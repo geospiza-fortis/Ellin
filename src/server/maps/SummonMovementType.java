@@ -7,11 +7,10 @@
 package server.maps;
 
 /**
- * 
+ *
  * @author GabrielSin
  */
 public enum SummonMovementType {
-        
     STATIONARY(0),
     FOLLOW(1),
     CIRCLE_FOLLOW(3);

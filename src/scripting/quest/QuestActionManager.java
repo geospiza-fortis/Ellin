@@ -26,7 +26,8 @@ import scripting.npc.NPCConversationManager;
 import server.quest.MapleQuest;
 
 public class QuestActionManager extends NPCConversationManager {
-    private final boolean start; 
+
+    private final boolean start;
     private final int quest;
 
     public QuestActionManager(Client c, int quest, int npc, boolean start) {
@@ -59,7 +60,7 @@ public class QuestActionManager extends NPCConversationManager {
     public boolean forceCompleteQuest() {
         return forceCompleteQuest(quest);
     }
-    
+
     public void startQuest() {
         forceStartQuest();
     }

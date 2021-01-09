@@ -49,9 +49,8 @@ import tools.FileLogger;
  */
 
 public class DueyProcessor {
-    
+
     public enum Actions {
-        
         TOSERVER_SEND_ITEM(0x02),
         TOSERVER_CLAIM_PACKAGE(0x04),
         TOSERVER_REMOVE_PACKAGE(0x05),
@@ -73,7 +72,7 @@ public class DueyProcessor {
         TOCLIENT_RECV_RECEIVER_WITH_UNIQUE(0x16),
         TOCLIENT_RECV_SUCCESSFUL_MSG(0x17),
         TOCLIENT_RECV_PACKAGE_MSG(0x1B);
-        
+
         final byte code;
 
         private Actions(int code) {
@@ -84,7 +83,7 @@ public class DueyProcessor {
             return code;
         }
     }
-    
+
     private static int getAccIdFromCNAME(String name, boolean accountid) {
         try {
             PreparedStatement ps;
@@ -109,7 +108,7 @@ public class DueyProcessor {
         }
         return -1;
     }
-    
+
     private static String getCurrentDate() {
         String date = "";
         Calendar cal = Calendar.getInstance();
@@ -119,7 +118,7 @@ public class DueyProcessor {
         date += day < 9 ? "0" + day + "-" : "" + day + "-";
         date += month < 9 ? "0" + month + "-" : "" + month + "-";
         date += year;
-        
+
         return date;
     }
 
@@ -127,12 +126,17 @@ public class DueyProcessor {
         Connection con = null;
         try {
             con = DatabaseConnection.getConnection();
-            
-            PreparedStatement ps = con.prepareStatement("DELETE FROM dueypackages WHERE PackageId = ?");
+
+            PreparedStatement ps = con.prepareStatement(
+                "DELETE FROM dueypackages WHERE PackageId = ?"
+            );
             ps.setInt(1, packageid);
             ps.executeUpdate();
             ps.close();
-            ps = con.prepareStatement("DELETE FROM dueyitems WHERE PackageId = ?");
+            ps =
+                con.prepareStatement(
+                    "DELETE FROM dueyitems WHERE PackageId = ?"
+                );
             ps.setInt(1, packageid);
             ps.executeUpdate();
             ps.close();
@@ -167,7 +171,11 @@ public class DueyProcessor {
                 eq.setOwner(rs.getString("owner"));
                 dueypack = new DueyPackages(rs.getInt("PackageId"), eq);
             } else if (rs.getInt("type") == 2) {
-                Item newItem = new Item(rs.getInt("itemid"), (short) 0, (short) rs.getInt("quantity"));
+                Item newItem = new Item(
+                    rs.getInt("itemid"),
+                    (short) 0,
+                    (short) rs.getInt("quantity")
+                );
                 newItem.setOwner(rs.getString("owner"));
                 dueypack = new DueyPackages(rs.getInt("PackageId"), newItem);
             } else {
@@ -179,7 +187,7 @@ public class DueyProcessor {
             return null;
         }
     }
-    
+
     private static void showDueyNotification(Client c, Player p) {
         Connection con = null;
         PreparedStatement ps = null;
@@ -187,13 +195,19 @@ public class DueyProcessor {
         ResultSet rs = null;
         try {
             con = DatabaseConnection.getConnection();
-            ps = con.prepareStatement("SELECT Mesos FROM dueypackages WHERE ReceiverId = ? and Checked = 1");
+            ps =
+                con.prepareStatement(
+                    "SELECT Mesos FROM dueypackages WHERE ReceiverId = ? and Checked = 1"
+                );
             ps.setInt(1, p.getId());
             rs = ps.executeQuery();
             if (rs.next()) {
                 try {
                     try (Connection con2 = DatabaseConnection.getConnection()) {
-                        pss = con2.prepareStatement("UPDATE dueypackages SET Checked = 0 where ReceiverId = ?");
+                        pss =
+                            con2.prepareStatement(
+                                "UPDATE dueypackages SET Checked = 0 where ReceiverId = ?"
+                            );
                         pss.setInt(1, p.getId());
                         pss.executeUpdate();
                         pss.close();
@@ -225,7 +239,7 @@ public class DueyProcessor {
             }
         }
     }
-    
+
     private static int getFee(long meso) {
         long fee = 0;
         if (meso >= 100000000) {
@@ -243,16 +257,27 @@ public class DueyProcessor {
         }
         return (int) fee;
     }
-    
+
     private static void addMesoToDB(int mesos, String sName, int recipientID) {
         addItemToDB(null, 1, mesos, sName, recipientID);
     }
 
-    public static void addItemToDB(Item item, int quantity, int mesos, String sName, int recipientID) {
+    public static void addItemToDB(
+        Item item,
+        int quantity,
+        int mesos,
+        String sName,
+        int recipientID
+    ) {
         Connection con = null;
         try {
             con = DatabaseConnection.getConnection();
-            try (PreparedStatement ps = con.prepareStatement("INSERT INTO dueypackages (ReceiverId, SenderName, Mesos, TimeStamp, Checked, Type) VALUES (?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
+            try (
+                PreparedStatement ps = con.prepareStatement(
+                    "INSERT INTO dueypackages (ReceiverId, SenderName, Mesos, TimeStamp, Checked, Type) VALUES (?, ?, ?, ?, ?, ?)",
+                    Statement.RETURN_GENERATED_KEYS
+                )
+            ) {
                 ps.setInt(1, recipientID);
                 ps.setString(2, sName);
                 ps.setInt(3, mesos);
@@ -263,13 +288,18 @@ public class DueyProcessor {
                     ps.executeUpdate();
                 } else {
                     ps.setInt(6, item.getType());
-                    
+
                     ps.executeUpdate();
                     try (ResultSet rs = ps.getGeneratedKeys()) {
                         rs.next();
                         PreparedStatement ps2;
-                        if (item.getInventoryType().equals(InventoryType.EQUIP)) {
-                            ps2 = con.prepareStatement("INSERT INTO dueyitems (PackageId, itemid, quantity, upgradeslots, level, str, dex, `int`, luk, hp, mp, watk, matk, wdef, mdef, acc, avoid, hands, speed, jump, owner) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                        if (
+                            item.getInventoryType().equals(InventoryType.EQUIP)
+                        ) {
+                            ps2 =
+                                con.prepareStatement(
+                                    "INSERT INTO dueyitems (PackageId, itemid, quantity, upgradeslots, level, str, dex, `int`, luk, hp, mp, watk, matk, wdef, mdef, acc, avoid, hands, speed, jump, owner) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                                );
                             Equip eq = (Equip) item;
                             ps2.setInt(2, eq.getItemId());
                             ps2.setInt(3, 1);
@@ -292,7 +322,10 @@ public class DueyProcessor {
                             ps2.setInt(20, eq.getJump());
                             ps2.setString(21, eq.getOwner());
                         } else {
-                            ps2 = con.prepareStatement("INSERT INTO dueyitems (PackageId, itemid, quantity, owner) VALUES (?, ?, ?, ?)");
+                            ps2 =
+                                con.prepareStatement(
+                                    "INSERT INTO dueyitems (PackageId, itemid, quantity, owner) VALUES (?, ?, ?, ?)"
+                                );
                             ps2.setInt(2, item.getItemId());
                             ps2.setInt(3, quantity);
                             ps2.setString(4, item.getOwner());
@@ -303,7 +336,7 @@ public class DueyProcessor {
                     }
                 }
             }
-            
+
             con.close();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -315,7 +348,11 @@ public class DueyProcessor {
         Connection con = null;
         try {
             con = DatabaseConnection.getConnection();
-            try (PreparedStatement ps = con.prepareStatement("SELECT * FROM dueypackages dp LEFT JOIN dueyitems di ON dp.PackageId=di.PackageId WHERE ReceiverId = ?")) {
+            try (
+                PreparedStatement ps = con.prepareStatement(
+                    "SELECT * FROM dueypackages dp LEFT JOIN dueyitems di ON dp.PackageId=di.PackageId WHERE ReceiverId = ?"
+                )
+            ) {
                 ps.setInt(1, p.getId());
                 try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
@@ -327,7 +364,7 @@ public class DueyProcessor {
                     }
                 }
             }
-            
+
             con.close();
             return packages;
         } catch (SQLException e) {
@@ -335,15 +372,40 @@ public class DueyProcessor {
             return null;
         }
     }
-    
-    public static void dueySendItem(Client c, byte inventId, short itemPos, short amount, int mesos, String recipient) {
+
+    public static void dueySendItem(
+        Client c,
+        byte inventId,
+        short itemPos,
+        short amount,
+        int mesos,
+        String recipient
+    ) {
         c.lockClient();
         try {
             final int fee = 5000;
             final long sendMesos = (long) mesos + fee;
-            if (mesos < 0 || sendMesos > Integer.MAX_VALUE || (amount < 1 && mesos == 0)) {
-                AutobanManager.getInstance().autoban(c, c.getPlayer().getName() + " tried to packet edit with duey.");
-                FileLogger.printError(FileLogger.EXPLOITS + c.getPlayer().getName() + ".txt", c.getPlayer().getName() + " tried to use duey with mesos " + mesos + " and amount " + amount + "\r\n");           	
+            if (
+                mesos < 0 ||
+                sendMesos > Integer.MAX_VALUE ||
+                (amount < 1 && mesos == 0)
+            ) {
+                AutobanManager
+                    .getInstance()
+                    .autoban(
+                        c,
+                        c.getPlayer().getName() +
+                        " tried to packet edit with duey."
+                    );
+                FileLogger.printError(
+                    FileLogger.EXPLOITS + c.getPlayer().getName() + ".txt",
+                    c.getPlayer().getName() +
+                    " tried to use duey with mesos " +
+                    mesos +
+                    " and amount " +
+                    amount +
+                    "\r\n"
+                );
                 return;
             }
             int finalcost = mesos + fee;
@@ -354,50 +416,110 @@ public class DueyProcessor {
                     if (accid != c.getAccountID()) {
                         send = true;
                     } else {
-                        c.announce(PacketCreator.SendDueyMSG(DueyProcessor.Actions.TOCLIENT_SEND_SAMEACC_ERROR.getCode()));
+                        c.announce(
+                            PacketCreator.SendDueyMSG(
+                                DueyProcessor.Actions.TOCLIENT_SEND_SAMEACC_ERROR.getCode()
+                            )
+                        );
                     }
                 } else {
-                    c.announce(PacketCreator.SendDueyMSG(DueyProcessor.Actions.TOCLIENT_SEND_NAME_DOES_NOT_EXIST.getCode()));
+                    c.announce(
+                        PacketCreator.SendDueyMSG(
+                            DueyProcessor.Actions.TOCLIENT_SEND_NAME_DOES_NOT_EXIST.getCode()
+                        )
+                    );
                 }
             } else {
-                c.announce(PacketCreator.SendDueyMSG(DueyProcessor.Actions.TOCLIENT_SEND_NOT_ENOUGH_MESOS.getCode()));
+                c.announce(
+                    PacketCreator.SendDueyMSG(
+                        DueyProcessor.Actions.TOCLIENT_SEND_NOT_ENOUGH_MESOS.getCode()
+                    )
+                );
             }
 
             Client rClient = null;
-            
+
             int channel = FindService.findChannel(recipient);
             if (channel > -1) {
                 ChannelServer rcserv = c.getChannelServer();
-                rClient = rcserv.getPlayerStorage().getCharacterByName(recipient).getClient();
+                rClient =
+                    rcserv
+                        .getPlayerStorage()
+                        .getCharacterByName(recipient)
+                        .getClient();
             }
-            
+
             if (send) {
                 if (inventId > 0) {
                     InventoryType inv = InventoryType.getByType(inventId);
-                    Item item = c.getPlayer().getInventory(inv).getItem(itemPos);
-                    if (item != null && c.getPlayer().getItemQuantity(item.getItemId(), false) >= amount) {
+                    Item item = c
+                        .getPlayer()
+                        .getInventory(inv)
+                        .getItem(itemPos);
+                    if (
+                        item != null &&
+                        c
+                            .getPlayer()
+                            .getItemQuantity(item.getItemId(), false) >=
+                        amount
+                    ) {
                         c.getPlayer().gainMeso(-finalcost, false);
-                        c.announce(PacketCreator.SendDueyMSG(DueyProcessor.Actions.TOCLIENT_SEND_SUCCESSFULLY_SENT.getCode()));
+                        c.announce(
+                            PacketCreator.SendDueyMSG(
+                                DueyProcessor.Actions.TOCLIENT_SEND_SUCCESSFULLY_SENT.getCode()
+                            )
+                        );
 
                         if (ItemConstants.isRechargeable(item.getItemId())) {
-                            InventoryManipulator.removeFromSlot(c, inv, itemPos, item.getQuantity(), true);
+                            InventoryManipulator.removeFromSlot(
+                                c,
+                                inv,
+                                itemPos,
+                                item.getQuantity(),
+                                true
+                            );
                         } else {
-                            InventoryManipulator.removeFromSlot(c, inv, itemPos, amount, true, false);
+                            InventoryManipulator.removeFromSlot(
+                                c,
+                                inv,
+                                itemPos,
+                                amount,
+                                true,
+                                false
+                            );
                         }
 
-                       // MapleKarmaManipulator.toggleKarmaFlagToUntradeable(item);
-                        addItemToDB(item, amount, mesos - getFee(mesos), c.getPlayer().getName(), getAccIdFromCNAME(recipient, false));
+                        // MapleKarmaManipulator.toggleKarmaFlagToUntradeable(item);
+                        addItemToDB(
+                            item,
+                            amount,
+                            mesos - getFee(mesos),
+                            c.getPlayer().getName(),
+                            getAccIdFromCNAME(recipient, false)
+                        );
                     } else {
                         if (item != null) {
-                            c.announce(PacketCreator.SendDueyMSG(DueyProcessor.Actions.TOCLIENT_SEND_INCORRECT_REQUEST.getCode()));
+                            c.announce(
+                                PacketCreator.SendDueyMSG(
+                                    DueyProcessor.Actions.TOCLIENT_SEND_INCORRECT_REQUEST.getCode()
+                                )
+                            );
                         }
                         return;
                     }
                 } else {
                     c.getPlayer().gainMeso(-finalcost, false);
-                    c.announce(PacketCreator.SendDueyMSG(DueyProcessor.Actions.TOCLIENT_SEND_SUCCESSFULLY_SENT.getCode()));    
+                    c.announce(
+                        PacketCreator.SendDueyMSG(
+                            DueyProcessor.Actions.TOCLIENT_SEND_SUCCESSFULLY_SENT.getCode()
+                        )
+                    );
 
-                    addMesoToDB(mesos - getFee(mesos), c.getPlayer().getName(), getAccIdFromCNAME(recipient, false));
+                    addMesoToDB(
+                        mesos - getFee(mesos),
+                        c.getPlayer().getName(),
+                        getAccIdFromCNAME(recipient, false)
+                    );
                 }
 
                 if (rClient != null && rClient.isLoggedIn()) {
@@ -408,7 +530,7 @@ public class DueyProcessor {
             c.unlockClient();
         }
     }
-    
+
     public static void dueyRemovePackage(Client c, int packageid) {
         c.lockClient();
         try {
@@ -418,7 +540,7 @@ public class DueyProcessor {
             c.unlockClient();
         }
     }
-    
+
     public static void dueyClaimPackage(Client c, int packageid) {
         c.lockClient();
         try {
@@ -428,7 +550,11 @@ public class DueyProcessor {
             try {
                 con = DatabaseConnection.getConnection();
                 DueyPackages dueypack;
-                try (PreparedStatement ps = con.prepareStatement("SELECT * FROM dueypackages LEFT JOIN dueyitems USING (PackageId) WHERE PackageId = ?")) {
+                try (
+                    PreparedStatement ps = con.prepareStatement(
+                        "SELECT * FROM dueypackages LEFT JOIN dueyitems USING (PackageId) WHERE PackageId = ?"
+                    )
+                ) {
                     ps.setInt(1, packageid);
                     try (ResultSet rs = ps.executeQuery()) {
                         dueypack = null;
@@ -443,29 +569,71 @@ public class DueyProcessor {
                     }
                 }
                 dp = dueypack;
-                if(dp == null) {
-                    c.announce(PacketCreator.SendDueyMSG(Actions.TOCLIENT_RECV_UNKNOWN_ERROR.getCode()));
-                    FileLogger.printError(FileLogger.EXPLOITS + c.getPlayer().getName() + ".txt", c.getPlayer().getName() + " tried to receive package from duey with id " + packageid + "\r\n");
+                if (dp == null) {
+                    c.announce(
+                        PacketCreator.SendDueyMSG(
+                            Actions.TOCLIENT_RECV_UNKNOWN_ERROR.getCode()
+                        )
+                    );
+                    FileLogger.printError(
+                        FileLogger.EXPLOITS + c.getPlayer().getName() + ".txt",
+                        c.getPlayer().getName() +
+                        " tried to receive package from duey with id " +
+                        packageid +
+                        "\r\n"
+                    );
                     return;
                 }
 
                 if (dp.getItem() != null) {
-                    if (!InventoryManipulator.checkSpace(c, dp.getItem().getItemId(), dp.getItem().getQuantity(), dp.getItem().getOwner())) {
+                    if (
+                        !InventoryManipulator.checkSpace(
+                            c,
+                            dp.getItem().getItemId(),
+                            dp.getItem().getQuantity(),
+                            dp.getItem().getOwner()
+                        )
+                    ) {
                         int itemid = dp.getItem().getItemId();
-                        if(ItemInformationProvider.getInstance().isPickupRestricted(itemid) && c.getPlayer().getInventory(ItemConstants.getInventoryType(itemid)).findById(itemid) != null) {
-                            c.announce(PacketCreator.SendDueyMSG(Actions.TOCLIENT_RECV_RECEIVER_WITH_UNIQUE.getCode()));
+                        if (
+                            ItemInformationProvider
+                                .getInstance()
+                                .isPickupRestricted(itemid) &&
+                            c
+                                .getPlayer()
+                                .getInventory(
+                                    ItemConstants.getInventoryType(itemid)
+                                )
+                                .findById(itemid) !=
+                            null
+                        ) {
+                            c.announce(
+                                PacketCreator.SendDueyMSG(
+                                    Actions.TOCLIENT_RECV_RECEIVER_WITH_UNIQUE.getCode()
+                                )
+                            );
                         } else {
-                            c.announce(PacketCreator.SendDueyMSG(Actions.TOCLIENT_RECV_NO_FREE_SLOTS.getCode()));
+                            c.announce(
+                                PacketCreator.SendDueyMSG(
+                                    Actions.TOCLIENT_RECV_NO_FREE_SLOTS.getCode()
+                                )
+                            );
                         }
 
                         return;
                     } else {
-                        InventoryManipulator.addFromDrop(c, dp.getItem(), "", false);
+                        InventoryManipulator.addFromDrop(
+                            c,
+                            dp.getItem(),
+                            "",
+                            false
+                        );
                     }
                 }
 
                 long gainmesos;
-                long totalmesos = (long) dp.getMesos() + c.getPlayer().getMeso();
+                long totalmesos = (long) dp.getMesos() +
+                c.getPlayer().getMeso();
 
                 if (totalmesos < 0 || dp.getMesos() < 0) {
                     gainmesos = 0;
@@ -473,8 +641,8 @@ public class DueyProcessor {
                     totalmesos = Math.min(totalmesos, Integer.MAX_VALUE);
                     gainmesos = totalmesos - c.getPlayer().getMeso();
                 }
-                
-                c.getPlayer().gainMeso((int)gainmesos, false);
+
+                c.getPlayer().gainMeso((int) gainmesos, false);
 
                 removeItemFromDB(packageid);
                 c.announce(PacketCreator.RemoveItemFromDuey(false, packageid));
@@ -487,11 +655,13 @@ public class DueyProcessor {
             c.unlockClient();
         }
     }
-    
+
     public static void dueySendTalk(Client c) {
         c.lockClient();
         try {
-            c.announce(PacketCreator.SendDuey((byte) 8, loadItems(c.getPlayer())));
+            c.announce(
+                PacketCreator.SendDuey((byte) 8, loadItems(c.getPlayer()))
+            );
         } finally {
             c.unlockClient();
         }

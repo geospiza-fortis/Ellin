@@ -72,9 +72,9 @@ public enum MonitoredLockType {
     REACTOR(42),
     CHR_SAVE(43),
     WORLD_SRVMESSAGES(44);
-    
+
     private final int i;
-    
+
     private MonitoredLockType(int val) {
         this.i = val;
     }

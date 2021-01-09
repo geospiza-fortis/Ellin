@@ -1,8 +1,8 @@
 package client.player.inventory;
 
-import client.player.inventory.types.InventoryType;
 import client.Client;
 import client.player.Player;
+import client.player.inventory.types.InventoryType;
 import constants.ItemConstants;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,7 +20,7 @@ import tools.locks.MonitoredReentrantLock;
 /**
  * @author Matze
  * Special thanks Ronan (HeavenMS)
-*/
+ */
 
 public class Inventory implements Iterable<Item> {
 
@@ -28,29 +28,32 @@ public class Inventory implements Iterable<Item> {
     private boolean checked = false;
     private final InventoryType type;
     private Map<Short, Item> inventory = new LinkedHashMap<>();
-    private Lock lock = new MonitoredReentrantLock(MonitoredLockType.INVENTORY, true);
+    private Lock lock = new MonitoredReentrantLock(
+        MonitoredLockType.INVENTORY,
+        true
+    );
 
     public Inventory(InventoryType type, byte slotLimit) {
         this.inventory = new LinkedHashMap<>();
         this.slotLimit = slotLimit;
         this.type = type;
     }
-    
+
     public boolean contains(short i) {
-    	return inventory.containsKey(i);
+        return inventory.containsKey(i);
     }
 
     public Item findById(int itemId) {
         lock.lock();
-           try {
+        try {
             for (Item item : inventory.values()) {
                 if (item.getItemId() == itemId) {
                     return item;
                 }
             }
-          return null;
+            return null;
         } finally {
-           lock.unlock();
+            lock.unlock();
         }
     }
 
@@ -66,7 +69,7 @@ public class Inventory implements Iterable<Item> {
         } finally {
             lock.unlock();
         }
-    } 
+    }
 
     public int countById(int itemId) {
         lock.lock();
@@ -77,9 +80,9 @@ public class Inventory implements Iterable<Item> {
                     possesed += item.getQuantity();
                 }
             }
-           return possesed;
+            return possesed;
         } finally {
-           lock.unlock();
+            lock.unlock();
         }
     }
 
@@ -87,18 +90,24 @@ public class Inventory implements Iterable<Item> {
         lock.lock();
         try {
             List<Item> ret = new ArrayList<>();
-            inventory.values().stream().filter((item) -> (item.getItemId() == itemId)).forEach((item) -> {
-                ret.add(item);
-            });
+            inventory
+                .values()
+                .stream()
+                .filter(item -> (item.getItemId() == itemId))
+                .forEach(
+                    item -> {
+                        ret.add(item);
+                    }
+                );
             if (ret.size() > 1) {
                 Collections.sort(ret);
             }
             return ret;
         } finally {
-          lock.unlock();   
+            lock.unlock();
         }
     }
-        
+
     public Collection<Item> list() {
         lock.lock();
         try {
@@ -107,7 +116,7 @@ public class Inventory implements Iterable<Item> {
             lock.unlock();
         }
     }
-        
+
     public short addItem(Item item) {
         lock.lock();
         try {
@@ -126,7 +135,9 @@ public class Inventory implements Iterable<Item> {
     public void addFromDB(Item item) {
         lock.lock();
         try {
-            if (item.getPosition() < 0 && !type.equals(InventoryType.EQUIPPED)) {
+            if (
+                item.getPosition() < 0 && !type.equals(InventoryType.EQUIPPED)
+            ) {
                 return;
             }
             if (item.getPosition() > 0 && type.equals(InventoryType.EQUIPPED)) {
@@ -134,7 +145,7 @@ public class Inventory implements Iterable<Item> {
             }
             inventory.put(item.getPosition(), item);
         } finally {
-            lock.unlock();    
+            lock.unlock();
         }
     }
 
@@ -150,22 +161,30 @@ public class Inventory implements Iterable<Item> {
                 source.setPosition(dSlot);
                 inventory.put(dSlot, source);
                 inventory.remove(sSlot);
-            } else if (target.getItemId() == source.getItemId() && !ItemConstants.isThrowingStar(source.getItemId()) && !ItemConstants.isBullet(source.getItemId())) {
+            } else if (
+                target.getItemId() == source.getItemId() &&
+                !ItemConstants.isThrowingStar(source.getItemId()) &&
+                !ItemConstants.isBullet(source.getItemId())
+            ) {
                 if (type.getType() == InventoryType.EQUIP.getType()) {
                     swap(target, source);
                 }
                 if (source.getQuantity() + target.getQuantity() > slotMax) {
-                    short rest = (short) ((source.getQuantity() + target.getQuantity()) - slotMax);
+                    short rest = (short) (
+                        (source.getQuantity() + target.getQuantity()) - slotMax
+                    );
                     source.setQuantity(rest);
                     target.setQuantity(slotMax);
                 } else {
-                    target.setQuantity((short) (source.getQuantity() + target.getQuantity()));
+                    target.setQuantity(
+                        (short) (source.getQuantity() + target.getQuantity())
+                    );
                     inventory.remove(sSlot);
                 }
-            } else  {
+            } else {
                 swap(target, source);
-            }    
-	} finally {
+            }
+        } finally {
             lock.unlock();
         }
     }
@@ -208,10 +227,10 @@ public class Inventory implements Iterable<Item> {
                 removeSlot(slot);
             }
         } finally {
-           lock.unlock();
+            lock.unlock();
         }
     }
-       
+
     public void removeSlot(short slot) {
         Item item;
         lock.lock();
@@ -251,7 +270,7 @@ public class Inventory implements Iterable<Item> {
         }
         return -1;
     }
-    
+
     public short getNumFreeSlot() {
         if (isFull()) {
             return 0;
@@ -269,7 +288,7 @@ public class Inventory implements Iterable<Item> {
         return type;
     }
 
-     @Override
+    @Override
     public Iterator<Item> iterator() {
         return Collections.unmodifiableCollection(list()).iterator();
     }
@@ -281,7 +300,7 @@ public class Inventory implements Iterable<Item> {
     public void checked(boolean yes) {
         checked = yes;
     }
-    
+
     public void addSlots(int add) {
         slotLimit += (byte) add;
     }
@@ -303,120 +322,165 @@ public class Inventory implements Iterable<Item> {
             lock.unlock();
         }
     }
-    
+
     public static boolean checkSpot(Player chr, Item item) {
-    	return !chr.getInventory(InventoryType.getByType(item.getType())).isFull();
+        return !chr
+            .getInventory(InventoryType.getByType(item.getType()))
+            .isFull();
     }
-    
-    public static boolean checkSpots(Player p, List<Pair<Item, InventoryType>> items) {
+
+    public static boolean checkSpots(
+        Player p,
+        List<Pair<Item, InventoryType>> items
+    ) {
         List<Integer> zeroedList = new ArrayList<>(5);
         for (byte i = 0; i < 5; i++) zeroedList.add(0);
-        
+
         return checkSpots(p, items, zeroedList);
     }
-    
-    public static boolean checkSpots(Player p, List<Pair<Item, InventoryType>> items, List<Integer> typesSlotsUsed) {
+
+    public static boolean checkSpots(
+        Player p,
+        List<Pair<Item, InventoryType>> items,
+        List<Integer> typesSlotsUsed
+    ) {
         Map<Integer, Short> rcvItems = new LinkedHashMap<>();
         Map<Integer, Byte> rcvTypes = new LinkedHashMap<>();
-        
-        items.stream().forEach((item) -> {
-            Integer itemId = item.left.getItemId();
-            Short quantity = rcvItems.get(itemId);
 
-            if (quantity == null) {
-                rcvItems.put(itemId, item.left.getQuantity());
-                rcvTypes.put(itemId, item.right.getType());
-            } else {
-                rcvItems.put(itemId, (short)(quantity + item.left.getQuantity()));
-            }
-        });
-        
+        items
+            .stream()
+            .forEach(
+                item -> {
+                    Integer itemId = item.left.getItemId();
+                    Short quantity = rcvItems.get(itemId);
+
+                    if (quantity == null) {
+                        rcvItems.put(itemId, item.left.getQuantity());
+                        rcvTypes.put(itemId, item.right.getType());
+                    } else {
+                        rcvItems.put(
+                            itemId,
+                            (short) (quantity + item.left.getQuantity())
+                        );
+                    }
+                }
+            );
+
         Client c = p.getClient();
-        for (Map.Entry<Integer, Short> it: rcvItems.entrySet()) {
+        for (Map.Entry<Integer, Short> it : rcvItems.entrySet()) {
             int itemType = rcvTypes.get(it.getKey()) - 1;
             int usedSlots = typesSlotsUsed.get(itemType);
 
-            int result = InventoryManipulator.checkSpaceProgressively(c, it.getKey(), it.getValue(), "", usedSlots);
+            int result = InventoryManipulator.checkSpaceProgressively(
+                c,
+                it.getKey(),
+                it.getValue(),
+                "",
+                usedSlots
+            );
             boolean hasSpace = ((result % 2) != 0);
 
             if (!hasSpace) return false;
             typesSlotsUsed.set(itemType, (result >> 1));
         }
-        
-    	return true;
+
+        return true;
     }
-    
+
     private static long fnvHash32(final String k) {
         final int FNV_32_INIT = 0x811c9dc5;
         final int FNV_32_PRIME = 0x01000193;
 
         int rv = FNV_32_INIT;
         final int len = k.length();
-        for(int i = 0; i < len; i++) {
+        for (int i = 0; i < len; i++) {
             rv ^= k.charAt(i);
             rv *= FNV_32_PRIME;
         }
-        
+
         return rv >= 0 ? rv : (2L * Integer.MAX_VALUE) + rv;
     }
-    
+
     private static Long hashKey(Integer itemId, String owner) {
         return (itemId.longValue() << 32L) + fnvHash32(owner);
     }
-    
-    public static boolean checkSpotsAndOwnership(Player p, List<Pair<Item, InventoryType>> items) {
+
+    public static boolean checkSpotsAndOwnership(
+        Player p,
+        List<Pair<Item, InventoryType>> items
+    ) {
         List<Integer> zeroedList = new ArrayList<>(5);
-        for(byte i = 0; i < 5; i++) zeroedList.add(0);
-        
+        for (byte i = 0; i < 5; i++) zeroedList.add(0);
+
         return checkSpotsAndOwnership(p, items, zeroedList);
     }
-    
-    public static boolean checkSpotsAndOwnership(Player p, List<Pair<Item, InventoryType>> items, List<Integer> typesSlotsUsed) {
+
+    public static boolean checkSpotsAndOwnership(
+        Player p,
+        List<Pair<Item, InventoryType>> items,
+        List<Integer> typesSlotsUsed
+    ) {
         Map<Long, Short> rcvItems = new LinkedHashMap<>();
         Map<Long, Byte> rcvTypes = new LinkedHashMap<>();
         Map<Long, String> rcvOwners = new LinkedHashMap<>();
-        
-        items.stream().forEach((item) -> {
-            Long itemHash = hashKey(item.left.getItemId(), item.left.getOwner());
-            Short quantity = rcvItems.get(itemHash);
-            
-            if (quantity == null) {
-                rcvItems.put(itemHash, item.left.getQuantity());
-                rcvTypes.put(itemHash, item.right.getType());
-                rcvOwners.put(itemHash, item.left.getOwner());
-            } else {
-                rcvItems.put(itemHash, (short)(quantity + item.left.getQuantity()));
-            }
-        });
-        
+
+        items
+            .stream()
+            .forEach(
+                item -> {
+                    Long itemHash = hashKey(
+                        item.left.getItemId(),
+                        item.left.getOwner()
+                    );
+                    Short quantity = rcvItems.get(itemHash);
+
+                    if (quantity == null) {
+                        rcvItems.put(itemHash, item.left.getQuantity());
+                        rcvTypes.put(itemHash, item.right.getType());
+                        rcvOwners.put(itemHash, item.left.getOwner());
+                    } else {
+                        rcvItems.put(
+                            itemHash,
+                            (short) (quantity + item.left.getQuantity())
+                        );
+                    }
+                }
+            );
+
         Client c = p.getClient();
-        for (Map.Entry<Long, Short> it: rcvItems.entrySet()) {
+        for (Map.Entry<Long, Short> it : rcvItems.entrySet()) {
             int itemType = rcvTypes.get(it.getKey()) - 1;
             int usedSlots = typesSlotsUsed.get(itemType);
 
             Long itemId = it.getKey() >> 32L;
 
-            int result = InventoryManipulator.checkSpaceProgressively(c, itemId.intValue(), it.getValue(), rcvOwners.get(it.getKey()), usedSlots);
+            int result = InventoryManipulator.checkSpaceProgressively(
+                c,
+                itemId.intValue(),
+                it.getValue(),
+                rcvOwners.get(it.getKey()),
+                usedSlots
+            );
             boolean hasSpace = ((result % 2) != 0);
 
             if (!hasSpace) return false;
             typesSlotsUsed.set(itemType, (result >> 1));
         }
-        
-    	return true;
+
+        return true;
     }
-    
+
     public int freeSlotCountById(int itemId, int required) {
         List<Item> itemList = listById(itemId);
         int openSlot = 0;
-        
+
         if (!ItemConstants.isRechargeable(itemId)) {
             for (Item item : itemList) {
                 required -= item.getQuantity();
 
-                if(required >= 0) {
+                if (required >= 0) {
                     openSlot++;
-                    if(required == 0) return openSlot;
+                    if (required == 0) return openSlot;
                 } else {
                     return openSlot;
                 }
@@ -427,16 +491,16 @@ public class Inventory implements Iterable<Item> {
 
                 if (required >= 0) {
                     openSlot++;
-                    if(required == 0) return openSlot;
+                    if (required == 0) return openSlot;
                 } else {
                     return openSlot;
                 }
             }
         }
-        
+
         return -1;
     }
-    
+
     public boolean isFullAfterSomeItems(int margin, int used) {
         lock.lock();
         try {
@@ -445,11 +509,11 @@ public class Inventory implements Iterable<Item> {
             lock.unlock();
         }
     }
-    
+
     public void lockInventory() {
         lock.lock();
     }
-    
+
     public void unlockInventory() {
         lock.unlock();
     }

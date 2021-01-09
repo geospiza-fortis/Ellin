@@ -1,6 +1,6 @@
 /*
 This file is part of the OdinMS Maple Story Server
-Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc> 
+Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc>
 Matthias Butz <matze@odinms.de>
 Jan Christian Meyer <vimes@odinms.de>
 
@@ -21,11 +21,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package provider;
 
 import java.util.List;
-
 import provider.wzxml.MapleDataType;
 
 public interface MapleData extends MapleDataEntity, Iterable<MapleData> {
-
     public String getName();
 
     public MapleDataType getType();

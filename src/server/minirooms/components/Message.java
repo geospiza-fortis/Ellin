@@ -7,7 +7,7 @@
 package server.minirooms.components;
 
 public class Message {
-    
+
     public final byte slot;
     public final String message;
 

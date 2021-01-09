@@ -25,82 +25,85 @@ import tools.TimerTools.MapTimer;
  * @author GabrielSin
  */
 public class MapleGuildContract {
-    
+
     private static final Map<Integer, String> pendingParty = new HashMap<>();
     private static final Map<Integer, Integer> agreeCount = new HashMap<>();
     private static final Map<Integer, Integer> declineCount = new HashMap<>();
     private static final Map<Integer, Integer> answerCount = new HashMap<>();
     private static ScheduledFuture<?> sendPacketTime = null;
     private static final ReentrantLock lock = new ReentrantLock();
-       
+
     public static int getAgreeCount(MapleParty party) {
         if (party == null) return 0;
         lock.lock();
         try {
-            return agreeCount.get(party.getId()); 
+            return agreeCount.get(party.getId());
         } finally {
-           lock.unlock();
-        }   
+            lock.unlock();
+        }
     }
-    
+
     public static int getDeclineCount(MapleParty party) {
         if (party == null) return 0;
         lock.lock();
         try {
             return declineCount.get(party.getId());
         } finally {
-           lock.unlock();
-        } 
+            lock.unlock();
+        }
     }
-    
+
     public static int getAnswerCount(MapleParty party) {
         if (party == null) return 0;
         lock.lock();
         try {
             return answerCount.get(party.getId());
         } finally {
-           lock.unlock();
-        }    
+            lock.unlock();
+        }
     }
-    
+
     public static String getGuildName(MapleParty party) {
         if (party == null) return null;
         lock.lock();
         try {
             return pendingParty.get(party.getId());
         } finally {
-           lock.unlock();
-        }   
+            lock.unlock();
+        }
     }
-    
+
     public static void gainAgreeCount(MapleParty party) {
         if (party == null) return;
         lock.lock();
         try {
             agreeCount.put(party.getId(), agreeCount.get(party.getId()) + 1);
         } finally {
-           lock.unlock();
+            lock.unlock();
         }
     }
-    
+
     public static void gainDeclineCount(MapleParty party) {
         if (party == null) return;
         lock.lock();
         try {
-            declineCount.put(party.getId(), declineCount.get(party.getId()) + 1);
+            declineCount.put(
+                party.getId(),
+                declineCount.get(party.getId()) + 1
+            );
         } finally {
-           lock.unlock(); 
+            lock.unlock();
         }
     }
-    
+
     public static boolean containsParty(MapleParty party) {
         return pendingParty.containsKey(party.getId());
     }
-    
+
     public static void clear(MapleParty party) {
         if (pendingParty.get(party.getId()) != null) {
             pendingParty.clear();
-        } 
+        }
         if (declineCount.get(party.getId()) != null) {
             declineCount.clear();
         }
@@ -114,22 +117,39 @@ public class MapleGuildContract {
             sendPacketTime.cancel(true);
         }
     }
-    
-    public static void sendContractMembers(Player p, String guildName, MapleParty party) {
+
+    public static void sendContractMembers(
+        Player p,
+        String guildName,
+        MapleParty party
+    ) {
         if (p != null) {
             if (containsParty(party)) {
-                sendNPCSay("The members of the group are still deciding, wait!", p.getClient());
+                sendNPCSay(
+                    "The members of the group are still deciding, wait!",
+                    p.getClient()
+                );
                 return;
             }
             if (isGuildNameAccept(guildName)) {
-                sendNPCSay("The name of the guild you chose is not valid !", p.getClient());
+                sendNPCSay(
+                    "The name of the guild you chose is not valid !",
+                    p.getClient()
+                );
                 return;
             }
             if (party == null) {
-                sendNPCSay("An error occurred. Please try again.", p.getClient());
+                sendNPCSay(
+                    "An error occurred. Please try again.",
+                    p.getClient()
+                );
                 return;
             }
-            if (p.getName() == null ? party.getLeader().getName() != null : !p.getName().equals(party.getLeader().getName())) {
+            if (
+                p.getName() == null
+                    ? party.getLeader().getName() != null
+                    : !p.getName().equals(party.getLeader().getName())
+            ) {
                 sendNPCSay("Ask your leader to speak to me!", p.getClient());
                 return;
             }
@@ -138,17 +158,35 @@ public class MapleGuildContract {
                 return;
             }
             if (p.getParty().getMembers().size() < 6) {
-                sendNPCSay("An error occurred. Please try again!", p.getClient());
+                sendNPCSay(
+                    "An error occurred. Please try again!",
+                    p.getClient()
+                );
                 return;
             }
             for (final Player mc : p.getPartyMembers()) {
-                if (mc.getGuild() != null || mc.getMapId() != MapConstants.GUILD_ROOM) {
-                    sendNPCSay("Someone is already in a guild or not on the map!", p.getClient());
+                if (
+                    mc.getGuild() != null ||
+                    mc.getMapId() != MapConstants.GUILD_ROOM
+                ) {
+                    sendNPCSay(
+                        "Someone is already in a guild or not on the map!",
+                        p.getClient()
+                    );
                     return;
                 }
             }
             for (Player mc : p.getPartyMembers()) {
-                mc.getClient().getSession().write(GuildPackets.ContractGuildMember(party.getId(), guildName, p.getName()));
+                mc
+                    .getClient()
+                    .getSession()
+                    .write(
+                        GuildPackets.ContractGuildMember(
+                            party.getId(),
+                            guildName,
+                            p.getName()
+                        )
+                    );
             }
             lock.lock();
             try {
@@ -159,13 +197,24 @@ public class MapleGuildContract {
             } finally {
                 lock.unlock();
             }
-            sendPacketTime = MapTimer.getInstance().schedule(() -> {
-                clear(party);
-            }, 35000);
+            sendPacketTime =
+                MapTimer
+                    .getInstance()
+                    .schedule(
+                        () -> {
+                            clear(party);
+                        },
+                        35000
+                    );
         }
     }
-    
-    public static void receivedVote(Client c, MapleParty party, boolean voteReceived, int characterId) {
+
+    public static void receivedVote(
+        Client c,
+        MapleParty party,
+        boolean voteReceived,
+        int characterId
+    ) {
         if (party == null || party.getLeader() == null) {
             return;
         }
@@ -178,22 +227,27 @@ public class MapleGuildContract {
         if (leader == null) {
             for (MaplePartyCharacter mc : party.getMembers()) {
                 if (mc != null) {
-                    mc.getPlayer().dropMessage("An error occurred. Please try again!");
+                    mc
+                        .getPlayer()
+                        .dropMessage("An error occurred. Please try again!");
                 }
             }
             return;
         }
         if (p.getParty().getMembers().size() < 6) {
-            sendNPCSay("There was an error, it seems that your group does not have all the necessary members.", leader.getClient());
+            sendNPCSay(
+                "There was an error, it seems that your group does not have all the necessary members.",
+                leader.getClient()
+            );
             clear(party);
             return;
         }
-        
+
         if (!containsParty(party)) {
-            sendNPCSay("An error occurred. Please try again!", p.getClient());  
+            sendNPCSay("An error occurred. Please try again!", p.getClient());
             return;
         }
-        
+
         int vote = voteReceived ? 1 : 0;
         switch (vote) {
             case 0:
@@ -202,32 +256,41 @@ public class MapleGuildContract {
             case 1:
                 gainAgreeCount(party);
                 break;
-        }       
-        int totalVotes = (getAgreeCount(party) + getDeclineCount(party)); 
+        }
+        int totalVotes = (getAgreeCount(party) + getDeclineCount(party));
         if (totalVotes == (getAnswerCount(party))) {
             if (getAgreeCount(party) == (getAnswerCount(party))) {
                 if (getGuildName(party) != null) {
                     createGuild(leader, getGuildName(party));
                     clear(party);
                 } else {
-                    sendNPCSay("An error occurred. Please try again!", leader.getClient());  
+                    sendNPCSay(
+                        "An error occurred. Please try again!",
+                        leader.getClient()
+                    );
                 }
             } else {
-                sendNPCSay("Unfortunately, someone does not agree with your guild proposal!", leader.getClient());
+                sendNPCSay(
+                    "Unfortunately, someone does not agree with your guild proposal!",
+                    leader.getClient()
+                );
                 clear(party);
             }
         }
     }
-    
+
     public static void sendNPCSay(String text, Client c) {
         c.announce(PacketCreator.GetNPCTalk(2010007, (byte) 0, text, "00 00"));
         c.announce(PacketCreator.EnableActions());
     }
-    
+
     public static void createGuild(Player p, String gName) {
         int gid = GuildService.createGuild(p.getId(), gName);
         if (gid == 0) {
-            p.getClient().getSession().write(GuildPackets.GenericGuildMessage((byte) 0x1C));
+            p
+                .getClient()
+                .getSession()
+                .write(GuildPackets.GenericGuildMessage((byte) 0x1C));
             return;
         }
         if (p.getMeso() < GameConstants.GUILD_CRETECOST) {
@@ -247,27 +310,54 @@ public class MapleGuildContract {
                     return;
                 }
                 mc.saveGuildStatus();
-                mc.getClient().getSession().write(GuildPackets.ShowGuildInfo(mc));
-                GuildService.setGuildMemberOnline(mc.getMGC(), true, mc.getClient().getChannel());
-                GuildHandler.respawnPlayer(mc);	
+                mc
+                    .getClient()
+                    .getSession()
+                    .write(GuildPackets.ShowGuildInfo(mc));
+                GuildService.setGuildMemberOnline(
+                    mc.getMGC(),
+                    true,
+                    mc.getClient().getChannel()
+                );
+                GuildHandler.respawnPlayer(mc);
             } else {
-                GuildService.setGuildMemberOnline(mc.getMGC(), true, mc.getClient().getChannel());
-                p.getClient().getSession().write(GuildPackets.ShowGuildInfo(mc));
-                GuildHandler.respawnPlayer(mc);	
+                GuildService.setGuildMemberOnline(
+                    mc.getMGC(),
+                    true,
+                    mc.getClient().getChannel()
+                );
+                p
+                    .getClient()
+                    .getSession()
+                    .write(GuildPackets.ShowGuildInfo(mc));
+                GuildHandler.respawnPlayer(mc);
             }
         }
         p.getClient().getSession().write(GuildPackets.ShowGuildInfo(p));
-        p.getClient().announce(PacketCreator.GetNPCTalk(2010007, (byte) 0, "Congratulations~ " + gName + " the guild has been successfully registered.", "00 00"));  
-        GuildHandler.respawnPlayer(p);	
+        p
+            .getClient()
+            .announce(
+                PacketCreator.GetNPCTalk(
+                    2010007,
+                    (byte) 0,
+                    "Congratulations~ " +
+                    gName +
+                    " the guild has been successfully registered.",
+                    "00 00"
+                )
+            );
+        GuildHandler.respawnPlayer(p);
     }
-    
+
     private static boolean isGuildNameAccept(String name) {
         if (name.length() < 3 || name.length() > 12) {
             return true;
         }
         for (int i = 0; i < name.length(); i++) {
-            if (!Character.isLowerCase(name.charAt(i)) && !Character.isUpperCase(name.charAt(i)))
-                return true;
+            if (
+                !Character.isLowerCase(name.charAt(i)) &&
+                !Character.isUpperCase(name.charAt(i))
+            ) return true;
         }
         return false;
     }

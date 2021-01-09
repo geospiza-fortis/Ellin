@@ -24,11 +24,11 @@ import handling.world.audit.ThreadTracker;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import tools.TimerTools.MiscTimer;
 
 /**
@@ -36,6 +36,7 @@ import tools.TimerTools.MiscTimer;
  * @author RonanLana
  */
 public class MonitoredWriteLock extends ReentrantReadWriteLock.WriteLock {
+
     private ScheduledFuture<?> timeoutSchedule = null;
     private StackTraceElement[] deadlockedState = null;
     private final MonitoredLockType id;
@@ -48,41 +49,49 @@ public class MonitoredWriteLock extends ReentrantReadWriteLock.WriteLock {
         this.id = lock.id;
         hashcode = this.hashCode();
     }
-    
+
     @Override
     public void lock() {
         if (GameConstants.USE_THREAD_TRACKER) {
-            if(deadlockedState != null) {
-                DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-                dateFormat.setTimeZone(TimeZone.getTimeZone(GameConstants.TIMEZONE));
+            if (deadlockedState != null) {
+                DateFormat dateFormat = new SimpleDateFormat(
+                    "dd-MM-yyyy HH:mm:ss"
+                );
+                dateFormat.setTimeZone(
+                    TimeZone.getTimeZone(GameConstants.TIMEZONE)
+                );
 
                 //FilePrinter.printError(FilePrinter.DEADLOCK_ERROR, "[CRITICAL] " + dateFormat.format(new Date()) + " Deadlock occurred when trying to use the '" + id.name() + "' lock resources:\r\n" + printStackTrace(deadlockedState) + "\r\n\r\n");
-                ThreadTracker.getInstance().accessThreadTracker(true, true, id, hashcode);
+                ThreadTracker
+                    .getInstance()
+                    .accessThreadTracker(true, true, id, hashcode);
                 deadlockedState = null;
             }
 
             registerLocking();
         }
-        
+
         super.lock();
     }
-    
+
     @Override
     public void unlock() {
         if (GameConstants.USE_THREAD_TRACKER) {
             unregisterLocking();
         }
-        
+
         super.unlock();
     }
-    
+
     @Override
     public boolean tryLock() {
-        if(super.tryLock()) {
+        if (super.tryLock()) {
             if (GameConstants.USE_THREAD_TRACKER) {
-                if(deadlockedState != null) {
+                if (deadlockedState != null) {
                     //FilePrinter.printError(FilePrinter.DEADLOCK_ERROR, "Deadlock occurred when trying to use the '" + id.name() + "' lock resources:\r\n" + printStackTrace(deadlockedState) + "\r\n\r\n");
-                    ThreadTracker.getInstance().accessThreadTracker(true, true, id, hashcode);
+                    ThreadTracker
+                        .getInstance()
+                        .accessThreadTracker(true, true, id, hashcode);
                     deadlockedState = null;
                 }
 
@@ -93,53 +102,63 @@ public class MonitoredWriteLock extends ReentrantReadWriteLock.WriteLock {
             return false;
         }
     }
-    
+
     private void registerLocking() {
         state.lock();
         try {
-            ThreadTracker.getInstance().accessThreadTracker(false, true, id, hashcode);
-        
-            if(reentrantCount.incrementAndGet() == 1) {
+            ThreadTracker
+                .getInstance()
+                .accessThreadTracker(false, true, id, hashcode);
+
+            if (reentrantCount.incrementAndGet() == 1) {
                 final Thread t = Thread.currentThread();
-                timeoutSchedule = MiscTimer.getInstance().schedule(new Runnable() {
-                    @Override
-                    public void run() {
-                        issueDeadlock(t);
-                    }
-                }, GameConstants.LOCK_MONITOR_TIME);
+                timeoutSchedule =
+                    MiscTimer
+                        .getInstance()
+                        .schedule(
+                            new Runnable() {
+                                @Override
+                                public void run() {
+                                    issueDeadlock(t);
+                                }
+                            },
+                            GameConstants.LOCK_MONITOR_TIME
+                        );
             }
         } finally {
             state.unlock();
         }
     }
-    
+
     private void unregisterLocking() {
         state.lock();
         try {
-            if(reentrantCount.decrementAndGet() == 0) {
-                if(timeoutSchedule != null) {
+            if (reentrantCount.decrementAndGet() == 0) {
+                if (timeoutSchedule != null) {
                     timeoutSchedule.cancel(false);
                     timeoutSchedule = null;
                 }
             }
-            
-            ThreadTracker.getInstance().accessThreadTracker(false, false, id, hashcode);
+
+            ThreadTracker
+                .getInstance()
+                .accessThreadTracker(false, false, id, hashcode);
         } finally {
             state.unlock();
         }
     }
-    
+
     private void issueDeadlock(Thread t) {
         deadlockedState = t.getStackTrace();
         //super.unlock();
     }
-    
+
     private static String printStackTrace(StackTraceElement[] list) {
         String s = "";
-        for(int i = 0; i < list.length; i++) {
+        for (int i = 0; i < list.length; i++) {
             s += ("    " + list[i].toString() + "\r\n");
         }
-        
+
         return s;
     }
 }

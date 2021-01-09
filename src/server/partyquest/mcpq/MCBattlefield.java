@@ -6,6 +6,9 @@
 
 package server.partyquest.mcpq;
 
+import static server.partyquest.mcpq.MCField.MCTeam.RED;
+
+import client.player.Player;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import packet.creators.CarnivalPackets;
 import packet.creators.PacketCreator;
-import client.player.Player;
 import server.life.MapleLifeFactory;
 import server.life.MapleMonster;
 import server.life.MobSkillFactory;
@@ -23,11 +25,9 @@ import server.maps.object.FieldObjectType;
 import server.maps.reactors.Reactor;
 import server.maps.reactors.ReactorFactory;
 import server.partyquest.mcpq.MCField.MCTeam;
-import static server.partyquest.mcpq.MCField.MCTeam.RED;
 import server.partyquest.mcpq.MCWZData.MCGuardianGenPos;
 import server.partyquest.mcpq.MCWZData.MCMobGenPos;
 import server.partyquest.mcpq.MCWZData.MCSummonMob;
-
 
 /**
  * Keeps track of guardians and spawns in MCPQ.
@@ -64,14 +64,19 @@ public class MCBattlefield {
     private void fetchCarnivalData() {
         wzData = this.map.getMCPQData();
         if (wzData == null) {
-            MCTracker.log("[MCPQ] Fetching carnival failed for map " + map.getId());
+            MCTracker.log(
+                "[MCPQ] Fetching carnival failed for map " + map.getId()
+            );
         }
     }
 
     private void getOriginalSpawnPoints() {
-        this.map.getSpawnPoints().forEach((sp) -> {
-            originalSpawns.add((SpawnPoint) sp);
-        });
+        this.map.getSpawnPoints()
+            .forEach(
+                sp -> {
+                    originalSpawns.add((SpawnPoint) sp);
+                }
+            );
     }
 
     private void populateGuardianSpawns() {
@@ -115,7 +120,7 @@ public class MCBattlefield {
         MCMobGenPos spawnPos = getRandomSpawnPos(chr.getMCPQTeam());
 
         MCTeam team = chr.getMCPQTeam();
-        if (spawnPos == null) { 
+        if (spawnPos == null) {
             chr.getClient().announce(CarnivalPackets.CarnivalMessage(2));
             return;
         }
@@ -128,12 +133,25 @@ public class MCBattlefield {
         }
 
         chr.getMCPQField().loseCP(chr, spendCp);
-        this.map.broadcastMessage(CarnivalPackets.PlayerSummoned(MonsterCarnival.TAB_SPAWNS, num, chr.getName()));
-        numMonstersSpawned++; 
+        this.map.broadcastMessage(
+                CarnivalPackets.PlayerSummoned(
+                    MonsterCarnival.TAB_SPAWNS,
+                    num,
+                    chr.getName()
+                )
+            );
+        numMonstersSpawned++;
 
         MapleMonster monster = MapleLifeFactory.getMonster(mobToSummon.id);
         Point pos = new Point(spawnPos.x, spawnPos.y);
-        SpawnPoint sp = new SpawnPoint(monster, pos, !monster.isMobile(), mobToSummon.mobTime, 0, chr.getTeam());
+        SpawnPoint sp = new SpawnPoint(
+            monster,
+            pos,
+            !monster.isMobile(),
+            mobToSummon.mobTime,
+            0,
+            chr.getTeam()
+        );
 
         addedSpawns.add(sp);
         updateMonsterBuffs();
@@ -158,12 +176,21 @@ public class MCBattlefield {
 
         if (success) {
             chr.getMCPQField().loseCP(chr, spendCp);
-            map.broadcastMessage(CarnivalPackets.PlayerSummoned(MonsterCarnival.TAB_DEBUFF, num, chr.getName()));
+            map.broadcastMessage(
+                CarnivalPackets.PlayerSummoned(
+                    MonsterCarnival.TAB_DEBUFF,
+                    num,
+                    chr.getName()
+                )
+            );
         } else {
-            chr.getClient().getSession().write(CarnivalPackets.CarnivalMessage(5));
+            chr
+                .getClient()
+                .getSession()
+                .write(CarnivalPackets.CarnivalMessage(5));
         }
     }
-    
+
     public void readdSpawn(MCMobGenPos pos, MCTeam team) {
         List<MCMobGenPos> lst = null;
         if (this.wzData.mapDivided) {
@@ -182,10 +209,10 @@ public class MCBattlefield {
         } else {
             lst = originalUnifiedSpawns;
         }
-        
+
         if (lst == null) {
             return;
-        } 
+        }
         lst.add(pos);
     }
 
@@ -221,8 +248,14 @@ public class MCBattlefield {
         }
 
         chr.getMCPQField().loseCP(chr, spendCp);
-        this.map.broadcastMessage(CarnivalPackets.PlayerSummoned(MonsterCarnival.TAB_GUARDIAN, num, chr.getName()));
-        numGuardiansSpawned++; 
+        this.map.broadcastMessage(
+                CarnivalPackets.PlayerSummoned(
+                    MonsterCarnival.TAB_GUARDIAN,
+                    num,
+                    chr.getName()
+                )
+            );
+        numGuardiansSpawned++;
         MCGuardianGenPos genPos = getRandomGuardianPos(team);
         Point spawnPos = new Point(genPos.x, genPos.y);
 
@@ -231,12 +264,22 @@ public class MCBattlefield {
             return;
         } else switch (team) {
             case RED:
-                reactor = new Reactor(ReactorFactory.getReactor(MonsterCarnival.GUARDIAN_RED), MonsterCarnival.GUARDIAN_RED);
+                reactor =
+                    new Reactor(
+                        ReactorFactory.getReactor(MonsterCarnival.GUARDIAN_RED),
+                        MonsterCarnival.GUARDIAN_RED
+                    );
                 reactor.setPosition(spawnPos);
                 redGuardianIdToPos.put(num, genPos);
                 break;
             case BLUE:
-                reactor = new Reactor(ReactorFactory.getReactor(MonsterCarnival.GUARDIAN_BLUE), MonsterCarnival.GUARDIAN_BLUE);
+                reactor =
+                    new Reactor(
+                        ReactorFactory.getReactor(
+                            MonsterCarnival.GUARDIAN_BLUE
+                        ),
+                        MonsterCarnival.GUARDIAN_BLUE
+                    );
                 reactor.setPosition(spawnPos);
                 blueGuardianIdToPos.put(num, genPos);
                 break;
@@ -248,12 +291,18 @@ public class MCBattlefield {
         map.spawnReactor(reactor);
 
         if (team == MCTeam.RED) {
-            redReactors.put(reactor.getObjectId(), MCSkillFactory.getMCGuardian(num));
+            redReactors.put(
+                reactor.getObjectId(),
+                MCSkillFactory.getMCGuardian(num)
+            );
         } else {
-            blueReactors.put(reactor.getObjectId(), MCSkillFactory.getMCGuardian(num));
+            blueReactors.put(
+                reactor.getObjectId(),
+                MCSkillFactory.getMCGuardian(num)
+            );
         }
 
-        map.setReactorState(reactor, (byte) 1); 
+        map.setReactorState(reactor, (byte) 1);
         updateMonsterBuffs();
     }
 
@@ -262,14 +311,22 @@ public class MCBattlefield {
             System.out.println("STATE: " + reactor.getState());
         }
         MCTeam team = p.getMCPQTeam();
-        if (team == MCTeam.RED && reactor.getId() == MonsterCarnival.GUARDIAN_RED) {
+        if (
+            team == MCTeam.RED &&
+            reactor.getId() == MonsterCarnival.GUARDIAN_RED
+        ) {
             return;
         }
-        if (team == MCTeam.BLUE && reactor.getId() == MonsterCarnival.GUARDIAN_BLUE) {
+        if (
+            team == MCTeam.BLUE &&
+            reactor.getId() == MonsterCarnival.GUARDIAN_BLUE
+        ) {
             return;
         }
         reactor.setState((byte) (reactor.getState() + 1));
-        map.broadcastMessage(PacketCreator.TriggerReactor(reactor, reactor.getState()));
+        map.broadcastMessage(
+            PacketCreator.TriggerReactor(reactor, reactor.getState())
+        );
 
         if (reactor.getState() > 3) {
             int reactorObjId = reactor.getObjectId();
@@ -285,9 +342,11 @@ public class MCBattlefield {
                 guardianGenPos = redGuardianIdToPos.remove(guard.getType());
             }
             numGuardiansSpawned--;
-            
+
             if (MonsterCarnival.DEBUG) {
-                System.out.println("Removing reactor with x = " + guardianGenPos.x);
+                System.out.println(
+                    "Removing reactor with x = " + guardianGenPos.x
+                );
             }
             if (wzData.mapDivided) {
                 if (team == MCTeam.RED) {
@@ -300,7 +359,9 @@ public class MCBattlefield {
             }
 
             if (MonsterCarnival.DEBUG) {
-                System.out.println("Attempting to remove buff " + guard.getName());
+                System.out.println(
+                    "Attempting to remove buff " + guard.getName()
+                );
             }
             updateMonsterBuffs();
         }
@@ -311,19 +372,29 @@ public class MCBattlefield {
             if (null == team) {
                 return null;
             } else switch (team) {
-                case RED: {
-                    int randIndex = (int) Math.floor(Math.random() * this.originalRedGuardianSpawns.size());
-                    return originalRedGuardianSpawns.remove(randIndex);
-                }
-                case BLUE: {
-                    int randIndex = (int) Math.floor(Math.random() * this.originalBlueGuardianSpawns.size());
-                    return originalBlueGuardianSpawns.remove(randIndex);
-                }
+                case RED:
+                    {
+                        int randIndex = (int) Math.floor(
+                            Math.random() *
+                            this.originalRedGuardianSpawns.size()
+                        );
+                        return originalRedGuardianSpawns.remove(randIndex);
+                    }
+                case BLUE:
+                    {
+                        int randIndex = (int) Math.floor(
+                            Math.random() *
+                            this.originalBlueGuardianSpawns.size()
+                        );
+                        return originalBlueGuardianSpawns.remove(randIndex);
+                    }
                 default:
                     return null;
             }
         } else {
-            int randIndex = (int) Math.floor(Math.random() * this.originalGuardianSpawns.size());
+            int randIndex = (int) Math.floor(
+                Math.random() * this.originalGuardianSpawns.size()
+            );
             return originalGuardianSpawns.remove(randIndex);
         }
     }
@@ -346,10 +417,10 @@ public class MCBattlefield {
         } else {
             lst = originalUnifiedSpawns;
         }
-        
+
         if (lst == null) {
             return null;
-        } 
+        }
         if (lst.isEmpty()) {
             return null;
         }
@@ -361,63 +432,117 @@ public class MCBattlefield {
         List<MCGuardian> redGuardians = new ArrayList<>();
         List<MCGuardian> blueGuardians = new ArrayList<>();
 
-        this.redReactors.values().stream().map((g) -> {
-            redGuardians.add(g);
-            return g;
-        }).filter((g) -> (MonsterCarnival.DEBUG)).forEachOrdered((g) -> {
-            System.out.println("update buff red " + g.getMobSkillID());
-        });
-        this.blueReactors.values().stream().map((g) -> {
-            blueGuardians.add(g);
-            return g;
-        }).filter((g) -> (MonsterCarnival.DEBUG)).forEachOrdered((g) -> {
-            System.out.println("update buff blue " + g.getMobSkillID());
-        });
+        this.redReactors.values()
+            .stream()
+            .map(
+                g -> {
+                    redGuardians.add(g);
+                    return g;
+                }
+            )
+            .filter(g -> (MonsterCarnival.DEBUG))
+            .forEachOrdered(
+                g -> {
+                    System.out.println("update buff red " + g.getMobSkillID());
+                }
+            );
+        this.blueReactors.values()
+            .stream()
+            .map(
+                g -> {
+                    blueGuardians.add(g);
+                    return g;
+                }
+            )
+            .filter(g -> (MonsterCarnival.DEBUG))
+            .forEachOrdered(
+                g -> {
+                    System.out.println("update buff blue " + g.getMobSkillID());
+                }
+            );
 
-        map.getAllMonsters().stream().filter((mmo) -> (mmo.getType() == FieldObjectType.MONSTER)).map((mmo) -> ((MapleMonster) mmo)).map((mob) -> {
-            mob.dispel();
-            return mob;
-        }).forEachOrdered((mob) -> {
-            if (mob.getTeam() == MCField.MCTeam.RED.code) {
-                applyGuardians(mob, redGuardians);
-            } else if (mob.getTeam() == MCField.MCTeam.BLUE.code) {
-                applyGuardians(mob, blueGuardians);
-            } else {
-                MCTracker.log("[MCPQ] Attempting to give guardians to mob without team.");
-            }
-        });
+        map
+            .getAllMonsters()
+            .stream()
+            .filter(mmo -> (mmo.getType() == FieldObjectType.MONSTER))
+            .map(mmo -> ((MapleMonster) mmo))
+            .map(
+                mob -> {
+                    mob.dispel();
+                    return mob;
+                }
+            )
+            .forEachOrdered(
+                mob -> {
+                    if (mob.getTeam() == MCField.MCTeam.RED.code) {
+                        applyGuardians(mob, redGuardians);
+                    } else if (mob.getTeam() == MCField.MCTeam.BLUE.code) {
+                        applyGuardians(mob, blueGuardians);
+                    } else {
+                        MCTracker.log(
+                            "[MCPQ] Attempting to give guardians to mob without team."
+                        );
+                    }
+                }
+            );
     }
 
     private void giveMonsterBuffs(MapleMonster mob) {
         List<MCGuardian> redGuardians = new ArrayList<>();
         List<MCGuardian> blueGuardians = new ArrayList<>();
 
-        this.redReactors.values().stream().map((g) -> {
-            redGuardians.add(g);
-            return g;
-        }).filter((g) -> (MonsterCarnival.DEBUG)).forEachOrdered((g) -> {
-            System.out.println("update buff red " + g.getMobSkillID());
-        });
-        this.blueReactors.values().stream().map((g) -> {
-            blueGuardians.add(g);
-            return g;
-        }).filter((g) -> (MonsterCarnival.DEBUG)).forEachOrdered((g) -> {
-            System.out.println("update buff blue " + g.getMobSkillID());
-        });
+        this.redReactors.values()
+            .stream()
+            .map(
+                g -> {
+                    redGuardians.add(g);
+                    return g;
+                }
+            )
+            .filter(g -> (MonsterCarnival.DEBUG))
+            .forEachOrdered(
+                g -> {
+                    System.out.println("update buff red " + g.getMobSkillID());
+                }
+            );
+        this.blueReactors.values()
+            .stream()
+            .map(
+                g -> {
+                    blueGuardians.add(g);
+                    return g;
+                }
+            )
+            .filter(g -> (MonsterCarnival.DEBUG))
+            .forEachOrdered(
+                g -> {
+                    System.out.println("update buff blue " + g.getMobSkillID());
+                }
+            );
 
         if (mob.getTeam() == MCTeam.RED.code) {
             applyGuardians(mob, redGuardians);
         } else if (mob.getTeam() == MCTeam.BLUE.code) {
             applyGuardians(mob, blueGuardians);
         } else {
-            MCTracker.log("[MCPQ] Attempting to give guardians to mob without team.");
+            MCTracker.log(
+                "[MCPQ] Attempting to give guardians to mob without team."
+            );
         }
     }
 
     private void applyGuardians(MapleMonster mob, List<MCGuardian> guardians) {
-        guardians.stream().map((g) -> MobSkillFactory.getMobSkill(g.getMobSkillID(), g.getLevel())).forEachOrdered((sk) -> {
-            sk.applyEffect(null, mob, true);
-        });
+        guardians
+            .stream()
+            .map(
+                g ->
+                    MobSkillFactory.getMobSkill(g.getMobSkillID(), g.getLevel())
+            )
+            .forEachOrdered(
+                sk -> {
+                    sk.applyEffect(null, mob, true);
+                }
+            );
     }
 
     public void spawningTask() {
@@ -435,5 +560,5 @@ public class MCBattlefield {
                 this.map.spawnMonster(m);
             }
         }
-    } 
-}  
+    }
+}

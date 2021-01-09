@@ -1,8 +1,7 @@
 package cashshop;
 
-
 public class CashCouponData {
-    
+
     private final byte type;
     private final int data;
     private final int quantity;

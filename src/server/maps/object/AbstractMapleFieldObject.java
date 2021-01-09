@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -23,9 +23,8 @@ package server.maps.object;
 
 import java.awt.Point;
 
-
 public abstract class AbstractMapleFieldObject implements FieldObject {
-    
+
     private Point position = new Point();
     private int objectId;
 
@@ -56,5 +55,5 @@ public abstract class AbstractMapleFieldObject implements FieldObject {
     @Override
     public void setObjectId(int id) {
         this.objectId = id;
-    }    
+    }
 }

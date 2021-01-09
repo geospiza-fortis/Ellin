@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -20,14 +20,17 @@
  */
 package scripting.npc;
 
-import java.util.List;
 import client.player.Player;
 import community.MaplePartyCharacter;
+import java.util.List;
 import server.partyquest.mcpq.MCParty;
 
 public interface NPCScript {
     public void start();
+
     public void start(Player chr);
+
     public void start(List<MaplePartyCharacter> chrs, MCParty pty);
+
     public void action(byte mode, byte type, int selection);
 }

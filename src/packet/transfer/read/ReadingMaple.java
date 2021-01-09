@@ -64,7 +64,16 @@ public class ReadingMaple {
         long byte6 = this.bs.readByte();
         long byte7 = this.bs.readByte();
         long byte8 = this.bs.readByte();
-        return (byte8 << 56) + (byte7 << 48) + (byte6 << 40) + (byte5 << 32) + (byte4 << 24) + (byte3 << 16) + (byte2 << 8) + byte1;
+        return (
+            (byte8 << 56) +
+            (byte7 << 48) +
+            (byte6 << 40) +
+            (byte5 << 32) +
+            (byte4 << 24) +
+            (byte3 << 16) +
+            (byte2 << 8) +
+            byte1
+        );
     }
 
     public long readFLong() {
@@ -76,7 +85,16 @@ public class ReadingMaple {
         long byte6 = this.bs.readByte();
         long byte7 = this.bs.readByte();
         long byte8 = this.bs.readByte();
-        return (byte8 << 24) + (byte7 << 16) + (byte6 << 8) + byte5 + (byte4 << 56) + (byte3 << 48) + (byte2 << 40) + (byte1 << 32);
+        return (
+            (byte8 << 24) +
+            (byte7 << 16) +
+            (byte6 << 8) +
+            byte5 +
+            (byte4 << 56) +
+            (byte3 << 48) +
+            (byte2 << 40) +
+            (byte1 << 32)
+        );
     }
 
     public float readFloat() {
@@ -92,7 +110,10 @@ public class ReadingMaple {
         for (int x = 0; x < n; x++) {
             ret[x] = readByte();
         }
-        return new String(ret, Charset.forName(MapleLanguageType.LANGUAGE_PT_BR.getAscii()));
+        return new String(
+            ret,
+            Charset.forName(MapleLanguageType.LANGUAGE_PT_BR.getAscii())
+        );
     }
 
     public String readNullTerminatedAsciiString() {
@@ -103,7 +124,10 @@ public class ReadingMaple {
             baos.write(b);
         }
         byte[] buf = baos.toByteArray();
-        return new String(buf, Charset.forName(MapleLanguageType.LANGUAGE_PT_BR.getAscii()));
+        return new String(
+            buf,
+            Charset.forName(MapleLanguageType.LANGUAGE_PT_BR.getAscii())
+        );
     }
 
     public long getBytesRead() {

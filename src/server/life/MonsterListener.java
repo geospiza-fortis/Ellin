@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -24,8 +24,9 @@ package server.life;
 import client.player.Player;
 
 public interface MonsterListener {
-    
     public void monsterKilled(int aniTime);
+
     public void monsterDamaged(Player from, int trueDmg);
+
     public void monsterHealed(int trueHeal);
 }

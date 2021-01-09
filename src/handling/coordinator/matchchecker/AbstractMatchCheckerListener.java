@@ -27,8 +27,27 @@ import java.util.Set;
  * @author Ronan
  */
 public interface AbstractMatchCheckerListener {
-    public void onMatchCreated(Player leader, Set<Player> nonLeaderMatchPlayers, String message);
-    public void onMatchAccepted(int leaderid, Set<Player> matchPlayers, String message);
-    public void onMatchDeclined(int leaderid, Set<Player> matchPlayers, String message);
-    public void onMatchDismissed(int leaderid, Set<Player> matchPlayers, String message);
+    public void onMatchCreated(
+        Player leader,
+        Set<Player> nonLeaderMatchPlayers,
+        String message
+    );
+
+    public void onMatchAccepted(
+        int leaderid,
+        Set<Player> matchPlayers,
+        String message
+    );
+
+    public void onMatchDeclined(
+        int leaderid,
+        Set<Player> matchPlayers,
+        String message
+    );
+
+    public void onMatchDismissed(
+        int leaderid,
+        Set<Player> matchPlayers,
+        String message
+    );
 }

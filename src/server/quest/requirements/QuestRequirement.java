@@ -5,14 +5,13 @@
  */
 package server.quest.requirements;
 
+import client.player.Player;
 import java.util.HashMap;
 import java.util.Map;
-
 import provider.MapleData;
 import provider.MapleDataTool;
 import server.quest.MapleQuest;
 import server.quest.MapleQuestRequirementType;
-import client.player.Player;
 import server.quest.MapleQuestStatus;
 
 /**
@@ -20,6 +19,7 @@ import server.quest.MapleQuestStatus;
  * @author Tyler (Twdtwd)
  */
 public final class QuestRequirement extends MapleQuestRequirement {
+
     Map<Integer, Integer> quests = new HashMap<>();
 
     public QuestRequirement(MapleQuest quest, MapleData data) {
@@ -28,14 +28,16 @@ public final class QuestRequirement extends MapleQuestRequirement {
     }
 
     /**
-     * 
-     * @param data 
+     *
+     * @param data
      */
     @Override
     public void processData(MapleData data) {
         for (MapleData questEntry : data.getChildren()) {
             int questID = MapleDataTool.getInt(questEntry.getChildByPath("id"));
-            int stateReq = MapleDataTool.getInt(questEntry.getChildByPath("state"));
+            int stateReq = MapleDataTool.getInt(
+                questEntry.getChildByPath("state")
+            );
             quests.put(questID, stateReq);
         }
     }
@@ -46,11 +48,19 @@ public final class QuestRequirement extends MapleQuestRequirement {
             int stateReq = quests.get(questID);
             MapleQuestStatus q = chr.getQuest(MapleQuest.getInstance(questID));
 
-            if (q == null && MapleQuestStatus.Status.getById(stateReq).equals(MapleQuestStatus.Status.NOT_STARTED)) {
+            if (
+                q == null &&
+                MapleQuestStatus.Status
+                    .getById(stateReq)
+                    .equals(MapleQuestStatus.Status.NOT_STARTED)
+            ) {
                 continue;
             }
-            
-            if (q == null || !q.getStatus().equals(MapleQuestStatus.Status.getById(stateReq))) {
+
+            if (
+                q == null ||
+                !q.getStatus().equals(MapleQuestStatus.Status.getById(stateReq))
+            ) {
                 return false;
             }
         }

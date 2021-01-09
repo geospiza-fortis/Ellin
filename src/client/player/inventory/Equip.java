@@ -1,7 +1,7 @@
 package client.player.inventory;
 
-import client.player.inventory.types.ItemType;
 import client.player.PlayerJob;
+import client.player.inventory.types.ItemType;
 
 public class Equip extends Item {
 
@@ -32,7 +32,7 @@ public class Equip extends Item {
     }
 
     public Equip(int id, short position, int uniqueid) {
-        super(id, position, (short) 1, uniqueid);  
+        super(id, position, (short) 1, uniqueid);
     }
 
     @Override
@@ -76,7 +76,7 @@ public class Equip extends Item {
     public byte getLocked() {
         return locked;
     }
-    
+
     @Override
     public long getExpiration() {
         return expiration;
@@ -149,7 +149,7 @@ public class Equip extends Item {
     public void wear(boolean yes) {
         wear = yes;
     }
-    
+
     @Override
     public void setExpiration(long expiration) {
         this.expiration = expiration;
@@ -158,7 +158,7 @@ public class Equip extends Item {
     public byte getLevel() {
         return level;
     }
-    
+
     @Override
     public String getGiftFrom() {
         return giftFrom;
@@ -244,71 +244,77 @@ public class Equip extends Item {
     public void setLevel(byte level) {
         this.level = level;
     }
-    
+
     public void setJob(PlayerJob job) {
         this.job = job;
     }
-    
-    public void gainStrPoints(int gain){
-       this.str += gain;
+
+    public void gainStrPoints(int gain) {
+        this.str += gain;
     }
-    
-    public void gainDexPoints(int gain){
-       this.dex += gain;
+
+    public void gainDexPoints(int gain) {
+        this.dex += gain;
     }
-    
-    public void gainIntPoints(int gain){
-       this._int += gain;
+
+    public void gainIntPoints(int gain) {
+        this._int += gain;
     }
-    
-    public void gainLukPoints(int gain){
-       this.luk += gain;
+
+    public void gainLukPoints(int gain) {
+        this.luk += gain;
     }
-    
-    public void gainMatkPoints(int gain){
-       this.matk += gain;
+
+    public void gainMatkPoints(int gain) {
+        this.matk += gain;
     }
-    
-    public void gainWatkPoints(int gain){
-       this.watk += gain;
+
+    public void gainWatkPoints(int gain) {
+        this.watk += gain;
     }
-    
-    public void gainAccPoints(int gain){
-       this.acc += gain;
+
+    public void gainAccPoints(int gain) {
+        this.acc += gain;
     }
-    
-    public void gainAvoidPoints(int gain){
-       this.avoid += gain;
+
+    public void gainAvoidPoints(int gain) {
+        this.avoid += gain;
     }
-    
-    public void gainJumpPoints(int gain){
-       this.jump += gain;
+
+    public void gainJumpPoints(int gain) {
+        this.jump += gain;
     }
-     
-    public void gainSpeedPoints(int gain){
-       this.speed += gain;
+
+    public void gainSpeedPoints(int gain) {
+        this.speed += gain;
     }
-     
-    public void gainWdefPoints(int gain){
-       this.wdef += gain;
+
+    public void gainWdefPoints(int gain) {
+        this.wdef += gain;
     }
-     
-    public void gainMdefPoints(int gain){
-       this.mdef += gain;
+
+    public void gainMdefPoints(int gain) {
+        this.mdef += gain;
     }
-     
-    public void gainHpPoints(int gain){
-       this.hp += gain;
+
+    public void gainHpPoints(int gain) {
+        this.hp += gain;
     }
-         
-    public void gainMpPoints(int gain){
-       this.mp += gain;
-    } 
+
+    public void gainMpPoints(int gain) {
+        this.mp += gain;
+    }
 
     @Override
     public void setQuantity(short quantity) {
         if (quantity < 0 || quantity > 1) {
-            throw new RuntimeException("Setting the quantity to " + quantity + " on an equip (itemid: " + getItemId() + ")");
+            throw new RuntimeException(
+                "Setting the quantity to " +
+                quantity +
+                " on an equip (itemid: " +
+                getItemId() +
+                ")"
+            );
         }
         super.setQuantity(quantity);
     }

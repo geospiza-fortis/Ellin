@@ -13,7 +13,8 @@ import packet.creators.PacketCreator;
 
 public class AutobanManager implements Runnable {
 
-    private static class ExpirationEntry implements Comparable<ExpirationEntry> {
+    private static class ExpirationEntry
+        implements Comparable<ExpirationEntry> {
 
         public long time;
         public int acc;
@@ -49,12 +50,17 @@ public class AutobanManager implements Runnable {
         addPoints(c, autobanPoints, 0, reason);
     }
 
-    public synchronized void addPoints(Client c, int points, long expiration, String reason) {
+    public synchronized void addPoints(
+        Client c,
+        int points,
+        long expiration,
+        String reason
+    ) {
         if (c.getPlayer().isGameMaster()) return;
-        
+
         int acc = c.getPlayer().getAccountID();
         List<String> reasonList;
-        
+
         if (this.points.containsKey(acc)) {
             if (this.points.get(acc) >= autobanPoints) {
                 return;
@@ -76,12 +82,26 @@ public class AutobanManager implements Runnable {
             }
             if (GameConstants.AUTO_BAN) {
                 c.getPlayer().ban(banReason.toString(), true);
-                BroadcastService.broadcastGMMessage(PacketCreator.ServerNotice(6, name + " has been banned by the system. (Reason: " + reason + ")"));
+                BroadcastService.broadcastGMMessage(
+                    PacketCreator.ServerNotice(
+                        6,
+                        name +
+                        " has been banned by the system. (Reason: " +
+                        reason +
+                        ")"
+                    )
+                );
             }
             return;
         }
         if (expiration > 0) {
-            expirations.add(new ExpirationEntry(System.currentTimeMillis() + expiration, acc, points));
+            expirations.add(
+                new ExpirationEntry(
+                    System.currentTimeMillis() + expiration,
+                    acc,
+                    points
+                )
+            );
         }
     }
 

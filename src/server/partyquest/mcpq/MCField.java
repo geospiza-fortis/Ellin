@@ -6,21 +6,21 @@
 
 package server.partyquest.mcpq;
 
+import client.player.Player;
 import handling.channel.ChannelServer;
 import java.util.*;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import packet.creators.CarnivalPackets;
 import packet.creators.EffectPackets;
 import packet.creators.PacketCreator;
 import packet.transfer.write.OutPacket;
-import client.player.Player;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import server.MapleStatEffect;
 import server.itens.ItemInformationProvider;
 import server.maps.Field;
 import server.maps.FieldItem;
-import server.maps.reactors.Reactor;
 import server.maps.portal.Portal;
+import server.maps.reactors.Reactor;
 import tools.TimerTools.EventTimer;
 
 /**
@@ -36,6 +36,7 @@ public class MCField {
         RED(0),
         BLUE(1),
         NONE(-1);
+
         public final int code;
 
         MCTeam(int code) {
@@ -53,7 +54,7 @@ public class MCField {
     public enum MCState {
         LOBBY,
         BATTLE,
-        END;
+        END,
     }
 
     /**
@@ -66,6 +67,7 @@ public class MCField {
         VICTORY(3),
         DEFEAT(4),
         NONE(-1);
+
         private final int code;
 
         MCMaps(int code) {
@@ -92,9 +94,7 @@ public class MCField {
     private final ReentrantReadWriteLock MCFieldLocked = new ReentrantReadWriteLock();
 
     // Timer Tasks
-    private ScheduledFuture<?> acceptRequestsTask, validateRoomTask, startBattleTask,
-            validateBattleTask, runBattleTask, endBattleTask,
-            spawnMonstersTask;
+    private ScheduledFuture<?> acceptRequestsTask, validateRoomTask, startBattleTask, validateBattleTask, runBattleTask, endBattleTask, spawnMonstersTask;
 
     public MCField(int arena, ChannelServer cserv, MCParty red, MCParty blue) {
         this.arena = arena;
@@ -129,7 +129,6 @@ public class MCField {
                 this.blue.deregisterPlayers();
             }
         }
-
 
         this.red = null;
         this.blue = null;
@@ -187,20 +186,24 @@ public class MCField {
         if (this.red != null) {
             red.broadcast(pkt);
         } else {
-            MCTracker.log("[MCPQ] Trying to announce packet to red when it is null.");
+            MCTracker.log(
+                "[MCPQ] Trying to announce packet to red when it is null."
+            );
         }
 
         if (this.blue != null) {
             blue.broadcast(pkt);
         } else {
-            MCTracker.log("[MCPQ] Trying to announce packet to blue when it is null.");
+            MCTracker.log(
+                "[MCPQ] Trying to announce packet to blue when it is null."
+            );
         }
     }
 
     /**
      * Gets a string representing the status of this room for the Spiegelmann NPC.
      *   [MENTION=850422]return[/MENTION] String representing the room's status.
-     * @return 
+     * @return
      */
     public String getStatus() {
         if (isFull()) {
@@ -219,12 +222,18 @@ public class MCField {
                 break;
             case 5:
             case 6:
-                waitingParty = "(3~6 ppl)";   
+                waitingParty = "(3~6 ppl)";
                 break;
-                
         }
         if (this.red != null) {
-            waitingParty = "(" + this.red.getLeaderName() + "/" + this.red.getSize() + "users/Avg. Level " + this.red.getAverageLevel() + ")";
+            waitingParty =
+                "(" +
+                this.red.getLeaderName() +
+                "/" +
+                this.red.getSize() +
+                "users/Avg. Level " +
+                this.red.getAverageLevel() +
+                ")";
         }
         String fmt = "#L%d#Carnival Field %d%s#l\r\n";
         return String.format(fmt, this.arena, this.arena, waitingParty);
@@ -247,7 +256,9 @@ public class MCField {
             party.setTeam(team);
             this.blue = party;
         } else {
-            MCTracker.log("Attempting to register party when team is already set.");
+            MCTracker.log(
+                "Attempting to register party when team is already set."
+            );
             return;
         }
         party.setField(this);
@@ -256,13 +267,12 @@ public class MCField {
         onPartyRegistered(party, team);
     }
 
-
     /**
      * Accepts a challenge from a team.
      *   [MENTION=2000183830]para[/MENTION]m index Index of team in requests.
      *   [MENTION=850422]return[/MENTION] 1 if the challenge was accepted successfully, 0 otherwise.
      * @param pt
-     * @return 
+     * @return
      */
     public int acceptRequest(MCParty pt) {
         register(pt, MCTeam.BLUE);
@@ -275,8 +285,17 @@ public class MCField {
      */
     private void startLobbyTask(MCParty host) {
         host.clock(MonsterCarnival.TIME_LOBBYWAIT);
-        this.acceptRequestsTask = EventTimer.getInstance().schedule(new AcceptingRequestsTask(this, host), 1000 * MonsterCarnival.TIME_LOBBYWAIT); // 3 minutes
-        this.validateRoomTask = EventTimer.getInstance().register(new ValidateLobbyTask(this), 1000, 1000); // repeat every second
+        this.acceptRequestsTask =
+            EventTimer
+                .getInstance()
+                .schedule(
+                    new AcceptingRequestsTask(this, host),
+                    1000 * MonsterCarnival.TIME_LOBBYWAIT
+                ); // 3 minutes
+        this.validateRoomTask =
+            EventTimer
+                .getInstance()
+                .register(new ValidateLobbyTask(this), 1000, 1000); // repeat every second
     }
 
     /**
@@ -295,7 +314,10 @@ public class MCField {
             blue.clock(10);
             red.clock(10);
 
-            this.startBattleTask = EventTimer.getInstance().schedule(new GoBattlefieldTask(this), 1000 * 10); // 10 seconds
+            this.startBattleTask =
+                EventTimer
+                    .getInstance()
+                    .schedule(new GoBattlefieldTask(this), 1000 * 10); // 10 seconds
 
             red.notice("The Monster Carnival will begin in 10 seconds!");
             blue.notice("The Monster Carnival will begin in 10 seconds!");
@@ -307,8 +329,9 @@ public class MCField {
      */
     private void goBattle() {
         Field map = getMap(MCMaps.BATTLEFIELD);
-        if (MonsterCarnival.DEBUG)
-            System.out.println("warping to battle " + map + " " + map.getId());
+        if (MonsterCarnival.DEBUG) System.out.println(
+            "warping to battle " + map + " " + map.getId()
+        );
         if (red != null) {
             red.warp(map, "red00");
         } else {
@@ -328,13 +351,15 @@ public class MCField {
         red.notice2("  Monster Carnival is now underway!!");
         blue.notice2("  Monster Carnival is now underway!!");
 
-        validateBattleTask = EventTimer.getInstance().register(new ValidateBattlefieldTask(this), 1000, 500); // check every second
+        validateBattleTask =
+            EventTimer
+                .getInstance()
+                .register(new ValidateBattlefieldTask(this), 1000, 500); // check every second
 
         battlefield = new MCBattlefield(getMap(MCMaps.BATTLEFIELD));
 
         red.setEnemy(blue);
         blue.setEnemy(red);
-        
     }
 
     private void beginCarnival() {
@@ -342,9 +367,17 @@ public class MCField {
         blue.clock(MonsterCarnival.TIME_BATTLE);
         startTime = System.currentTimeMillis();
 
-        endBattleTask = EventTimer.getInstance().schedule(new EndBattleTask(this), 1000 * MonsterCarnival.TIME_BATTLE);
-        spawnMonstersTask = EventTimer.getInstance().register(new SpawnTask(this.battlefield), 1000 * 5);
-
+        endBattleTask =
+            EventTimer
+                .getInstance()
+                .schedule(
+                    new EndBattleTask(this),
+                    1000 * MonsterCarnival.TIME_BATTLE
+                );
+        spawnMonstersTask =
+            EventTimer
+                .getInstance()
+                .register(new SpawnTask(this.battlefield), 1000 * 5);
     }
 
     public void endBattle(MCParty winner, MCParty loser) {
@@ -368,7 +401,9 @@ public class MCField {
         this.getMap(MCMaps.BATTLEFIELD).clearDrops();
         this.deregister(false);
 
-        EventTimer.getInstance().schedule(new WarpEndBattleTask(this, winner, loser), 1000 * 3);
+        EventTimer
+            .getInstance()
+            .schedule(new WarpEndBattleTask(this, winner, loser), 1000 * 3);
     }
 
     /**
@@ -380,7 +415,7 @@ public class MCField {
      */
     public void monsterKilled(Player chr, int cp) {
         if (MonsterCarnival.DEBUG) {
-             System.out.println(chr.getName() + " killed for +" + cp + " CP");
+            System.out.println(chr.getName() + " killed for +" + cp + " CP");
         }
         // TODO: Personal stats for CP gain
         this.gainCP(chr, cp);
@@ -440,7 +475,7 @@ public class MCField {
      *   [MENTION=850422]return[/MENTION] True if pickup was successful, false otherwise.
      * @param p
      * @param mapitem
-     * @return 
+     * @return
      */
     public boolean onItemPickup(Player p, FieldItem mapitem) {
         if (mapitem == null) {
@@ -459,17 +494,27 @@ public class MCField {
         }
 
         if (itemEffect.isParty()) {
-            pty.getMembers().stream().filter((chr) -> (chr.getStat().getHp() > 0)).forEachOrdered((chr) -> {
-                itemEffect.applyTo(chr);
-            });
+            pty
+                .getMembers()
+                .stream()
+                .filter(chr -> (chr.getStat().getHp() > 0))
+                .forEachOrdered(
+                    chr -> {
+                        itemEffect.applyTo(chr);
+                    }
+                );
         } else { // Single Target Item
             itemEffect.applyTo(p);
-        } 
+        }
         // Status items
         if (itemEffect.getNuffSkill() != -1) {
-            MCSkill debuff = MCSkillFactory.getMCSkill(itemEffect.getNuffSkill());
+            MCSkill debuff = MCSkillFactory.getMCSkill(
+                itemEffect.getNuffSkill()
+            );
             if (debuff == null) {
-                MCTracker.log("[MCPQ] debuff skill is null " + itemEffect.getNuffSkill());
+                MCTracker.log(
+                    "[MCPQ] debuff skill is null " + itemEffect.getNuffSkill()
+                );
                 return false;
             }
 
@@ -484,13 +529,25 @@ public class MCField {
     }
 
     public void onPlayerRespawn(Player player) {
-        int cpLoss = Math.min(player.getAvailableCP(), MonsterCarnival.CP_LOSS_ON_DEATH);
+        int cpLoss = Math.min(
+            player.getAvailableCP(),
+            MonsterCarnival.CP_LOSS_ON_DEATH
+        );
         this.announce(CarnivalPackets.PlayerDiedMessage(player, cpLoss));
         this.loseCP(player, cpLoss);
         player.getStat().addMPHP(30000, 30000);
-        player.changeMap(this.getMap(MCMaps.RESURRECT), this.getMap(MCMaps.RESURRECT).getPortal(0));
-        player.getClient().getSession().write(PacketCreator.GetClockTimer(getTimeRemaining()));
-        player.getClient().getSession().write(CarnivalPackets.StartMonsterCarnival(player));
+        player.changeMap(
+            this.getMap(MCMaps.RESURRECT),
+            this.getMap(MCMaps.RESURRECT).getPortal(0)
+        );
+        player
+            .getClient()
+            .getSession()
+            .write(PacketCreator.GetClockTimer(getTimeRemaining()));
+        player
+            .getClient()
+            .getSession()
+            .write(CarnivalPackets.StartMonsterCarnival(player));
     }
 
     public void onPlayerDisconnected(Player player) {
@@ -498,7 +555,10 @@ public class MCField {
         if (pty != null) {
             pty.removePlayer(player);
         } else {
-            MCTracker.log("[MCPQ] Attempting to run player disconnect event when party is null for character " + player.getName());
+            MCTracker.log(
+                "[MCPQ] Attempting to run player disconnect event when party is null for character " +
+                player.getName()
+            );
         }
     }
 
@@ -544,15 +604,26 @@ public class MCField {
         }
 
         player.changeMap(getMap(MCMaps.BATTLEFIELD), portal);
-        player.getClient().getSession().write(PacketCreator.GetClockTimer(getTimeRemaining()));
-        player.getClient().getSession().write(CarnivalPackets.StartMonsterCarnival(player));
+        player
+            .getClient()
+            .getSession()
+            .write(PacketCreator.GetClockTimer(getTimeRemaining()));
+        player
+            .getClient()
+            .getSession()
+            .write(CarnivalPackets.StartMonsterCarnival(player));
     }
 
     public int getTimeRemaining() {
         // TODO: add support for setting an explicit endTime instead of using the hack with MonsterCarnival variables
-        return (int) ((startTime + 1000 * MonsterCarnival.TIME_BATTLE) - System.currentTimeMillis()) / 1000;
+        return (
+            (int) (
+                (startTime + 1000 * MonsterCarnival.TIME_BATTLE) -
+                System.currentTimeMillis()
+            ) /
+            1000
+        );
     }
-
 
     // Map Instances
 
@@ -657,32 +728,61 @@ public class MCField {
         @Override
         public void run() {
             if (this.field.red == null || field.red.getSize() == 0) {
-                MCTracker.log("[MCPQ] Red team null when validating battlefield");
+                MCTracker.log(
+                    "[MCPQ] Red team null when validating battlefield"
+                );
                 field.endBattle(blue, red);
                 return;
             }
-            Collection<Player> members = Collections.unmodifiableCollection(field.red.getMembers());
+            Collection<Player> members = Collections.unmodifiableCollection(
+                field.red.getMembers()
+            );
             for (Player c : members) {
-                if (c.getMap() != field.getMap(MCMaps.BATTLEFIELD) && c.getMap() != field.getMap(MCMaps.RESURRECT)) {
-                    this.field.announce(CarnivalPackets.CarnivalLeave(MCTeam.RED.code, c.getName()));
+                if (
+                    c.getMap() != field.getMap(MCMaps.BATTLEFIELD) &&
+                    c.getMap() != field.getMap(MCMaps.RESURRECT)
+                ) {
+                    this.field.announce(
+                            CarnivalPackets.CarnivalLeave(
+                                MCTeam.RED.code,
+                                c.getName()
+                            )
+                        );
                     red.removePlayer(c); // TODO: fix concurrent modification
                 }
-                if (c.getMap() == field.getMap(MCMaps.BATTLEFIELD) && !c.isAlive()) {
+                if (
+                    c.getMap() == field.getMap(MCMaps.BATTLEFIELD) &&
+                    !c.isAlive()
+                ) {
                     this.field.onPlayerRespawn(c);
                 }
             }
             if (this.field.blue == null || field.blue.getSize() == 0) {
-                MCTracker.log("[MCPQ] Blue team null when validating battlefield");
+                MCTracker.log(
+                    "[MCPQ] Blue team null when validating battlefield"
+                );
                 field.endBattle(red, blue);
                 return;
             }
-            members = Collections.unmodifiableCollection(field.blue.getMembers());
+            members =
+                Collections.unmodifiableCollection(field.blue.getMembers());
             for (Player c : members) {
-                if (c.getMap() != field.getMap(MCMaps.BATTLEFIELD) && c.getMap() != field.getMap(MCMaps.RESURRECT)) {
-                    this.field.announce(CarnivalPackets.CarnivalLeave(MCTeam.BLUE.code, c.getName()));
+                if (
+                    c.getMap() != field.getMap(MCMaps.BATTLEFIELD) &&
+                    c.getMap() != field.getMap(MCMaps.RESURRECT)
+                ) {
+                    this.field.announce(
+                            CarnivalPackets.CarnivalLeave(
+                                MCTeam.BLUE.code,
+                                c.getName()
+                            )
+                        );
                     blue.removePlayer(c);
                 }
-                if (c.getMap() == field.getMap(MCMaps.BATTLEFIELD) && !c.isAlive()) {
+                if (
+                    c.getMap() == field.getMap(MCMaps.BATTLEFIELD) &&
+                    !c.isAlive()
+                ) {
                     this.field.onPlayerRespawn(c);
                 }
             }
@@ -711,9 +811,11 @@ public class MCField {
         @Override
         public void run() {
             Collection<Player> chrs = this.host.getMembers();
-            chrs.forEach((c) -> {
-                c.changeMap(MonsterCarnival.MAP_LOBBY);
-            });
+            chrs.forEach(
+                c -> {
+                    c.changeMap(MonsterCarnival.MAP_LOBBY);
+                }
+            );
             this.field.deregister(true);
         }
     }
@@ -754,6 +856,7 @@ public class MCField {
     }
 
     public class EndBattleTask implements Runnable {
+
         private final MCField field;
 
         public EndBattleTask(MCField field) {
@@ -802,5 +905,5 @@ public class MCField {
             winner.warp(field.getMap(MCMaps.VICTORY));
             loser.warp(field.getMap(MCMaps.DEFEAT));
         }
-    } 
+    }
 }

@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -29,13 +29,13 @@ import handling.coordinator.matchchecker.MatchCheckerListenerFactory.MatchChecke
 import handling.world.service.PartyService;
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import scripting.event.EventInstanceManager;
 import server.maps.Field;
 import server.partyquest.mcpq.MCField;
@@ -43,13 +43,15 @@ import server.partyquest.mcpq.MonsterCarnival;
 
 public class MapleParty implements Serializable {
 
-    private int id; 
+    private int id;
     private int leaderId;
     private int nextEntry = 0;
     private MaplePartyCharacter leader;
     private List<MaplePartyCharacter> pqMembers = null;
     private final List<MaplePartyCharacter> members = new LinkedList<>();
-    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock(false);
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock(
+        false
+    );
     private Map<Integer, Integer> histMembers = new HashMap<>();
 
     public MapleParty(int id, MaplePartyCharacter chrfor) {
@@ -58,7 +60,7 @@ public class MapleParty implements Serializable {
         this.members.add(chrfor);
         this.id = id;
     }
-     
+
     public boolean containsMembers(MaplePartyCharacter member) {
         lock.writeLock().lock();
         try {
@@ -69,25 +71,25 @@ public class MapleParty implements Serializable {
     }
 
     public void addMember(MaplePartyCharacter member) {
-	lock.writeLock().lock();
-	try {
+        lock.writeLock().lock();
+        try {
             histMembers.put(member.getId(), nextEntry);
             nextEntry++;
-            
-	    members.add(member);
-	} finally {
-	    lock.writeLock().unlock();
-	}
+
+            members.add(member);
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
     public void removeMember(MaplePartyCharacter member) {
         lock.writeLock().lock();
-	try {
+        try {
             histMembers.remove(member.getId());
-	    members.remove(member);
-	} finally {
-	    lock.writeLock().unlock();
-	}
+            members.remove(member);
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
     public void setLeader(MaplePartyCharacter victim) {
@@ -129,7 +131,7 @@ public class MapleParty implements Serializable {
             lock.writeLock().unlock();
         }
     }
-    
+
     public List<MaplePartyCharacter> getPartyMembers() {
         lock.writeLock().lock();
         try {
@@ -138,39 +140,43 @@ public class MapleParty implements Serializable {
             lock.writeLock().unlock();
         }
     }
-    
+
     public byte getPartyDoor(int cid) {
         List<Entry<Integer, Integer>> histList;
-        
+
         lock.writeLock().lock();
         try {
             histList = new LinkedList<>(histMembers.entrySet());
         } finally {
-           lock.writeLock().unlock();
+            lock.writeLock().unlock();
         }
-        
-        Collections.sort(histList, (Entry<Integer, Integer> o1, Entry<Integer, Integer> o2) -> ( o1.getValue() ).compareTo( o2.getValue() ));
+
+        Collections.sort(
+            histList,
+            (Entry<Integer, Integer> o1, Entry<Integer, Integer> o2) ->
+                (o1.getValue()).compareTo(o2.getValue())
+        );
 
         byte slot = 0;
-        for(Entry<Integer, Integer> e: histList) {
-            if(e.getKey() == cid) break;
+        for (Entry<Integer, Integer> e : histList) {
+            if (e.getKey() == cid) break;
             slot++;
         }
 
         return slot;
     }
-    
+
     public MaplePartyCharacter getMemberByPos(int pos) {
         int i = 0;
         for (MaplePartyCharacter chr : members) {
             if (pos == i) {
                 return chr;
             }
-          i++;
+            i++;
         }
-        return null;		
+        return null;
     }
-    
+
     public void setEligibleMembers(List<MaplePartyCharacter> eliParty) {
         pqMembers = eliParty;
     }
@@ -190,8 +196,8 @@ public class MapleParty implements Serializable {
     public MaplePartyCharacter getLeader() {
         lock.writeLock().lock();
         try {
-            for(MaplePartyCharacter mpc: members) {
-                if(mpc.getId() == leaderId) {
+            for (MaplePartyCharacter mpc : members) {
+                if (mpc.getId() == leaderId) {
                     return mpc;
                 }
             }
@@ -201,7 +207,7 @@ public class MapleParty implements Serializable {
             lock.writeLock().unlock();
         }
     }
-    
+
     public int getLeaderId() {
         return leaderId;
     }
@@ -231,25 +237,29 @@ public class MapleParty implements Serializable {
         }
         return true;
     }
-    
+
     public static void leaveParty(MapleParty party, Client c) {
         ChannelServer cs = c.getChannelServer();
         Player player = c.getPlayer();
         MaplePartyCharacter partyplayer = player.getMPC();
-        
+
         if (party != null && partyplayer != null) {
             if (partyplayer.getId() == party.getLeaderId()) {
                 cs.removeMapPartyMembers(party.getId());
-                
+
                 MCField monsterCarnival = player.getMCPQField();
-                if (monsterCarnival != null) { 
+                if (monsterCarnival != null) {
                     monsterCarnival.onPlayerDisconnected(player);
                 }
 
-                PartyService.updateParty(party.getId(), MaplePartyOperation.DISBAND, partyplayer);
-                
+                PartyService.updateParty(
+                    party.getId(),
+                    MaplePartyOperation.DISBAND,
+                    partyplayer
+                );
+
                 EventInstanceManager eim = player.getEventInstance();
-                if(eim != null) {
+                if (eim != null) {
                     eim.disbandParty();
                 }
             } else {
@@ -257,24 +267,35 @@ public class MapleParty implements Serializable {
                 if (map != null) {
                     map.removePartyMember(player);
                 }
-                
-                MCField monsterCarnival = player.getMCPQField();
-                if (monsterCarnival != null) { 
-                    monsterCarnival.onPlayerDisconnected(player);
-                } 
 
-                PartyService.updateParty(party.getId(), MaplePartyOperation.LEAVE, partyplayer);
-                
+                MCField monsterCarnival = player.getMCPQField();
+                if (monsterCarnival != null) {
+                    monsterCarnival.onPlayerDisconnected(player);
+                }
+
+                PartyService.updateParty(
+                    party.getId(),
+                    MaplePartyOperation.LEAVE,
+                    partyplayer
+                );
+
                 EventInstanceManager eim = player.getEventInstance();
                 if (eim != null) {
                     eim.leftParty(player);
                 }
             }
-            
+
             player.setParty(null);
-            
-            MapleMatchCheckerCoordinator mmce = c.getChannelServer().getMatchCheckerCoordinator();
-            if (mmce.getMatchConfirmationLeaderid(player.getId()) == player.getId() && mmce.getMatchConfirmationType(player.getId()) == MatchCheckerType.GUILD_CREATION) {
+
+            MapleMatchCheckerCoordinator mmce = c
+                .getChannelServer()
+                .getMatchCheckerCoordinator();
+            if (
+                mmce.getMatchConfirmationLeaderid(player.getId()) ==
+                player.getId() &&
+                mmce.getMatchConfirmationType(player.getId()) ==
+                MatchCheckerType.GUILD_CREATION
+            ) {
                 mmce.dismissMatchConfirmation(player.getId());
             }
         }

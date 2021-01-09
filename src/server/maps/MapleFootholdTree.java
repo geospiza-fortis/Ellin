@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -31,9 +31,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-
 public class MapleFootholdTree {
-	
+
     private Point p1;
     private Point p2;
     private Point center;
@@ -75,13 +74,31 @@ public class MapleFootholdTree {
                 minDropX = f.getX2();
             }
         }
-        if (depth == maxDepth || (f.getX1() >= p1.x && f.getX2() <= p2.x && f.getY1() >= p1.y && f.getY2() <= p2.y)) {
+        if (
+            depth == maxDepth ||
+            (
+                f.getX1() >= p1.x &&
+                f.getX2() <= p2.x &&
+                f.getY1() >= p1.y &&
+                f.getY2() <= p2.y
+            )
+        ) {
             footholds.add(f);
         } else {
             if (nw == null) {
                 nw = new MapleFootholdTree(p1, center, depth + 1);
-                ne = new MapleFootholdTree(new Point(center.x, p1.y), new Point(p2.x, center.y), depth + 1);
-                sw = new MapleFootholdTree(new Point(p1.x, center.y), new Point(center.x, p2.y), depth + 1);
+                ne =
+                    new MapleFootholdTree(
+                        new Point(center.x, p1.y),
+                        new Point(p2.x, center.y),
+                        depth + 1
+                    );
+                sw =
+                    new MapleFootholdTree(
+                        new Point(p1.x, center.y),
+                        new Point(center.x, p2.y),
+                        depth + 1
+                    );
                 se = new MapleFootholdTree(center, p2, depth + 1);
             }
             if (f.getX2() <= center.x && f.getY2() <= center.y) {
@@ -95,12 +112,15 @@ public class MapleFootholdTree {
             }
         }
     }
-	
+
     private List<MapleFoothold> getRelevants(Point p) {
         return getRelevants(p, new LinkedList<>());
     }
-	
-    private final List<MapleFoothold> getRelevants(final Point p, final List<MapleFoothold> list) {
+
+    private final List<MapleFoothold> getRelevants(
+        final Point p,
+        final List<MapleFoothold> list
+    ) {
         list.addAll(footholds);
         if (nw != null) {
             if (p.x <= center.x && p.y <= center.y) {
@@ -115,11 +135,17 @@ public class MapleFootholdTree {
         }
         return list;
     }
-	
+
     private final MapleFoothold findWallR(Point p1, Point p2) {
         MapleFoothold ret;
         for (MapleFoothold f : footholds) {
-            if (f.isWall() && f.getX1() >= p1.x && f.getX1() <= p2.x && f.getY1() >= p1.y && f.getY2() <= p1.y) {
+            if (
+                f.isWall() &&
+                f.getX1() >= p1.x &&
+                f.getX1() <= p2.x &&
+                f.getY1() >= p1.y &&
+                f.getY2() <= p1.y
+            ) {
                 return f;
             }
         }
@@ -143,20 +169,25 @@ public class MapleFootholdTree {
         }
         return null;
     }
-	
+
     public final MapleFoothold findWall(final Point p1, final Point p2) {
         if (p1.y != p2.y) {
             throw new IllegalArgumentException();
         }
         return findWallR(p1, p2);
     }
-	
+
     public final MapleFoothold findBelow(final Point p) {
         final List<MapleFoothold> relevants = getRelevants(p);
         final List<MapleFoothold> xMatches = new LinkedList<>();
-        relevants.stream().filter((fh) -> (fh.getX1() <= p.x && fh.getX2() >= p.x)).forEach((fh) -> {
-            xMatches.add(fh);
-        });
+        relevants
+            .stream()
+            .filter(fh -> (fh.getX1() <= p.x && fh.getX2() >= p.x))
+            .forEach(
+                fh -> {
+                    xMatches.add(fh);
+                }
+            );
         Collections.sort(xMatches);
         for (final MapleFoothold fh : xMatches) {
             if (!fh.isWall() && fh.getY1() != fh.getY2()) {
@@ -183,7 +214,7 @@ public class MapleFootholdTree {
         }
         return null;
     }
-	
+
     public final int getX1() {
         return p1.x;
     }

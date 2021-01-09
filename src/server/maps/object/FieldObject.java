@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -20,24 +20,24 @@
 */
 
 package server.maps.object;
-import java.awt.Point;
+
 import client.Client;
+import java.awt.Point;
 
 public interface FieldObject {
-    
     public int getObjectId();
-    
+
     public void setObjectId(int id);
-    
+
     public FieldObjectType getType();
-    
+
     public Point getPosition();
-    
+
     public void setPosition(Point position);
-    
-    public void sendSpawnData (Client client);
-    
-    public void sendDestroyData (Client client);
-    
+
+    public void sendSpawnData(Client client);
+
+    public void sendDestroyData(Client client);
+
     public void nullifyPosition();
 }

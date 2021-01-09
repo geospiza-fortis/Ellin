@@ -7,12 +7,10 @@
 package client.player.inventory.types;
 
 /**
- * 
+ *
  * @author GabrielSin
  */
 public class ItemType {
-    public static final int 
-        EQUIP = 1,
-        ITEM = 2,
-        PET = 3;
+
+    public static final int EQUIP = 1, ITEM = 2, PET = 3;
 }

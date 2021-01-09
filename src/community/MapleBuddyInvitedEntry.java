@@ -11,7 +11,7 @@ public class MapleBuddyInvitedEntry {
     public MapleBuddyInvitedEntry(final String n, final int inviterid) {
         name = n.toLowerCase();
         inviter = inviterid;
-        expiration = System.currentTimeMillis() + 10 * 60 * 1000; 
+        expiration = System.currentTimeMillis() + 10 * 60 * 1000;
     }
 
     @Override
@@ -31,14 +31,20 @@ public class MapleBuddyInvitedEntry {
         hash = 97 * hash + (int) (this.expiration ^ (this.expiration >>> 32));
         return hash;
     }
-    
-    public static class BuddylistEntry {
-	private final String name;
-	private final int cid;
-	private int channel;
-	private boolean visible;
 
-        public BuddylistEntry(String name, int characterId, int channel, boolean visible) {
+    public static class BuddylistEntry {
+
+        private final String name;
+        private final int cid;
+        private int channel;
+        private boolean visible;
+
+        public BuddylistEntry(
+            String name,
+            int characterId,
+            int channel,
+            boolean visible
+        ) {
             super();
             this.name = name;
             this.cid = characterId;
@@ -92,7 +98,7 @@ public class MapleBuddyInvitedEntry {
                 return true;
             }
             if (obj == null) {
-               return false; 
+                return false;
             }
             if (getClass() != obj.getClass()) {
                 return false;
@@ -102,6 +108,6 @@ public class MapleBuddyInvitedEntry {
                 return false;
             }
             return true;
-        }   
+        }
     }
 }

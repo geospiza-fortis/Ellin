@@ -1,6 +1,6 @@
 /*
 This file is part of the OdinMS Maple Story Server
-Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc> 
+Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc>
 Matthias Butz <matze@odinms.de>
 Jan Christian Meyer <vimes@odinms.de>
 
@@ -20,13 +20,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package handling.channel;
 
+import client.player.Player;
+import client.player.PlayerStringUtil;
 import handling.world.CheaterData;
 import handling.world.service.FindService;
-import client.player.Player;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import client.player.PlayerStringUtil;
 
 public class PlayerStorage {
 
@@ -36,7 +36,7 @@ public class PlayerStorage {
     private final int channel;
 
     public PlayerStorage(int channel) {
-	this.channel = channel;
+        this.channel = channel;
     }
 
     public final ArrayList<Player> getAllCharacters() {
@@ -59,7 +59,6 @@ public class PlayerStorage {
         FindService.register(chr.getId(), chr.getName(), channel);
     }
 
-   
     public final void deregisterPlayer(final Player chr) {
         pStorageLock.lock();
         try {
@@ -103,7 +102,7 @@ public class PlayerStorage {
     public final int getConnectedClients() {
         return idToChar.size();
     }
-    
+
     public final int getCheatersSize() {
         int size = 0;
         pStorageLock.lock();
@@ -123,7 +122,6 @@ public class PlayerStorage {
         return size;
     }
 
-    
     public final List<CheaterData> getCheaters() {
         final List<CheaterData> cheaters = new ArrayList<>();
 
@@ -135,7 +133,16 @@ public class PlayerStorage {
                 chr = itr.next();
 
                 if (chr.getCheatTracker().getPoints() > 0) {
-                    cheaters.add(new CheaterData(chr.getCheatTracker().getPoints(), PlayerStringUtil.makeMapleReadable(chr.getName()) + " (" + chr.getCheatTracker().getPoints() + ") " + chr.getCheatTracker().getSummary()));
+                    cheaters.add(
+                        new CheaterData(
+                            chr.getCheatTracker().getPoints(),
+                            PlayerStringUtil.makeMapleReadable(chr.getName()) +
+                            " (" +
+                            chr.getCheatTracker().getPoints() +
+                            ") " +
+                            chr.getCheatTracker().getSummary()
+                        )
+                    );
                 }
             }
         } finally {
@@ -143,7 +150,6 @@ public class PlayerStorage {
         }
         return cheaters;
     }
-
 
     public final void disconnectAll() {
         disconnectAll(false);
@@ -177,7 +183,9 @@ public class PlayerStorage {
             try {
                 final Iterator<Player> itr = nameToChar.values().iterator();
                 while (itr.hasNext()) {
-                    sb.append(PlayerStringUtil.makeMapleReadable(itr.next().getName()));
+                    sb.append(
+                        PlayerStringUtil.makeMapleReadable(itr.next().getName())
+                    );
                     sb.append(", ");
                 }
             } finally {
@@ -192,7 +200,9 @@ public class PlayerStorage {
                     chr = itr.next();
 
                     if (!chr.isGameMaster()) {
-                        sb.append(PlayerStringUtil.makeMapleReadable(chr.getName()));
+                        sb.append(
+                            PlayerStringUtil.makeMapleReadable(chr.getName())
+                        );
                         sb.append(", ");
                     }
                 }

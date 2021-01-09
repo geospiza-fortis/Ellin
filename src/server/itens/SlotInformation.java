@@ -5,7 +5,6 @@ package server.itens;
  * @author BlackRabbit (http://forum.ragezone.com/members/2000112471.html)
  */
 public enum SlotInformation {
-    
     CAP(100, -1),
     FACE_ACCESSORY(101, -2),
     EYE_ACCESSORY(102, -3),
@@ -19,14 +18,14 @@ public enum SlotInformation {
     CAPE(110, -9),
     RING(111, -12, -13, -15, -16),
     PENDANT(112, -17),
-    
+
     ONE_HANDED_SWORD(130, -11),
     ONE_HANDED_AXE(131, -11),
     ONE_HANDED_BLUNT_WEAPON(132, -11),
     DAGGER(133, -11),
     WAND(137, -11),
     STAFF(138, -11),
-    
+
     FISTS(139, -11),
     TWO_HANDED_SWORD(140, -11),
     TWO_HANDED_AXE(141, -11),
@@ -38,17 +37,15 @@ public enum SlotInformation {
     CLAW(147, -11),
     KNUCKLER(148, -11),
     GUN(149, -11),
-    
+
     TAMING_MOB(190, -18),
     SADDLE(191, -19),
     SPECIAL_TAMING_MOB(193, -18),
-    
-    CASH_ITEM;
 
+    CASH_ITEM;
 
     private int prefix;
     private int[] allowed;
-
 
     private SlotInformation() {
         prefix = 0;
@@ -62,7 +59,7 @@ public enum SlotInformation {
     public int getPrefix() {
         return prefix;
     }
-    
+
     public boolean isTwoHanded() {
         return prefix >= 139 && prefix <= 149;
     }

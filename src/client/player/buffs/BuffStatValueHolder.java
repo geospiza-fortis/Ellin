@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -22,7 +22,6 @@
 package client.player.buffs;
 
 import java.util.concurrent.ScheduledFuture;
-
 import server.MapleStatEffect;
 
 public class BuffStatValueHolder {
@@ -32,11 +31,16 @@ public class BuffStatValueHolder {
     public int value;
     public ScheduledFuture<?> schedule;
 
-    public BuffStatValueHolder(MapleStatEffect effect, long startTime, ScheduledFuture<?> schedule, int value) {
-	super();
-	this.effect = effect;
-	this.startTime = startTime;
-	this.schedule = schedule;
-	this.value = value;
+    public BuffStatValueHolder(
+        MapleStatEffect effect,
+        long startTime,
+        ScheduledFuture<?> schedule,
+        int value
+    ) {
+        super();
+        this.effect = effect;
+        this.startTime = startTime;
+        this.schedule = schedule;
+        this.value = value;
     }
 }

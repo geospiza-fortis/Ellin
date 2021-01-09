@@ -65,11 +65,13 @@ public class MCWZData {
 
     private void populateMobGenPos(MapleData src) {
         for (MapleData n : src) {
-            MCMobGenPos nn = new MCMobGenPos(MapleDataTool.getInt("x", n, 0),
-            MapleDataTool.getInt("y", n, 0),
-            MapleDataTool.getInt("fh", n, 0),
-            MapleDataTool.getInt("cy", n, 0),
-            MapleDataTool.getInt("team", n, -1));
+            MCMobGenPos nn = new MCMobGenPos(
+                MapleDataTool.getInt("x", n, 0),
+                MapleDataTool.getInt("y", n, 0),
+                MapleDataTool.getInt("fh", n, 0),
+                MapleDataTool.getInt("cy", n, 0),
+                MapleDataTool.getInt("team", n, -1)
+            );
             mobGenPosList.add(nn);
         }
     }
@@ -78,9 +80,9 @@ public class MCWZData {
         for (MapleData n : src) {
             int id = Integer.parseInt(n.getName());
             MCSummonMob mcs = new MCSummonMob(
-            MapleDataTool.getInt("id", n, 0),
-            MapleDataTool.getInt("spendCP", n, 0),
-            MapleDataTool.getInt("mobTime", n, 0)
+                MapleDataTool.getInt("id", n, 0),
+                MapleDataTool.getInt("spendCP", n, 0),
+                MapleDataTool.getInt("mobTime", n, 0)
             );
 
             this.summons.put(id, mcs);
@@ -98,10 +100,12 @@ public class MCWZData {
 
     private void populateGuardianGenPos(MapleData src) {
         for (MapleData n : src) {
-            MCGuardianGenPos nn = new MCGuardianGenPos(MapleDataTool.getInt("x", n, 0),
-            MapleDataTool.getInt("y", n, 0),
-            MapleDataTool.getInt("f", n, 0),
-            MapleDataTool.getInt("team", n, -1));
+            MCGuardianGenPos nn = new MCGuardianGenPos(
+                MapleDataTool.getInt("x", n, 0),
+                MapleDataTool.getInt("y", n, 0),
+                MapleDataTool.getInt("f", n, 0),
+                MapleDataTool.getInt("team", n, -1)
+            );
             guardianGenPosList.add(nn);
         }
     }
@@ -150,4 +154,4 @@ public class MCWZData {
             this.mobTime = mobTime;
         }
     }
-}  
+}

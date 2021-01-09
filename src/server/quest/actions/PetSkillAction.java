@@ -22,16 +22,17 @@
 package server.quest.actions;
 
 import client.player.Player;
-import server.quest.MapleQuestStatus;
 import provider.MapleData;
 import server.quest.MapleQuest;
 import server.quest.MapleQuestActionType;
+import server.quest.MapleQuestStatus;
 
 /**
  *
  * @author Tyler (Twdtwd)
  */
 public final class PetSkillAction extends MapleQuestAction {
+
     int flag;
 
     public PetSkillAction(MapleQuest quest, MapleData data) {
@@ -48,14 +49,19 @@ public final class PetSkillAction extends MapleQuestAction {
     @Override
     public boolean check(Player chr, Integer extSelection) {
         MapleQuestStatus status = chr.getQuest(MapleQuest.getInstance(questID));
-        if(!(status.getStatus() == MapleQuestStatus.Status.NOT_STARTED && status.getForfeited() > 0)) {
+        if (
+            !(
+                status.getStatus() == MapleQuestStatus.Status.NOT_STARTED &&
+                status.getForfeited() > 0
+            )
+        ) {
             return false;
         }
-        return chr.getPet(0) != null; 
+        return chr.getPet(0) != null;
     }
 
     @Override
     public void run(Player chr, Integer extSelection) {
-            //chr.getPet(0).setFlag((byte) ItemConstants.getFlagByInt(flag));
+        //chr.getPet(0).setFlag((byte) ItemConstants.getFlagByInt(flag));
     }
-} 
+}

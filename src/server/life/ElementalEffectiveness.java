@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -22,12 +22,11 @@
 package server.life;
 
 public enum ElementalEffectiveness {
-    
     NORMAL,
     IMMUNE,
     STRONG,
     WEAK;
-	
+
     public static ElementalEffectiveness getByNumber(int num) {
         switch (num) {
             case 1:
@@ -37,7 +36,9 @@ public enum ElementalEffectiveness {
             case 3:
                 return WEAK;
             default:
-                throw new IllegalArgumentException("Unkown effectiveness: " + num);
+                throw new IllegalArgumentException(
+                    "Unkown effectiveness: " + num
+                );
         }
     }
 }

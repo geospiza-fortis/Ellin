@@ -33,6 +33,7 @@ import server.quest.MapleQuestActionType;
  * @author Tyler (Twdtwd)
  */
 public final class MesoAction extends MapleQuestAction {
+
     int mesos;
 
     public MesoAction(MapleQuest quest, MapleData data) {
@@ -40,7 +41,7 @@ public final class MesoAction extends MapleQuestAction {
         questID = quest.getId();
         processData(data);
     }
-    
+
     @Override
     public void processData(MapleData data) {
         mesos = MapleDataTool.getInt(data);
@@ -48,6 +49,11 @@ public final class MesoAction extends MapleQuestAction {
 
     @Override
     public void run(Player p, Integer extSelection) {
-        p.gainMeso(mesos < 0 ? mesos : mesos * ServerProperties.World.MESO, true, false, true);
+        p.gainMeso(
+            mesos < 0 ? mesos : mesos * ServerProperties.World.MESO,
+            true,
+            false,
+            true
+        );
     }
-} 
+}

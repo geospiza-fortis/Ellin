@@ -5,7 +5,7 @@ import packet.creators.EffectPackets;
 import packet.transfer.write.OutPacket;
 
 public class FieldEffect {
-    
+
     private final String msg;
     private final int itemId;
     private boolean active = true;

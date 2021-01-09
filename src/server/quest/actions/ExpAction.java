@@ -34,6 +34,7 @@ import server.quest.MapleQuestActionType;
  * @author Tyler (Twdtwd)
  */
 public final class ExpAction extends MapleQuestAction {
+
     int exp;
 
     public ExpAction(MapleQuest quest, MapleData data) {
@@ -51,7 +52,14 @@ public final class ExpAction extends MapleQuestAction {
         if (PlayerJob.isBeginner(p.getJob().getId()) && p.getLevel() < 10) {
             p.gainExperience(exp, true, true);
         } else {
-            p.gainExperience(exp * ChannelServer.getInstance(p.getClient().getChannel()).getQuestRate(), true, true);  
+            p.gainExperience(
+                exp *
+                ChannelServer
+                    .getInstance(p.getClient().getChannel())
+                    .getQuestRate(),
+                true,
+                true
+            );
         }
     }
-} 
+}

@@ -5,7 +5,6 @@ package client.player;
  */
 
 public enum PlayerGender {
-
     MALE(0),
     FEMALE(1),
     UNSPECIFIED(2);
@@ -22,9 +21,9 @@ public enum PlayerGender {
 
     public static PlayerGender fromNumber(final int type) {
         switch (type) {
-            case 0: 
+            case 0:
                 return MALE;
-            case 1: 
+            case 1:
                 return FEMALE;
             case 2:
                 return UNSPECIFIED;

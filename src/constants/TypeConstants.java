@@ -13,12 +13,14 @@ package constants;
  */
 
 public class TypeConstants {
-    
-    public static MapleLanguageType MAPLE_TYPE = MapleLanguageType.LANGUAGE_PT_BR;
-    
+
+    public static MapleLanguageType MAPLE_TYPE =
+        MapleLanguageType.LANGUAGE_PT_BR;
+
     public enum MapleLanguageType {
         LANGUAGE_PT_BR(1, "ISO-8859-1"),
         LANGUAGE_US(2, "");
+
         final byte type;
         final String ascii;
 
@@ -43,5 +45,5 @@ public class TypeConstants {
             }
             return LANGUAGE_PT_BR;
         }
-    } 
+    }
 }

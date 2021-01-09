@@ -23,7 +23,11 @@ public class MapleBuddyListEntry {
     private final int cid;
     private int channel;
 
-    public MapleBuddyListEntry(final String name, final int characterId, final int channel) {
+    public MapleBuddyListEntry(
+        final String name,
+        final int characterId,
+        final int channel
+    ) {
         this.name = name;
         this.cid = characterId;
         this.channel = channel;

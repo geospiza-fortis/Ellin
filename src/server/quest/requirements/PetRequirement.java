@@ -35,6 +35,7 @@ import server.quest.MapleQuestRequirementType;
  * @author Tyler (Twdtwd)
  */
 public final class PetRequirement extends MapleQuestRequirement {
+
     List<Integer> petIDs = new ArrayList<>();
 
     public PetRequirement(MapleQuest quest, MapleData data) {

@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -25,13 +25,13 @@
  */
 package scripting.event;
 
+import handling.channel.ChannelServer;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
-import handling.channel.ChannelServer;
 import scripting.AbstractScriptManager;
 
 /**
@@ -39,25 +39,31 @@ import scripting.AbstractScriptManager;
  * @author Matze
  */
 public class EventScriptManager extends AbstractScriptManager {
+
     private class EventEntry {
+
         public EventEntry(String script, Invocable iv, EventManager em) {
             this.script = script;
             this.iv = iv;
             this.em = em;
         }
+
         public String script;
         public Invocable iv;
         public EventManager em;
     }
+
     private Map<String, EventEntry> events = new LinkedHashMap<>();
 
     public EventScriptManager(ChannelServer cserv, String[] scripts) {
         super();
-        for (String script : scripts)
-            if (!script.equals("")) {
-                Invocable iv = getInvocable("event/" + script + ".js", null);
-                events.put(script, new EventEntry(script, iv, new EventManager(cserv, iv, script)));
-            }
+        for (String script : scripts) if (!script.equals("")) {
+            Invocable iv = getInvocable("event/" + script + ".js", null);
+            events.put(
+                script,
+                new EventEntry(script, iv, new EventManager(cserv, iv, script))
+            );
+        }
     }
 
     public EventManager getEventManager(String event) {
@@ -74,19 +80,20 @@ public class EventScriptManager extends AbstractScriptManager {
                 ((ScriptEngine) entry.iv).put("em", entry.em);
                 entry.iv.invokeFunction("init", (Object) null);
             } catch (final Exception ex) {
-                Logger.getLogger(EventScriptManager.class.getName()).log(Level.SEVERE, null, ex);
+                Logger
+                    .getLogger(EventScriptManager.class.getName())
+                    .log(Level.SEVERE, null, ex);
                 System.out.println("Error on script: " + entry.em.getName());
             }
         }
     }
-    
-    public void reload(){
-    	cancel();
-    	init();
+
+    public void reload() {
+        cancel();
+        init();
     }
 
     public void cancel() {
-        for (EventEntry entry : events.values())
-            entry.em.cancel();
+        for (EventEntry entry : events.values()) entry.em.cancel();
     }
 }

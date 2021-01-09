@@ -21,25 +21,24 @@
  */
 package server.quest.requirements;
 
+import client.player.Player;
+import client.player.inventory.Item;
+import client.player.inventory.types.InventoryType;
 import java.util.HashMap;
 import java.util.Map;
-
 import provider.MapleData;
 import provider.MapleDataTool;
 import server.itens.ItemInformationProvider;
 import server.quest.MapleQuest;
 import server.quest.MapleQuestRequirementType;
-import client.player.Player;
-import client.player.inventory.Item;
-import client.player.inventory.types.InventoryType;
 
 /**
  *
  * @author Tyler (Twdtwd)
  */
 public final class ItemRequirement extends MapleQuestRequirement {
-    Map<Integer, Integer> items = new HashMap<>();
 
+    Map<Integer, Integer> items = new HashMap<>();
 
     public ItemRequirement(MapleQuest quest, MapleData data) {
         super(MapleQuestRequirementType.ITEM);
@@ -50,15 +49,18 @@ public final class ItemRequirement extends MapleQuestRequirement {
     public void processData(MapleData data) {
         for (MapleData itemEntry : data.getChildren()) {
             int itemId = MapleDataTool.getInt(itemEntry.getChildByPath("id"));
-            int count = MapleDataTool.getInt(itemEntry.getChildByPath("count"), 0);
+            int count = MapleDataTool.getInt(
+                itemEntry.getChildByPath("count"),
+                0
+            );
             items.put(itemId, count);
         }
     }
-	
+
     @Override
     public boolean check(Player chr, Integer npcid) {
         ItemInformationProvider ii = ItemInformationProvider.getInstance();
-        for(Integer itemId : items.keySet()) {
+        for (Integer itemId : items.keySet()) {
             int countNeeded = items.get(itemId);
             int count = 0;
 
@@ -72,13 +74,26 @@ public final class ItemRequirement extends MapleQuestRequirement {
             }
             if (iType.equals(InventoryType.EQUIP)) {
                 if (chr.isGameMaster()) {
-                    for (Item item : chr.getInventory(InventoryType.EQUIPPED).listById(itemId)) {
+                    for (Item item : chr
+                        .getInventory(InventoryType.EQUIPPED)
+                        .listById(itemId)) {
                         count += item.getQuantity();
                     }
                 } else {
                     if (count < countNeeded) {
-                        if (chr.getInventory(InventoryType.EQUIPPED).countById(itemId) + count >= countNeeded) {
-                            chr.dropMessage(5, "Desequipar o item " + ii.getName(itemId) + " antes de tentar esta quest.");
+                        if (
+                            chr
+                                .getInventory(InventoryType.EQUIPPED)
+                                .countById(itemId) +
+                            count >=
+                            countNeeded
+                        ) {
+                            chr.dropMessage(
+                                5,
+                                "Desequipar o item " +
+                                ii.getName(itemId) +
+                                " antes de tentar esta quest."
+                            );
                             return false;
                         }
                     }
@@ -91,7 +106,7 @@ public final class ItemRequirement extends MapleQuestRequirement {
         }
         return true;
     }
-	
+
     public int getItemAmountNeeded(int itemid) {
         if (items.containsKey(itemid)) {
             return items.get(itemid);

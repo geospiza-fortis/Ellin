@@ -21,21 +21,21 @@
  */
 package server.quest.requirements;
 
+import client.player.Player;
+import client.player.PlayerJob;
 import java.util.ArrayList;
 import java.util.List;
-
 import provider.MapleData;
 import provider.MapleDataTool;
 import server.quest.MapleQuest;
 import server.quest.MapleQuestRequirementType;
-import client.player.Player;
-import client.player.PlayerJob;
 
 /**
  *
  * @author Tyler (Twdtwd)
  */
 public final class JobRequirement extends MapleQuestRequirement {
+
     List<Integer> jobs = new ArrayList<>();
 
     public JobRequirement(MapleQuest quest, MapleData data) {
@@ -44,8 +44,8 @@ public final class JobRequirement extends MapleQuestRequirement {
     }
 
     /**
-     * 
-     * @param data 
+     *
+     * @param data
      */
     @Override
     public void processData(MapleData data) {
@@ -57,7 +57,10 @@ public final class JobRequirement extends MapleQuestRequirement {
     @Override
     public boolean check(Player chr, Integer npcid) {
         for (Integer job : jobs) {
-            if (chr.getJob().equals(PlayerJob.getById(job)) || chr.isGameMaster()) {
+            if (
+                chr.getJob().equals(PlayerJob.getById(job)) ||
+                chr.isGameMaster()
+            ) {
                 return true;
             }
         }

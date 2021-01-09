@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -24,7 +24,6 @@ package client.player.buffs;
 import java.io.Serializable;
 
 public enum BuffStat implements Serializable {
-    
     MORPH(0x2),
     RECOVERY(0x4),
     MAPLE_WARRIOR(0x8),
@@ -32,7 +31,7 @@ public enum BuffStat implements Serializable {
     SHARP_EYES(0x20),
     MANA_REFLECTION(0x40),
     SHADOW_CLAW(0x100),
-    INFINITY(0x200), 
+    INFINITY(0x200),
     HOLY_SHIELD(0x400),
     HAMSTRING(0x800),
     BLIND(0x1000),
@@ -72,19 +71,19 @@ public enum BuffStat implements Serializable {
     MESOUP(0x200000000000000L),
     SHADOWPARTNER(0x400000000000000L),
     PICKPOCKET(0x800000000000000L),
-    PUPPET(0x800000000000000L), 
+    PUPPET(0x800000000000000L),
     CURSE(0x8000000000000000L),
     MESOGUARD(0x1000000000000000L),
     WEAKEN(0x4000000000000000L),
-    SLOW(0x200000000L), 
-    ELEMENTAL_RESET(0x200000000L), 
-    MAGIC_SHIELD(0x400000000L), 
+    SLOW(0x200000000L),
+    ELEMENTAL_RESET(0x200000000L),
+    MAGIC_SHIELD(0x400000000L),
     MAGIC_RESISTANCE(0x800000000L),
     DASH_SPEED(0x0000000010000000L),
     DASH_JUMP(0x0000000020000000L),
     ENERGY_CHARGE(0x0000000008000000L),
     HOMING_BEACON(0x0000000000000001L);
-    
+
     static final long serialVersionUID = 0L;
     private final long i;
 

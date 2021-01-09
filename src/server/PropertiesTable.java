@@ -4,20 +4,21 @@
  */
 
 package server;
-import java.util.LinkedHashMap;
-import java.util.ArrayList;
-import tools.Pair;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import tools.Pair;
 
 public class PropertiesTable {
+
     private LinkedHashMap<String, Object> PropertiesHashmap = new LinkedHashMap<>();
     private ReentrantReadWriteLock propsLock = new ReentrantReadWriteLock();
- 
-    public PropertiesTable(){}
 
-    public PropertiesTable(Pair<String,Object>[] initialProps) {
-        for(Pair<String, Object> p : initialProps) {
+    public PropertiesTable() {}
+
+    public PropertiesTable(Pair<String, Object>[] initialProps) {
+        for (Pair<String, Object> p : initialProps) {
             this.setProperty(p.getLeft(), p.getRight());
         }
     }
@@ -26,9 +27,12 @@ public class PropertiesTable {
         ArrayList<String> res = new ArrayList<>();
         propsLock.readLock().lock();
         try {
-            this.PropertiesHashmap.keySet().forEach((s) -> {
-                res.add(s);
-            });
+            this.PropertiesHashmap.keySet()
+                .forEach(
+                    s -> {
+                        res.add(s);
+                    }
+                );
         } finally {
             propsLock.readLock().unlock();
         }
@@ -38,7 +42,7 @@ public class PropertiesTable {
     public void setProperty(String propertyName, Object value) {
         propsLock.writeLock().lock();
         try {
-            if( this.PropertiesHashmap.containsKey(propertyName)) {
+            if (this.PropertiesHashmap.containsKey(propertyName)) {
                 this.PropertiesHashmap.remove(propertyName);
             }
             this.PropertiesHashmap.put(propertyName, value);
@@ -50,7 +54,7 @@ public class PropertiesTable {
     public Object getProperty(String propertyName) {
         propsLock.readLock().lock();
         try {
-            if(this.PropertiesHashmap.containsKey(propertyName)) {
+            if (this.PropertiesHashmap.containsKey(propertyName)) {
                 return this.PropertiesHashmap.get(propertyName);
             }
             return null;

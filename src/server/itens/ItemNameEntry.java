@@ -1,7 +1,7 @@
 package server.itens;
 
 public final class ItemNameEntry {
-    
+
     public final int itemId;
     public final String name;
 

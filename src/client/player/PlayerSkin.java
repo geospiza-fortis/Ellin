@@ -1,8 +1,7 @@
 package client.player;
 
 public enum PlayerSkin {
-    
-    NORMAL(0), 
+    NORMAL(0),
     DARK(1),
     BLACK(2),
     PALE(3),

@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -28,7 +28,6 @@ import packet.creators.PacketCreator;
 import tools.FileLogger;
 
 public enum CheatingOffense {
-    
     FASTATTACK(1, 60000, 300),
     MOVE_MONSTERS,
     POSSIBLE_VAC(1, 60000, 500),
@@ -57,7 +56,7 @@ public enum CheatingOffense {
     FAST_SUMMON_ATTACK,
     ATTACKING_WHILE_DEAD(10, 300000),
     USING_UNAVAILABLE_ITEM(10, 300000),
-    FAMING_SELF(10, 300000),  
+    FAMING_SELF(10, 300000),
     FAMING_UNDER_15(10, 300000),
     EXPLODING_NONEXISTANT,
     SUMMON_HACK,
@@ -89,11 +88,11 @@ public enum CheatingOffense {
         return count > autobancount;
     }
 
-    public void setEnabled (boolean enabled) {
+    public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
 
-    public boolean isEnabled () {
+    public boolean isEnabled() {
         return enabled;
     }
 
@@ -109,23 +108,52 @@ public enum CheatingOffense {
         this(points, validityDuration, -1);
     }
 
-    private CheatingOffense(int points, long validityDuration, int autobancount) {
+    private CheatingOffense(
+        int points,
+        long validityDuration,
+        int autobancount
+    ) {
         this(points, validityDuration, autobancount, true);
     }
 
-    private CheatingOffense(int points, long validityDuration, int autobancount, boolean enabled) {
+    private CheatingOffense(
+        int points,
+        long validityDuration,
+        int autobancount,
+        boolean enabled
+    ) {
         this.points = points;
         this.validityDuration = validityDuration;
         this.autobancount = autobancount;
         this.enabled = enabled;
     }
-    
+
     public void cheatingSuspicious(Player p, String reason) {
-        FileLogger.printError("cheatingWarn.txt", (p != null ? PlayerStringUtil.makeMapleReadable(p.getName()) : "") + " caused " + this.name() + " " + reason + "\r\n");
-        if (p != null){
+        FileLogger.printError(
+            "cheatingWarn.txt",
+            (p != null ? PlayerStringUtil.makeMapleReadable(p.getName()) : "") +
+            " caused " +
+            this.name() +
+            " " +
+            reason +
+            "\r\n"
+        );
+        if (p != null) {
             return;
         }
-        BroadcastService.broadcastGMMessage(PacketCreator.SendYellowTip((p != null ? PlayerStringUtil.makeMapleReadable(p.getName()) : "") + " caused " + this.name() + " " + reason));
+        BroadcastService.broadcastGMMessage(
+            PacketCreator.SendYellowTip(
+                (
+                    p != null
+                        ? PlayerStringUtil.makeMapleReadable(p.getName())
+                        : ""
+                ) +
+                " caused " +
+                this.name() +
+                " " +
+                reason
+            )
+        );
         if (p != null) {
             p.announce(PacketCreator.EnableActions());
         }

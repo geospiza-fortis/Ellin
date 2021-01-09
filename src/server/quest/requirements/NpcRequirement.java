@@ -32,6 +32,7 @@ import server.quest.MapleQuestRequirementType;
  * @author Tyler (Twdtwd)
  */
 public final class NpcRequirement extends MapleQuestRequirement {
+
     private int reqNPC;
 
     public NpcRequirement(MapleQuest quest, MapleData data) {

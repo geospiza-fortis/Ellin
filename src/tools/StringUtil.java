@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -27,17 +27,18 @@ import java.nio.file.Paths;
 
 /**
  * Provides a suite of utilities for manipulating strings.
- * 
+ *
  * @author Frz
  * @since Revision 336
  * @version 1.0
- * 
+ *
  */
 public class StringUtil {
+
     /**
      * Gets a string padded from the left to <code>length</code> by
      * <code>padchar</code>.
-     * 
+     *
      * @param in The input string to be padded.
      * @param padchar The character to pad with.
      * @param length The length to pad to.
@@ -55,13 +56,17 @@ public class StringUtil {
     /**
      * Gets a string padded from the right to <code>length</code> by
      * <code>padchar</code>.
-     * 
+     *
      * @param in The input string to be padded.
      * @param padchar The character to pad with.
      * @param length The length to pad to.
      * @return The padded string.
      */
-    public static String getRightPaddedStr(String in, char padchar, int length) {
+    public static String getRightPaddedStr(
+        String in,
+        char padchar,
+        int length
+    ) {
         StringBuilder builder = new StringBuilder(in);
         for (int x = in.length(); x < length; x++) {
             builder.append(padchar);
@@ -72,7 +77,7 @@ public class StringUtil {
     /**
      * Joins an array of strings starting from string <code>start</code> with
      * a space.
-     * 
+     *
      * @param arr The array of strings to join.
      * @param start Starting from which string.
      * @return The joined strings.
@@ -84,7 +89,7 @@ public class StringUtil {
     /**
      * Joins an array of strings starting from string <code>start</code> with
      * <code>sep</code> as a seperator.
-     * 
+     *
      * @param arr The array of strings to join.
      * @param start Starting from which string.
      * @param sep
@@ -103,7 +108,7 @@ public class StringUtil {
 
     /**
      * Makes an enum name human readable (fixes spaces, capitalization, etc)
-     * 
+     *
      * @param enumName The name of the enum to neaten up.
      * @return The human-readable enum name.
      */
@@ -112,7 +117,7 @@ public class StringUtil {
         String[] words = enumName.split("_");
         for (String word : words) {
             if (word.length() <= 2) {
-                builder.append(word);  
+                builder.append(word);
             } else {
                 builder.append(word.charAt(0));
                 builder.append(word.substring(1).toLowerCase());
@@ -124,7 +129,7 @@ public class StringUtil {
 
     /**
      * Counts the number of <code>chr</code>'s in <code>str</code>.
-     * 
+     *
      * @param str The string to check for instances of <code>chr</code>.
      * @param chr The character to check for.
      * @return The number of times <code>chr</code> occurs in <code>str</code>.
@@ -138,22 +143,28 @@ public class StringUtil {
         }
         return ret;
     }
-        
+
     public static String readFileAsString(String path) {
         StringBuilder builder = new StringBuilder();
-        try
-            {
-            for (String str : Files.readAllLines(Paths.get(path, new String[0]))) {
+        try {
+            for (String str : Files.readAllLines(
+                Paths.get(path, new String[0])
+            )) {
                 builder.append(str).append(System.lineSeparator());
             }
             return builder.toString();
         } catch (IOException e) {
-            System.out.println("Error while loading file " + path + " " + e.getMessage());
+            System.out.println(
+                "Error while loading file " + path + " " + e.getMessage()
+            );
         }
         return "";
     }
-        
-    public static final String getReadableMillis(long startMillis, long endMillis) {
+
+    public static final String getReadableMillis(
+        long startMillis,
+        long endMillis
+    ) {
         StringBuilder sb = new StringBuilder();
         double elapsedSeconds = (endMillis - startMillis) / 1000.0;
         int elapsedSecs = ((int) elapsedSeconds) % 60;
@@ -165,57 +176,87 @@ public class StringUtil {
         if (elapsedDays > 0) {
             boolean mins = elapsedHours > 0;
             sb.append(elapsedDays);
-            sb.append(" day").append(elapsedDays > 1 ? "s" : "").append(mins ? ", " : ".");
+            sb
+                .append(" day")
+                .append(elapsedDays > 1 ? "s" : "")
+                .append(mins ? ", " : ".");
             if (mins) {
                 boolean secs = elapsedMins > 0;
                 if (!secs) {
                     sb.append("and ");
                 }
                 sb.append(elapsedHours);
-                sb.append(" hour").append(elapsedHours > 1 ? "s" : "").append(secs ? ", " : ".");
+                sb
+                    .append(" hour")
+                    .append(elapsedHours > 1 ? "s" : "")
+                    .append(secs ? ", " : ".");
                 if (secs) {
                     boolean millis = elapsedSecs > 0;
                     if (!millis) {
                         sb.append("and ");
                     }
                     sb.append(elapsedMins);
-                    sb.append(" minute").append(elapsedMins > 1 ? "s" : "").append(millis ? ", " : ".");
+                    sb
+                        .append(" minute")
+                        .append(elapsedMins > 1 ? "s" : "")
+                        .append(millis ? ", " : ".");
                     if (millis) {
                         sb.append("and ");
                         sb.append(elapsedSecs);
-                        sb.append(" second").append(elapsedSecs > 1 ? "s" : "").append(".");
+                        sb
+                            .append(" second")
+                            .append(elapsedSecs > 1 ? "s" : "")
+                            .append(".");
                     }
                 }
             }
         } else if (elapsedHours > 0) {
             boolean mins = elapsedMins > 0;
             sb.append(elapsedHours);
-            sb.append(" hour").append(elapsedHours > 1 ? "s" : "").append(mins ? ", " : ".");
+            sb
+                .append(" hour")
+                .append(elapsedHours > 1 ? "s" : "")
+                .append(mins ? ", " : ".");
             if (mins) {
                 boolean secs = elapsedSecs > 0;
                 if (!secs) {
                     sb.append("and ");
                 }
                 sb.append(elapsedMins);
-                sb.append(" minute").append(elapsedMins > 1 ? "s" : "").append(secs ? ", " : ".");
+                sb
+                    .append(" minute")
+                    .append(elapsedMins > 1 ? "s" : "")
+                    .append(secs ? ", " : ".");
                 if (secs) {
                     sb.append("and ");
                     sb.append(elapsedSecs);
-                    sb.append(" second").append(elapsedSecs > 1 ? "s" : "").append(".");
+                    sb
+                        .append(" second")
+                        .append(elapsedSecs > 1 ? "s" : "")
+                        .append(".");
                 }
             }
         } else if (elapsedMinutes > 0) {
             boolean secs = elapsedSecs > 0;
             sb.append(elapsedMinutes);
-            sb.append(" minute").append(elapsedMinutes > 1 ? "s" : "").append(secs ? " " : ".");
+            sb
+                .append(" minute")
+                .append(elapsedMinutes > 1 ? "s" : "")
+                .append(secs ? " " : ".");
             if (secs) {
                 sb.append("and ");
                 sb.append(elapsedSecs);
-                sb.append(" second").append(elapsedSecs > 1 ? "s" : "").append(".");
+                sb
+                    .append(" second")
+                    .append(elapsedSecs > 1 ? "s" : "")
+                    .append(".");
             }
         } else if (elapsedSeconds > 0) {
             sb.append((int) elapsedSeconds);
-            sb.append(" second").append(elapsedSeconds > 1 ? "s" : "").append(".");
+            sb
+                .append(" second")
+                .append(elapsedSeconds > 1 ? "s" : "")
+                .append(".");
         } else {
             sb.append("None.");
         }

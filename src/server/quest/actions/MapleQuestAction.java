@@ -8,16 +8,17 @@ package server.quest.actions;
 import client.player.Player;
 import java.util.ArrayList;
 import java.util.List;
-import server.quest.MapleQuestStatus;
 import provider.MapleData;
 import server.quest.MapleQuest;
 import server.quest.MapleQuestActionType;
+import server.quest.MapleQuestStatus;
 
 /**
  *
  * @author Tyler (Twdtwd)
  */
 public abstract class MapleQuestAction {
+
     private final MapleQuestActionType type;
     protected int questID;
 
@@ -27,11 +28,15 @@ public abstract class MapleQuestAction {
     }
 
     public abstract void run(Player chr, Integer extSelection);
+
     public abstract void processData(MapleData data);
 
     public boolean check(Player chr, Integer extSelection) {
         MapleQuestStatus status = chr.getQuest(MapleQuest.getInstance(questID));
-        return !(status.getStatus() == MapleQuestStatus.Status.NOT_STARTED && status.getForfeited() > 0);
+        return !(
+            status.getStatus() == MapleQuestStatus.Status.NOT_STARTED &&
+            status.getForfeited() > 0
+        );
     }
 
     public MapleQuestActionType getType() {

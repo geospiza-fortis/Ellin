@@ -1,6 +1,6 @@
 /*
 This file is part of the OdinMS Maple Story Server
-Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc> 
+Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc>
 Matthias Butz <matze@odinms.de>
 Jan Christian Meyer <vimes@odinms.de>
 
@@ -32,27 +32,42 @@ public class PlayerBuffStorage implements Serializable {
     private static final Map<Integer, List<PlayerCoolDownValueHolder>> coolDowns = new ConcurrentHashMap<>();
     private static final Map<Integer, List<DiseaseValueHolder>> diseases = new ConcurrentHashMap<>();
 
-    public static final void addBuffsToStorage(final int chrid, final List<PlayerBuffValueHolder> toStore) {
+    public static final void addBuffsToStorage(
+        final int chrid,
+        final List<PlayerBuffValueHolder> toStore
+    ) {
         buffs.put(chrid, toStore);
     }
 
-    public static final void addCooldownsToStorage(final int chrid, final List<PlayerCoolDownValueHolder> toStore) {
+    public static final void addCooldownsToStorage(
+        final int chrid,
+        final List<PlayerCoolDownValueHolder> toStore
+    ) {
         coolDowns.put(chrid, toStore);
     }
 
-    public static final void addDiseaseToStorage(final int chrid, final List<DiseaseValueHolder> toStore) {
+    public static final void addDiseaseToStorage(
+        final int chrid,
+        final List<DiseaseValueHolder> toStore
+    ) {
         diseases.put(chrid, toStore);
     }
 
-    public static final List<PlayerBuffValueHolder> getBuffsFromStorage(final int chrid) {
+    public static final List<PlayerBuffValueHolder> getBuffsFromStorage(
+        final int chrid
+    ) {
         return buffs.remove(chrid);
     }
 
-    public static final List<PlayerCoolDownValueHolder> getCooldownsFromStorage(final int chrid) {
+    public static final List<PlayerCoolDownValueHolder> getCooldownsFromStorage(
+        final int chrid
+    ) {
         return coolDowns.remove(chrid);
     }
 
-    public static final List<DiseaseValueHolder> getDiseaseFromStorage(final int chrid) {
+    public static final List<DiseaseValueHolder> getDiseaseFromStorage(
+        final int chrid
+    ) {
         return diseases.remove(chrid);
     }
 }

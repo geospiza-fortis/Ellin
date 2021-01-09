@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -25,6 +25,7 @@ import java.awt.Point;
 import packet.transfer.write.WritingPacket;
 
 public class TeleportMovement extends AbsoluteLifeMovement {
+
     public TeleportMovement(int type, Point position, int newstate) {
         super(type, position, 0, newstate);
     }

@@ -1,11 +1,13 @@
 package server.maps;
+
 import client.Client;
-import packet.transfer.write.OutPacket;
 import java.util.Calendar;
 import java.util.concurrent.ScheduledFuture;
 import packet.creators.PacketCreator;
+import packet.transfer.write.OutPacket;
 
 public class FieldTimer {
+
     private final int duration;
     private final Calendar startTime;
     private final Calendar predictedStopTime;
@@ -14,7 +16,13 @@ public class FieldTimer {
     private int maxLevelToWarp = 256;
     private final ScheduledFuture<?> schedule;
 
-    public FieldTimer(ScheduledFuture<?> schedule, int newDuration, int fieldToWarpToP, int minLevelToWarpP, int maxLevelToWarpP) {
+    public FieldTimer(
+        ScheduledFuture<?> schedule,
+        int newDuration,
+        int fieldToWarpToP,
+        int minLevelToWarpP,
+        int maxLevelToWarpP
+    ) {
         this.duration = newDuration;
         this.startTime = Calendar.getInstance();
         this.predictedStopTime = Calendar.getInstance();
@@ -28,7 +36,9 @@ public class FieldTimer {
     public OutPacket makeSpawnData() {
         long StopTimeStamp = this.predictedStopTime.getTimeInMillis();
         long CurrentTimeStamp = Calendar.getInstance().getTimeInMillis();
-        return PacketCreator.GetClockTimer((int) (StopTimeStamp - CurrentTimeStamp) / 1000);
+        return PacketCreator.GetClockTimer(
+            (int) (StopTimeStamp - CurrentTimeStamp) / 1000
+        );
     }
 
     public void sendSpawnData(Client c) {

@@ -1,6 +1,5 @@
 package tools;
 
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -10,78 +9,87 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class FileLogger {
-    
-    private static final SimpleDateFormat SIMPLE_DATE = new SimpleDateFormat("dd-MM-yyyy");
-    private static final SimpleDateFormat SIMPLE_DATE_ = new SimpleDateFormat("HH:mm");
 
-    public static final String 
-            
-        NPC = "Npcs/",
-        ITEM = "Items/",
-        QUEST = "Quests/",
-        PORTAL = "Portals/",
-        REACTOR = "Reactors/",
-        EXPLOITS = "Exploits/",
-        FREDRICK = "fredrick/",
-        FIELD = "Field/map.txt",
-        INVOCABLE = "Invocable/",
-        PACKET_LOG = "Packets/log.txt",
-        DEADLOCK_ERROR = "deadlocks.txt",
-        DEADLOCK_STACK = "deadlocks/path.txt",
-        DEADLOCK_LOCKS = "deadlocks/locks.txt",
-        DEADLOCK_STATE = "deadlocks/state.txt",
-        EXCEPTION = "Exception/exceptions.txt",
-        ACCOUNT_STUCK = "Stuck/AccountStuck.txt",
-        PLAYER_STUCK = "Stuck/PlayerStuck.txt",
-        DATABASE_EXCEPTION = "Exception/Database/",
-        COMMANDS_EXCEPTION = "Exception/Commands/",
-        QUEST_UNCODED = "Quests/uncodedQuests.txt",
-        EXCEPTION_CAUGHT = "Exception/ExceptionCaught.txt";
-    
-    private static final String FILE_PATH = "MSLog/" + SIMPLE_DATE.format(Calendar.getInstance().getTime()) + "/";
-    
+    private static final SimpleDateFormat SIMPLE_DATE = new SimpleDateFormat(
+        "dd-MM-yyyy"
+    );
+    private static final SimpleDateFormat SIMPLE_DATE_ = new SimpleDateFormat(
+        "HH:mm"
+    );
+
+    public static final String NPC = "Npcs/", ITEM = "Items/", QUEST =
+        "Quests/", PORTAL = "Portals/", REACTOR = "Reactors/", EXPLOITS =
+        "Exploits/", FREDRICK = "fredrick/", FIELD =
+        "Field/map.txt", INVOCABLE = "Invocable/", PACKET_LOG =
+        "Packets/log.txt", DEADLOCK_ERROR = "deadlocks.txt", DEADLOCK_STACK =
+        "deadlocks/path.txt", DEADLOCK_LOCKS =
+        "deadlocks/locks.txt", DEADLOCK_STATE =
+        "deadlocks/state.txt", EXCEPTION =
+        "Exception/exceptions.txt", ACCOUNT_STUCK =
+        "Stuck/AccountStuck.txt", PLAYER_STUCK =
+        "Stuck/PlayerStuck.txt", DATABASE_EXCEPTION =
+        "Exception/Database/", COMMANDS_EXCEPTION =
+        "Exception/Commands/", QUEST_UNCODED =
+        "Quests/uncodedQuests.txt", EXCEPTION_CAUGHT =
+        "Exception/ExceptionCaught.txt";
+
+    private static final String FILE_PATH =
+        "MSLog/" + SIMPLE_DATE.format(Calendar.getInstance().getTime()) + "/";
+
     public static void logPacket(final String file, final String msg) {
         logETCs(file, msg, true);
     }
 
     public static void log(final String file, final String msg) {
-	FileOutputStream out = null;
-	try {
-	    out = new FileOutputStream(file, true);
-	    out.write(msg.getBytes());
-	    out.write("\n------------------------\n".getBytes());
-	} catch (IOException ess) {
-	} finally {
-	    try {
-		if (out != null) {
-		    out.close();
-		}
-	    } catch (IOException ignore) {
-	    }
-	}
-    }
-    
-    public static void logETCs(final String file, final String msg, final boolean packet) {
         FileOutputStream out = null;
         try {
-            out = new FileOutputStream((packet ? "../MSLog/packet\\" : "../MSLog/Usuarios\\")+ file + ".rtf", true);
-            out.write(("\n------------------------ " + CurrentReadable_Time() + " ------------------------\n").getBytes());
+            out = new FileOutputStream(file, true);
             out.write(msg.getBytes());
-        } catch (IOException ess) {
-        } finally {
+            out.write("\n------------------------\n".getBytes());
+        } catch (IOException ess) {} finally {
             try {
                 if (out != null) {
                     out.close();
                 }
-            } catch (IOException ignore) {
-            }
+            } catch (IOException ignore) {}
         }
     }
-    
-    public static final String CurrentReadable_Time() {
-	return SIMPLE_DATE.format(Calendar.getInstance().getTime());
+
+    public static void logETCs(
+        final String file,
+        final String msg,
+        final boolean packet
+    ) {
+        FileOutputStream out = null;
+        try {
+            out =
+                new FileOutputStream(
+                    (packet ? "../MSLog/packet\\" : "../MSLog/Usuarios\\") +
+                    file +
+                    ".rtf",
+                    true
+                );
+            out.write(
+                (
+                    "\n------------------------ " +
+                    CurrentReadable_Time() +
+                    " ------------------------\n"
+                ).getBytes()
+            );
+            out.write(msg.getBytes());
+        } catch (IOException ess) {} finally {
+            try {
+                if (out != null) {
+                    out.close();
+                }
+            } catch (IOException ignore) {}
+        }
     }
-    
+
+    public static final String CurrentReadable_Time() {
+        return SIMPLE_DATE.format(Calendar.getInstance().getTime());
+    }
+
     public static void printError(final String name, final Throwable t) {
         FileOutputStream out = null;
         final String file = FILE_PATH + "error/" + name;
@@ -93,18 +101,20 @@ public class FileLogger {
             out = new FileOutputStream(file, true);
             out.write(getString(t).getBytes());
             out.write("\n---------------------------------\r\n".getBytes());
-        } catch (IOException ess) {
-        } finally {
+        } catch (IOException ess) {} finally {
             try {
                 if (out != null) {
                     out.close();
                 }
-            } catch (IOException ignore) {
-            }
+            } catch (IOException ignore) {}
         }
     }
 
-    public static void printError(final String name, final Throwable t, final String info) {
+    public static void printError(
+        final String name,
+        final Throwable t,
+        final String info
+    ) {
         FileOutputStream out = null;
         final String file = FILE_PATH + "error/" + name;
         try {
@@ -116,14 +126,12 @@ public class FileLogger {
             out.write((info + "\r\n").getBytes());
             out.write(getString(t).getBytes());
             out.write("\n---------------------------------\r\n".getBytes());
-        } catch (IOException ess) {
-        } finally {
+        } catch (IOException ess) {} finally {
             try {
                 if (out != null) {
                     out.close();
                 }
-            } catch (IOException ignore) {
-            }
+            } catch (IOException ignore) {}
         }
     }
 
@@ -137,21 +145,18 @@ public class FileLogger {
             }
             out = new FileOutputStream(file, true);
             out.write(s.getBytes());
-        } catch (IOException ess) {
-        } finally {
+        } catch (IOException ess) {} finally {
             try {
                 if (out != null) {
                     out.close();
                 }
-            } catch (IOException ignore) {
-            }
+            } catch (IOException ignore) {}
         }
     }
 
     public static void print(final String name, final String s) {
         print(name, s, true);
     }
-    
 
     public static void print(final String name, final String s, boolean line) {
         FileOutputStream out = null;
@@ -167,17 +172,15 @@ public class FileLogger {
             if (line) {
                 out.write("---------------------------------\r\n".getBytes());
             }
-        } catch (IOException ess) {
-        } finally {
+        } catch (IOException ess) {} finally {
             try {
                 if (out != null) {
                     out.close();
                 }
-            } catch (IOException ignore) {
-            }
+            } catch (IOException ignore) {}
         }
     }
-    
+
     private static String getString(final Throwable e) {
         String retValue = null;
         StringWriter sw = null;
@@ -195,8 +198,7 @@ public class FileLogger {
                 if (sw != null) {
                     sw.close();
                 }
-            } catch (IOException ignore) {
-            }
+            } catch (IOException ignore) {}
         }
         return retValue;
     }
