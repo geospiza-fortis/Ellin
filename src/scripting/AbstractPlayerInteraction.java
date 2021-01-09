@@ -32,7 +32,6 @@ import packet.creators.PetPackets;
 import scripting.event.EventInstanceManager;
 import server.itens.InventoryManipulator;
 import server.itens.ItemInformationProvider;
-import server.events.RussianRoulette;
 import server.expeditions.MapleExpedition;
 import server.expeditions.MapleExpeditionType;
 import server.transitions.Boats;
@@ -248,8 +247,6 @@ public class AbstractPlayerInteraction {
                 return Cabin.cabinOpen();
             case "Genio":  
                 return Genie.genioOpen();
-            case "RoletaRussa":  
-                return RussianRoulette.RoletaDisponivel();
             case "ElevadorDescendo":  
                 return Elevator.elevatorIsDown();
             case "ElevadorSubindo":  
