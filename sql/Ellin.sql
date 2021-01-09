@@ -813,6 +813,31 @@ CREATE TABLE IF NOT EXISTS `savedlocations` (
 
 
 -- ----------------------------
+-- Table structure for shopitems
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `shopitems` (
+  `shopitemid` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `shopid` int(10) unsigned NOT NULL DEFAULT '0',
+  `itemid` int(11) NOT NULL DEFAULT '0',
+  `price` int(11) NOT NULL DEFAULT '0',
+  `position` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`shopitemid`),
+  KEY `shopid` (`shopid`),
+  UNIQUE KEY `shopid_2` (`shopid`,`itemid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+-- ----------------------------
+-- Table structure for shops
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `shops` (
+  `shopid` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `npcid` int(11) DEFAULT '0',
+  PRIMARY KEY (`shopid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+-- ----------------------------
 -- Table structure for skillmacros
 -- ----------------------------
 CREATE TABLE IF NOT EXISTS `skillmacros` (
