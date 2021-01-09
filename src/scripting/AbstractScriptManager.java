@@ -51,7 +51,7 @@ public abstract class AbstractScriptManager {
     }
 
     protected Invocable getInvocable(String path, Client c) {
-        path = ServerProperties.Misc.DATA_ROOT + "/Script/" + path;
+        path = ServerProperties.Misc.SCRIPT_ROOT + "/" + path;
         engine = null;
         if (c != null) {
             engine = c.getScriptEngine(path);
@@ -83,8 +83,6 @@ public abstract class AbstractScriptManager {
     }
 
     protected void resetContext(String path, Client c) {
-        c.removeScriptEngine(
-            ServerProperties.Misc.DATA_ROOT + "/Script/" + path
-        );
+        c.removeScriptEngine(ServerProperties.Misc.SCRIPT_ROOT + "/" + path);
     }
 }

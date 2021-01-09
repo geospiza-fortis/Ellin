@@ -537,9 +537,7 @@ public class ChannelServer {
 
     private static String[] getEvents() {
         List<String> events = new ArrayList<>();
-        for (File file : new File(
-            ServerProperties.Misc.DATA_ROOT + "/Script/event"
-        )
+        for (File file : new File(ServerProperties.Misc.SCRIPT_ROOT + "/event")
             .listFiles()) {
             events.add(
                 file.getName().substring(0, file.getName().length() - 3)
