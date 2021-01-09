@@ -18,8 +18,7 @@ SET FOREIGN_KEY_CHECKS=0;
 -- ----------------------------
 -- Table structure for accounts
 -- ----------------------------
-DROP TABLE IF EXISTS `accounts`;
-CREATE TABLE `accounts` (
+CREATE TABLE IF NOT EXISTS `accounts` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(13) NOT NULL DEFAULT '',
   `password` varchar(128) NOT NULL DEFAULT '',
@@ -63,8 +62,7 @@ CREATE TABLE `accounts` (
 -- ----------------------------
 -- Table structure for alliances
 -- ----------------------------
-DROP TABLE IF EXISTS `alliances`;
-CREATE TABLE `alliances` (
+CREATE TABLE IF NOT EXISTS `alliances` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(13) NOT NULL,
   `leaderid` int(11) NOT NULL,
@@ -87,8 +85,7 @@ CREATE TABLE `alliances` (
 -- ----------------------------
 -- Table structure for bbs_replies
 -- ----------------------------
-DROP TABLE IF EXISTS `bbs_replies`;
-CREATE TABLE `bbs_replies` (
+CREATE TABLE IF NOT EXISTS `bbs_replies` (
   `replyid` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `threadid` int(10) unsigned NOT NULL,
   `postercid` int(10) unsigned NOT NULL,
@@ -102,8 +99,7 @@ CREATE TABLE `bbs_replies` (
 -- ----------------------------
 -- Table structure for bbs_threads
 -- ----------------------------
-DROP TABLE IF EXISTS `bbs_threads`;
-CREATE TABLE `bbs_threads` (
+CREATE TABLE IF NOT EXISTS `bbs_threads` (
   `threadid` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `postercid` int(10) unsigned NOT NULL,
   `name` varchar(26) NOT NULL DEFAULT '',
@@ -120,8 +116,7 @@ CREATE TABLE `bbs_threads` (
 -- ----------------------------
 -- Table structure for bosslog
 -- ----------------------------
-DROP TABLE IF EXISTS `bosslog`;
-CREATE TABLE `bosslog` (
+CREATE TABLE IF NOT EXISTS `bosslog` (
   `bosslogid` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `characterid` int(10) unsigned NOT NULL,
   `bossid` varchar(20) NOT NULL,
@@ -133,37 +128,32 @@ CREATE TABLE `bosslog` (
 -- ----------------------------
 -- Table structure for buddies
 -- ----------------------------
-DROP TABLE IF EXISTS `buddies`;
-CREATE TABLE `buddies` (
+CREATE TABLE IF NOT EXISTS `buddies` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `characterid` int(11) NOT NULL,
   `buddyid` int(11) NOT NULL,
   `pending` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
-  KEY `buddies_ibfk_1` (`characterid`),
-  CONSTRAINT `buddies_ibfk_1` FOREIGN KEY (`characterid`) REFERENCES `characters` (`id`) ON DELETE CASCADE
+  FOREIGN KEY (`characterid`) REFERENCES `characters` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 -- ----------------------------
 -- Table structure for buddyentries
 -- ----------------------------
-DROP TABLE IF EXISTS `buddyentries`;
-CREATE TABLE `buddyentries` (
+CREATE TABLE IF NOT EXISTS `buddyentries` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `owner` int(11) NOT NULL,
   `buddyid` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `owner` (`owner`),
-  CONSTRAINT `buddyentries_ibfk_1` FOREIGN KEY (`owner`) REFERENCES `characters` (`id`) ON DELETE CASCADE
+  FOREIGN KEY (`owner`) REFERENCES `characters` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 -- ----------------------------
 -- Table structure for cashshopcouponitems
 -- ----------------------------
-DROP TABLE IF EXISTS `cashshopcouponitems`;
-CREATE TABLE `cashshopcouponitems` (
+CREATE TABLE IF NOT EXISTS `cashshopcouponitems` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `code` varchar(32) NOT NULL,
   `type` int(11) NOT NULL,
@@ -176,8 +166,7 @@ CREATE TABLE `cashshopcouponitems` (
 -- ----------------------------
 -- Table structure for cashshopcoupons
 -- ----------------------------
-DROP TABLE IF EXISTS `cashshopcoupons`;
-CREATE TABLE `cashshopcoupons` (
+CREATE TABLE IF NOT EXISTS `cashshopcoupons` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `code` varchar(32) NOT NULL,
   `used` int(11) NOT NULL DEFAULT '0',
@@ -189,8 +178,7 @@ CREATE TABLE `cashshopcoupons` (
 -- ----------------------------
 -- Table structure for characters
 -- ----------------------------
-DROP TABLE IF EXISTS `characters`;
-CREATE TABLE `characters` (
+CREATE TABLE IF NOT EXISTS `characters` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `accountid` int(11) NOT NULL DEFAULT '0',
   `world` int(11) NOT NULL DEFAULT '0',
@@ -270,24 +258,21 @@ CREATE TABLE `characters` (
 -- ----------------------------
 -- Table structure for characterslots
 -- ----------------------------
-DROP TABLE IF EXISTS `characterslots`;
-CREATE TABLE `characterslots` (
+CREATE TABLE IF NOT EXISTS `characterslots` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `accountId` int(11) NOT NULL,
   `world` tinyint(3) unsigned NOT NULL,
   `slots` tinyint(3) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `Index_3` (`accountId`),
-  KEY `FK_characterslots_1` (`accountId`),
-  CONSTRAINT `characterslots_ibfk_1` FOREIGN KEY (`accountId`) REFERENCES `accounts` (`id`) ON DELETE CASCADE
+  FOREIGN KEY (`accountId`) REFERENCES `accounts` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 -- ----------------------------
 -- Table structure for cheatlog
 -- ----------------------------
-DROP TABLE IF EXISTS `cheatlog`;
-CREATE TABLE `cheatlog` (
+CREATE TABLE IF NOT EXISTS `cheatlog` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `characterid` int(11) NOT NULL DEFAULT '0',
   `offense` tinytext NOT NULL,
@@ -302,8 +287,7 @@ CREATE TABLE `cheatlog` (
 -- ----------------------------
 -- Table structure for completpqs
 -- ----------------------------
-DROP TABLE IF EXISTS `completpqs`;
-CREATE TABLE `completpqs` (
+CREATE TABLE IF NOT EXISTS `completpqs` (
   `id` int(11) NOT NULL,
   `henesysPQ` int(11) DEFAULT '0',
   `kerningPQ` int(11) DEFAULT '0',
@@ -321,8 +305,7 @@ CREATE TABLE `completpqs` (
 -- ----------------------------
 -- Table structure for cooldowns
 -- ----------------------------
-DROP TABLE IF EXISTS `cooldowns`;
-CREATE TABLE `cooldowns` (
+CREATE TABLE IF NOT EXISTS `cooldowns` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `charid` int(11) NOT NULL,
   `skillid` int(11) NOT NULL,
@@ -335,8 +318,7 @@ CREATE TABLE `cooldowns` (
 -- ----------------------------
 -- Table structure for drop_data
 -- ----------------------------
-DROP TABLE IF EXISTS `drop_data`;
-CREATE TABLE `drop_data` (
+CREATE TABLE IF NOT EXISTS `drop_data` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `dropperid` int(11) NOT NULL,
   `itemid` int(11) NOT NULL DEFAULT '0',
@@ -354,8 +336,7 @@ CREATE TABLE `drop_data` (
 -- ----------------------------
 -- Table structure for drop_data_global
 -- ----------------------------
-DROP TABLE IF EXISTS `drop_data_global`;
-CREATE TABLE `drop_data_global` (
+CREATE TABLE IF NOT EXISTS `drop_data_global` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `continent` int(11) NOT NULL,
   `dropType` tinyint(1) NOT NULL DEFAULT '0',
@@ -373,8 +354,7 @@ CREATE TABLE `drop_data_global` (
 -- ----------------------------
 -- Table structure for dueyitems
 -- ----------------------------
-DROP TABLE IF EXISTS `dueyitems`;
-CREATE TABLE `dueyitems` (
+CREATE TABLE IF NOT EXISTS `dueyitems` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `PackageId` int(10) unsigned NOT NULL DEFAULT '0',
   `itemid` int(10) unsigned NOT NULL DEFAULT '0',
@@ -399,16 +379,14 @@ CREATE TABLE `dueyitems` (
   `flag` int(11) DEFAULT '0',
   `owner` tinytext,
   PRIMARY KEY (`id`),
-  KEY `PackageId` (`PackageId`),
-  CONSTRAINT `dueyitems_ibfk_1` FOREIGN KEY (`PackageId`) REFERENCES `dueypackages` (`PackageId`) ON DELETE CASCADE
+  FOREIGN KEY (`PackageId`) REFERENCES `dueypackages` (`PackageId`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 -- ----------------------------
 -- Table structure for dueypackages
 -- ----------------------------
-DROP TABLE IF EXISTS `dueypackages`;
-CREATE TABLE `dueypackages` (
+CREATE TABLE IF NOT EXISTS `dueypackages` (
   `PackageId` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `ReceiverId` int(10) unsigned NOT NULL,
   `SenderName` varchar(13) NOT NULL,
@@ -423,23 +401,20 @@ CREATE TABLE `dueypackages` (
 -- ----------------------------
 -- Table structure for famelog
 -- ----------------------------
-DROP TABLE IF EXISTS `famelog`;
-CREATE TABLE `famelog` (
+CREATE TABLE IF NOT EXISTS `famelog` (
   `famelogid` int(11) NOT NULL AUTO_INCREMENT,
   `characterid` int(11) NOT NULL DEFAULT '0',
   `characterid_to` int(11) NOT NULL DEFAULT '0',
   `when` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`famelogid`),
-  KEY `characterid` (`characterid`),
-  CONSTRAINT `famelog_ibfk_1` FOREIGN KEY (`characterid`) REFERENCES `characters` (`id`) ON DELETE CASCADE
+  FOREIGN KEY (`characterid`) REFERENCES `characters` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 -- ----------------------------
 -- Table structure for gifts
 -- ----------------------------
-DROP TABLE IF EXISTS `gifts`;
-CREATE TABLE `gifts` (
+CREATE TABLE IF NOT EXISTS `gifts` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `to` int(11) NOT NULL,
   `from` varchar(13) NOT NULL,
@@ -455,8 +430,7 @@ CREATE TABLE `gifts` (
 -- ----------------------------
 -- Table structure for gmlog
 -- ----------------------------
-DROP TABLE IF EXISTS `gmlog`;
-CREATE TABLE `gmlog` (
+CREATE TABLE IF NOT EXISTS `gmlog` (
   `gmlogid` int(11) NOT NULL AUTO_INCREMENT,
   `cid` int(11) NOT NULL DEFAULT '0',
   `command` text NOT NULL,
@@ -469,8 +443,7 @@ CREATE TABLE `gmlog` (
 -- ----------------------------
 -- Table structure for guilds
 -- ----------------------------
-DROP TABLE IF EXISTS `guilds`;
-CREATE TABLE `guilds` (
+CREATE TABLE IF NOT EXISTS `guilds` (
   `guildid` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `leader` int(10) unsigned NOT NULL DEFAULT '0',
   `GP` int(10) unsigned NOT NULL DEFAULT '0',
@@ -495,8 +468,7 @@ CREATE TABLE `guilds` (
 -- ----------------------------
 -- Table structure for hwidbans
 -- ----------------------------
-DROP TABLE IF EXISTS `hwidbans`;
-CREATE TABLE `hwidbans` (
+CREATE TABLE IF NOT EXISTS `hwidbans` (
   `hwidbanid` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `hwid` varchar(30) NOT NULL,
   PRIMARY KEY (`hwidbanid`),
@@ -507,8 +479,7 @@ CREATE TABLE `hwidbans` (
 -- ----------------------------
 -- Table structure for inventoryequipment
 -- ----------------------------
-DROP TABLE IF EXISTS `inventoryequipment`;
-CREATE TABLE `inventoryequipment` (
+CREATE TABLE IF NOT EXISTS `inventoryequipment` (
   `inventoryequipmentid` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `inventoryitemid` int(10) unsigned NOT NULL DEFAULT '0',
   `upgradeslots` int(11) NOT NULL DEFAULT '0',
@@ -530,16 +501,14 @@ CREATE TABLE `inventoryequipment` (
   `jump` int(11) NOT NULL DEFAULT '0',
   `locked` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`inventoryequipmentid`),
-  KEY `inventoryitemid` (`inventoryitemid`),
-  CONSTRAINT `inventoryequipment_ibfk_1` FOREIGN KEY (`inventoryitemid`) REFERENCES `inventoryitems` (`inventoryitemid`) ON DELETE CASCADE
+  FOREIGN KEY (`inventoryitemid`) REFERENCES `inventoryitems` (`inventoryitemid`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 -- ----------------------------
 -- Table structure for inventoryitems
 -- ----------------------------
-DROP TABLE IF EXISTS `inventoryitems`;
-CREATE TABLE `inventoryitems` (
+CREATE TABLE IF NOT EXISTS `inventoryitems` (
   `inventoryitemid` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `type` tinyint(1) NOT NULL,
   `characterid` int(11) DEFAULT NULL,
@@ -564,8 +533,7 @@ CREATE TABLE `inventoryitems` (
 -- ----------------------------
 -- Table structure for ipbans
 -- ----------------------------
-DROP TABLE IF EXISTS `ipbans`;
-CREATE TABLE `ipbans` (
+CREATE TABLE IF NOT EXISTS `ipbans` (
   `ipbanid` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `ip` varchar(40) NOT NULL DEFAULT '',
   PRIMARY KEY (`ipbanid`)
@@ -575,8 +543,7 @@ CREATE TABLE `ipbans` (
 -- ----------------------------
 -- Table structure for iplog
 -- ----------------------------
-DROP TABLE IF EXISTS `iplog`;
-CREATE TABLE `iplog` (
+CREATE TABLE IF NOT EXISTS `iplog` (
   `iplogid` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `accountid` int(11) NOT NULL DEFAULT '0',
   `ip` varchar(30) NOT NULL DEFAULT '',
@@ -591,24 +558,21 @@ CREATE TABLE `iplog` (
 -- ----------------------------
 -- Table structure for keymap
 -- ----------------------------
-DROP TABLE IF EXISTS `keymap`;
-CREATE TABLE `keymap` (
+CREATE TABLE IF NOT EXISTS `keymap` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `characterid` int(11) NOT NULL DEFAULT '0',
   `key` int(11) NOT NULL DEFAULT '0',
   `type` int(11) NOT NULL DEFAULT '0',
   `action` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
-  KEY `keymap_ibfk_1` (`characterid`),
-  CONSTRAINT `keymap_ibfk_1` FOREIGN KEY (`characterid`) REFERENCES `characters` (`id`) ON DELETE CASCADE
+  FOREIGN KEY (`characterid`) REFERENCES `characters` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 -- ----------------------------
 -- Table structure for macbans
 -- ----------------------------
-DROP TABLE IF EXISTS `macbans`;
-CREATE TABLE `macbans` (
+CREATE TABLE IF NOT EXISTS `macbans` (
   `macbanid` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `mac` varchar(30) NOT NULL,
   PRIMARY KEY (`macbanid`),
@@ -619,8 +583,7 @@ CREATE TABLE `macbans` (
 -- ----------------------------
 -- Table structure for macfilters
 -- ----------------------------
-DROP TABLE IF EXISTS `macfilters`;
-CREATE TABLE `macfilters` (
+CREATE TABLE IF NOT EXISTS `macfilters` (
   `macfilterid` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `filter` varchar(30) NOT NULL,
   PRIMARY KEY (`macfilterid`)
@@ -630,8 +593,7 @@ CREATE TABLE `macfilters` (
 -- ----------------------------
 -- Table structure for mountdata
 -- ----------------------------
-DROP TABLE IF EXISTS `mountdata`;
-CREATE TABLE `mountdata` (
+CREATE TABLE IF NOT EXISTS `mountdata` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `characterid` int(10) unsigned DEFAULT NULL,
   `Level` int(3) unsigned NOT NULL DEFAULT '0',
@@ -644,8 +606,7 @@ CREATE TABLE `mountdata` (
 -- ----------------------------
 -- Table structure for notes
 -- ----------------------------
-DROP TABLE IF EXISTS `notes`;
-CREATE TABLE `notes` (
+CREATE TABLE IF NOT EXISTS `notes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `to` varchar(13) NOT NULL DEFAULT '',
   `from` varchar(13) NOT NULL DEFAULT '',
@@ -659,8 +620,7 @@ CREATE TABLE `notes` (
 -- ----------------------------
 -- Table structure for pets
 -- ----------------------------
-DROP TABLE IF EXISTS `pets`;
-CREATE TABLE `pets` (
+CREATE TABLE IF NOT EXISTS `pets` (
   `petid` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(13) DEFAULT NULL,
   `level` int(3) unsigned NOT NULL,
@@ -675,8 +635,7 @@ CREATE TABLE `pets` (
 -- ----------------------------
 -- Table structure for playernpcs
 -- ----------------------------
-DROP TABLE IF EXISTS `playernpcs`;
-CREATE TABLE `playernpcs` (
+CREATE TABLE IF NOT EXISTS `playernpcs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(13) NOT NULL,
   `hair` int(11) NOT NULL,
@@ -699,23 +658,20 @@ CREATE TABLE `playernpcs` (
 -- ----------------------------
 -- Table structure for playernpcs_equip
 -- ----------------------------
-DROP TABLE IF EXISTS `playernpcs_equip`;
-CREATE TABLE `playernpcs_equip` (
+CREATE TABLE IF NOT EXISTS `playernpcs_equip` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `npcid` int(11) NOT NULL,
   `equipid` int(11) NOT NULL,
   `equippos` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `FK_playernpcs_equip_1` (`npcid`),
-  CONSTRAINT `playernpcs_equip_ibfk_1` FOREIGN KEY (`npcid`) REFERENCES `playernpcs` (`id`) ON DELETE CASCADE
+  FOREIGN KEY (`npcid`) REFERENCES `playernpcs` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 -- ----------------------------
 -- Table structure for player_variables
 -- ----------------------------
-DROP TABLE IF EXISTS `player_variables`;
-CREATE TABLE `player_variables` (
+CREATE TABLE IF NOT EXISTS `player_variables` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `characterid` int(11) unsigned NOT NULL,
   `name` varchar(45) NOT NULL,
@@ -727,8 +683,7 @@ CREATE TABLE `player_variables` (
 -- ----------------------------
 -- Table structure for questactions
 -- ----------------------------
-DROP TABLE IF EXISTS `questactions`;
-CREATE TABLE `questactions` (
+CREATE TABLE IF NOT EXISTS `questactions` (
   `questactionid` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `questid` int(11) NOT NULL DEFAULT '0',
   `status` int(11) NOT NULL DEFAULT '0',
@@ -740,8 +695,7 @@ CREATE TABLE `questactions` (
 -- ----------------------------
 -- Table structure for questprogress
 -- ----------------------------
-DROP TABLE IF EXISTS `questprogress`;
-CREATE TABLE `questprogress` (
+CREATE TABLE IF NOT EXISTS `questprogress` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `queststatusid` int(10) unsigned NOT NULL DEFAULT '0',
   `progressid` int(11) NOT NULL DEFAULT '0',
@@ -753,8 +707,7 @@ CREATE TABLE `questprogress` (
 -- ----------------------------
 -- Table structure for questrequirements
 -- ----------------------------
-DROP TABLE IF EXISTS `questrequirements`;
-CREATE TABLE `questrequirements` (
+CREATE TABLE IF NOT EXISTS `questrequirements` (
   `questrequirementid` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `questid` int(11) NOT NULL DEFAULT '0',
   `status` int(11) NOT NULL DEFAULT '0',
@@ -766,8 +719,7 @@ CREATE TABLE `questrequirements` (
 -- ----------------------------
 -- Table structure for queststatus
 -- ----------------------------
-DROP TABLE IF EXISTS `queststatus`;
-CREATE TABLE `queststatus` (
+CREATE TABLE IF NOT EXISTS `queststatus` (
   `queststatusid` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `characterid` int(11) NOT NULL DEFAULT '0',
   `quest` int(11) NOT NULL DEFAULT '0',
@@ -776,31 +728,27 @@ CREATE TABLE `queststatus` (
   `forfeited` int(11) NOT NULL DEFAULT '0',
   `completed` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`queststatusid`),
-  KEY `characterid` (`characterid`),
-  CONSTRAINT `queststatus_ibfk_1` FOREIGN KEY (`characterid`) REFERENCES `characters` (`id`) ON DELETE CASCADE
+  FOREIGN KEY (`characterid`) REFERENCES `characters` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 -- ----------------------------
 -- Table structure for queststatusmobs
 -- ----------------------------
-DROP TABLE IF EXISTS `queststatusmobs`;
-CREATE TABLE `queststatusmobs` (
+CREATE TABLE IF NOT EXISTS `queststatusmobs` (
   `queststatusmobid` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `queststatusid` int(10) unsigned NOT NULL DEFAULT '0',
   `mob` int(11) NOT NULL DEFAULT '0',
   `count` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`queststatusmobid`),
-  KEY `queststatusid` (`queststatusid`),
-  CONSTRAINT `queststatusmobs_ibfk_1` FOREIGN KEY (`queststatusid`) REFERENCES `queststatus` (`queststatusid`) ON DELETE CASCADE
+  FOREIGN KEY (`queststatusid`) REFERENCES `queststatus` (`queststatusid`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 -- ----------------------------
 -- Table structure for reactordrops
 -- ----------------------------
-DROP TABLE IF EXISTS `reactordrops`;
-CREATE TABLE `reactordrops` (
+CREATE TABLE IF NOT EXISTS `reactordrops` (
   `reactordropid` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `reactorid` int(11) NOT NULL,
   `itemid` int(11) NOT NULL,
@@ -813,8 +761,7 @@ CREATE TABLE `reactordrops` (
 -- ----------------------------
 -- Table structure for regrocklocations
 -- ----------------------------
-DROP TABLE IF EXISTS `regrocklocations`;
-CREATE TABLE `regrocklocations` (
+CREATE TABLE IF NOT EXISTS `regrocklocations` (
   `trockid` int(11) NOT NULL AUTO_INCREMENT,
   `characterid` int(11) DEFAULT NULL,
   `mapid` int(11) DEFAULT NULL,
@@ -825,8 +772,7 @@ CREATE TABLE `regrocklocations` (
 -- ----------------------------
 -- Table structure for reports
 -- ----------------------------
-DROP TABLE IF EXISTS `reports`;
-CREATE TABLE `reports` (
+CREATE TABLE IF NOT EXISTS `reports` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `reporttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `reporterid` int(11) NOT NULL,
@@ -841,8 +787,7 @@ CREATE TABLE `reports` (
 -- ----------------------------
 -- Table structure for rings
 -- ----------------------------
-DROP TABLE IF EXISTS `rings`;
-CREATE TABLE `rings` (
+CREATE TABLE IF NOT EXISTS `rings` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `partnerRingId` int(11) NOT NULL DEFAULT '0',
   `partnerChrId` int(11) NOT NULL DEFAULT '0',
@@ -855,19 +800,13 @@ CREATE TABLE `rings` (
 -- ----------------------------
 -- Table structure for savedlocations
 -- ----------------------------
-DROP TABLE IF EXISTS `savedlocations`;
-CREATE TABLE `savedlocations` (
+CREATE TABLE IF NOT EXISTS `savedlocations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `characterid` int(11) NOT NULL,
   `locationtype` enum('FREE_MARKET','WORLDTOUR','FLORINA','MONSTER_CARNIVAL','ARIANT_PQ','EVENTO','BALROGPQ','RICHIE','RANDOM_EVENT') NOT NULL,
   `map` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `characterid` (`characterid`,`map`,`locationtype`),
-  UNIQUE KEY `characterid_2` (`characterid`,`map`,`locationtype`),
-  UNIQUE KEY `characterid_3` (`characterid`,`map`,`locationtype`),
-  UNIQUE KEY `characterid_4` (`characterid`,`map`,`locationtype`),
-  UNIQUE KEY `characterid_5` (`characterid`,`map`,`locationtype`),
-  UNIQUE KEY `characterid_6` (`characterid`,`map`,`locationtype`),
   KEY `savedlocations_ibfk_1` (`characterid`),
   CONSTRAINT `savedlocations_ibfk_1` FOREIGN KEY (`characterid`) REFERENCES `characters` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -876,8 +815,7 @@ CREATE TABLE `savedlocations` (
 -- ----------------------------
 -- Table structure for skillmacros
 -- ----------------------------
-DROP TABLE IF EXISTS `skillmacros`;
-CREATE TABLE `skillmacros` (
+CREATE TABLE IF NOT EXISTS `skillmacros` (
   `entryid` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `characterid` int(11) NOT NULL,
   `position` tinyint(1) NOT NULL,
@@ -895,8 +833,7 @@ CREATE TABLE `skillmacros` (
 -- ----------------------------
 -- Table structure for skills
 -- ----------------------------
-DROP TABLE IF EXISTS `skills`;
-CREATE TABLE `skills` (
+CREATE TABLE IF NOT EXISTS `skills` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `skillid` int(11) NOT NULL DEFAULT '0',
   `characterid` int(11) NOT NULL DEFAULT '0',
@@ -904,10 +841,6 @@ CREATE TABLE `skills` (
   `masterlevel` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `characterid` (`characterid`,`skillid`),
-  UNIQUE KEY `characterid_2` (`characterid`,`skillid`),
-  UNIQUE KEY `characterid_3` (`characterid`,`skillid`),
-  UNIQUE KEY `characterid_4` (`characterid`,`skillid`),
-  UNIQUE KEY `characterid_5` (`characterid`,`skillid`),
   KEY `skills_ibfk_1` (`characterid`),
   CONSTRAINT `skills_ibfk_1` FOREIGN KEY (`characterid`) REFERENCES `characters` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -916,8 +849,7 @@ CREATE TABLE `skills` (
 -- ----------------------------
 -- Table structure for spawns
 -- ----------------------------
-DROP TABLE IF EXISTS `spawns`;
-CREATE TABLE `spawns` (
+CREATE TABLE IF NOT EXISTS `spawns` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `idd` int(11) NOT NULL,
   `f` int(11) NOT NULL,
@@ -937,8 +869,7 @@ CREATE TABLE `spawns` (
 -- ----------------------------
 -- Table structure for storages
 -- ----------------------------
-DROP TABLE IF EXISTS `storages`;
-CREATE TABLE `storages` (
+CREATE TABLE IF NOT EXISTS IF NOT EXISTS `storages` (
   `storageid` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `accountid` int(11) NOT NULL DEFAULT '0',
   `slots` int(11) NOT NULL DEFAULT '0',
@@ -952,8 +883,7 @@ CREATE TABLE `storages` (
 -- ----------------------------
 -- Table structure for topresults
 -- ----------------------------
-DROP TABLE IF EXISTS `topresults`;
-CREATE TABLE `topresults` (
+CREATE TABLE IF NOT EXISTS `topresults` (
   `itemid` int(11) DEFAULT NULL,
   `count` int(11) DEFAULT NULL,
   `world` int(11) DEFAULT NULL
@@ -963,8 +893,7 @@ CREATE TABLE `topresults` (
 -- ----------------------------
 -- Table structure for trocklocations
 -- ----------------------------
-DROP TABLE IF EXISTS `trocklocations`;
-CREATE TABLE `trocklocations` (
+CREATE TABLE IF NOT EXISTS `trocklocations` (
   `trockid` int(11) NOT NULL AUTO_INCREMENT,
   `characterid` int(11) DEFAULT NULL,
   `mapid` int(11) DEFAULT NULL,
@@ -975,8 +904,7 @@ CREATE TABLE `trocklocations` (
 -- ----------------------------
 -- Table structure for wishlist
 -- ----------------------------
-DROP TABLE IF EXISTS `wishlist`;
-CREATE TABLE `wishlist` (
+CREATE TABLE IF NOT EXISTS `wishlist` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `characterid` int(11) NOT NULL,
   `sn` int(11) NOT NULL,
@@ -987,8 +915,7 @@ CREATE TABLE `wishlist` (
 -- ----------------------------
 -- Table structure for wz_speedquiz
 -- ----------------------------
-DROP TABLE IF EXISTS `wz_speedquiz`;
-CREATE TABLE `wz_speedquiz` (
+CREATE TABLE IF NOT EXISTS `wz_speedquiz` (
   `quizDataId` int(10) NOT NULL AUTO_INCREMENT,
   `type` smallint(6) NOT NULL,
   `objectid` int(11) NOT NULL,
@@ -1001,8 +928,7 @@ CREATE TABLE `wz_speedquiz` (
 -- ----------------------------
 -- Table structure for levelhistory
 -- ----------------------------
-DROP TABLE IF EXISTS `levelhistory`;
-CREATE TABLE `levelhistory` (
+CREATE TABLE IF NOT EXISTS `levelhistory` (
   `accountid` int(11) NOT NULL,
   `characterid` int(11) NOT NULL,
   `level` int(11) NOT NULL DEFAULT '1',
