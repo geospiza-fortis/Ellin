@@ -347,7 +347,7 @@ public class PlayerFactory {
                     q,
                     MapleQuestStatus.Status.getById(rs.getInt("status"))
                 );
-                long cTime = rs.getTimestamp("time").getTime();
+                long cTime = rs.getLong("time");
                 if (cTime > -1) {
                     status.setCompletionTime(cTime * 1000);
                 }
