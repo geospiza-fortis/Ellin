@@ -23,24 +23,24 @@
 var status = 0;
 
 function start() {
-    action(1, 0, 0);
+  action(1, 0, 0);
 }
 
 function action(mode, type, selection) {
-    if (status == 0) {
-        cm.sendYesNo("Você deseja deixar o gênio?");
-        status++;
+  if (status == 0) {
+    cm.sendYesNo("You want to leave the genie?");
+    status++;
+  } else {
+    if (mode < 1) {
+      cm.dispose();
     } else {
-        if (mode < 1) {
-            cm.dispose();
-        } else {
-            if (status == 1) {
-                cm.sendNext ("Tudo bem, fale comigo quando quiser novamente!");
-                status++;
-            } else if (status == 2) {
-                cm.warp(260000100, 0);
-                cm.dispose();
-            }
-        }
+      if (status == 1) {
+        cm.sendNext("Okay, talk to me when you want again!");
+        status++;
+      } else if (status == 2) {
+        cm.warp(260000100, 0);
+        cm.dispose();
+      }
     }
+  }
 }

@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -33,43 +33,45 @@
 
 var status;
 var completed;
- 
+
 function start() {
-        status = -1;
-        action(1, 0, 0);
+    status = -1;
+    action(1, 0, 0);
 }
 
 function action(mode, type, selection) {
-        if (mode == -1) {
-                cm.dispose();
-        } else {
-                if (mode == 0 && type > 0) {
-                        cm.dispose();
-                        return;
-                }
-                if (mode == 1)
-                        status++;
-                else
-                        status--;
-    
-                if(status == 0) {
-                    if (cm.haveItem(4031013,30)) {
-                        completed = true;
-                        cm.sendOk("You're a true hero! Take this and Athena will acknowledge you.");
-                    } else {
-                        completed = false;
-                        cm.sendSimple("You will have to collect me #b30 #t4031013##k. Good luck. \r\n#b#L1#I would like to leave#l");
-                    }
-                } else if(status == 1) {
-                    if(completed) {
-                        cm.removeAll(4031013);
-                        cm.completeQuest(100001);
-                        cm.startQuest(100002);
-                        cm.gainItem(4031012);
-                    }
-                    
-                    cm.warp(106010000, 9);
-                    cm.dispose();
-                }
+    if (mode == -1) {
+        cm.dispose();
+    } else {
+        if (mode == 0 && type > 0) {
+            cm.dispose();
+            return;
         }
+        if (mode == 1) status++;
+        else status--;
+
+        if (status == 0) {
+            if (cm.haveItem(4031013, 30)) {
+                completed = true;
+                cm.sendOk(
+                    "You're a true hero! Take this and Athena will acknowledge you."
+                );
+            } else {
+                completed = false;
+                cm.sendSimple(
+                    "You will have to collect me #b30 #t4031013##k. Good luck. \r\n#b#L1#I would like to leave#l"
+                );
+            }
+        } else if (status == 1) {
+            if (completed) {
+                cm.removeAll(4031013);
+                cm.completeQuest(100001);
+                cm.startQuest(100002);
+                cm.gainItem(4031012);
+            }
+
+            cm.warp(106010000, 9);
+            cm.dispose();
+        }
+    }
 }

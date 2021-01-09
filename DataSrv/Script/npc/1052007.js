@@ -1,6 +1,6 @@
 ///*
 //	This file is part of the OdinMS Maple Story Server
-//    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+//    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
 //					   Matthias Butz <matze@odinms.de>
 //					   Jan Christian Meyer <vimes@odinms.de>
 //
@@ -125,33 +125,37 @@ oldSelection = -1;
 
 function start() {
     var text = "Ola, eu sou o leitor de ticket's.";
-    if (cm.haveItem(4031711) || cm.haveItem(4031036) || cm.haveItem(4031037) || cm.haveItem(4031038))
+    if (
+        cm.haveItem(4031711) ||
+        cm.haveItem(4031036) ||
+        cm.haveItem(4031037) ||
+        cm.haveItem(4031038)
+    )
         text += " Voce sera levado imediatamente, que ticket quer usar?#b";
-    else
-        close = true;
-    if (cm.haveItem(4031711))
-        text += "\r\n#L3##t4031711#";
+    else close = true;
+    if (cm.haveItem(4031711)) text += "\r\n#L3##t4031711#";
     for (var i = 0; i < 3; i++)
         if (cm.haveItem(4031036 + i))
-            text += "\r\n#L" + i + "##t" + (4031036 + i) +"#";
+            text += "\r\n#L" + i + "##t" + (4031036 + i) + "#";
     if (close) {
         cm.sendOk(text);
         cm.dispose();
-    } else
-        cm.sendSimple(text);
+    } else cm.sendSimple(text);
 }
 
 function action(mode, type, selection) {
     status++;
     if (mode != 1) {
-        if(mode == 0)
+        if (mode == 0)
             cm.sendNext("Voce deve ter algum negocio para cuidar aqui, certo?");
         cm.dispose();
         return;
     }
     if (status == 0) {
         if (selection == 3) {
-                cm.sendYesNo("Me parece que ha muito espaco para esse passeio. Por favor, tenha o seu bilhete pronto para que eu possa deixa-lo entrar. A viagem pode ser longa, mas voce vai chegar ao seu destino muito bem. O que voce acha? Voce quer entrar nesta viagem?");
+            cm.sendYesNo(
+                "Me parece que ha muito espaco para esse passeio. Por favor, tenha o seu bilhete pronto para que eu possa deixa-lo entrar. A viagem pode ser longa, mas voce vai chegar ao seu destino muito bem. O que voce acha? Voce quer entrar nesta viagem?"
+            );
         }
         oldSelection = selection;
     } else if (status == 1) {
@@ -160,7 +164,7 @@ function action(mode, type, selection) {
             cm.warp(600010001, 0);
         } else {
             cm.gainItem(4031036 + oldSelection, -1);
-            cm.warp(103000900 + (oldSelection * 3), 0);
+            cm.warp(103000900 + oldSelection * 3, 0);
         }
         cm.dispose();
     }

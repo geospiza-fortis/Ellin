@@ -17,19 +17,21 @@ var sCost;
 var selectedMap = -1;
 
 function start() {
-	status = -1;
-	action(1, 0, 0);
+    status = -1;
+    action(1, 0, 0);
 }
 
 function action(mode, type, selection) {
     if (mode == -1) {
-            cm.dispose();
+        cm.dispose();
     } else {
         if (status == 1 && mode == 0) {
             cm.dispose();
             return;
         } else if (status >= 2 && mode == 0) {
-            cm.sendNext("Ha muito para ver nesta cidade, tambem. Voltar e encontrar-nos quando voce precisa ir para uma cidade diferente.");
+            cm.sendNext(
+                "Ha muito para ver nesta cidade, tambem. Voltar e encontrar-nos quando voce precisa ir para uma cidade diferente."
+            );
             cm.dispose();
             return;
         }
@@ -39,17 +41,35 @@ function action(mode, type, selection) {
             status--;
         }
         if (status == 0) {
-            cm.sendNext("Ola, eu dirijo o taxi normal. Se voce quiser ir de cidade em cidade de maneira segura e rapida, em seguida, entrar em nosso taxi. Teremos muito prazer em leva-lo ao seu destino com um preco acessivel.");
+            cm.sendNext(
+                "Ola, eu dirijo o taxi normal. Se voce quiser ir de cidade em cidade de maneira segura e rapida, em seguida, entrar em nosso taxi. Teremos muito prazer em leva-lo ao seu destino com um preco acessivel."
+            );
         } else if (status == 1) {
             if (cm.getJob().equals(PlayerJob.BEGINNER)) {
-                var selStr = "Temos um desconto especial de 90% para iniciantes. Escolha o seu destino, pois as taxas vao mudar de lugar para lugar.#b";
+                var selStr =
+                    "Temos um desconto especial de 90% para iniciantes. Escolha o seu destino, pois as taxas vao mudar de lugar para lugar.#b";
                 for (var i = 0; i < maps.length; i++) {
-                    selStr += "\r\n#L" + i + "##m" + maps[i] + "# (" + costBeginner[i] + " mesos)#l";
+                    selStr +=
+                        "\r\n#L" +
+                        i +
+                        "##m" +
+                        maps[i] +
+                        "# (" +
+                        costBeginner[i] +
+                        " mesos)#l";
                 }
             } else {
-                var selStr = "Escolha o seu destino, pois as taxas vao mudar de lugar para lugar.#b";
+                var selStr =
+                    "Escolha o seu destino, pois as taxas vao mudar de lugar para lugar.#b";
                 for (var i = 0; i < maps.length; i++) {
-                    selStr += "\r\n#L" + i + "##m" + maps[i] + "# (" + cost[i] + " mesos)#l";
+                    selStr +=
+                        "\r\n#L" +
+                        i +
+                        "##m" +
+                        maps[i] +
+                        "# (" +
+                        cost[i] +
+                        " mesos)#l";
                 }
             }
             cm.sendSimple(selStr);
@@ -61,11 +81,19 @@ function action(mode, type, selection) {
                 sCost = rCost[selection];
                 show = cost[selection];
             }
-            cm.sendYesNo("Voce nao tem mais nada para fazer aqui, hein? Voce realmente quer ir para #b#m" + maps[selection] + "##k?  Vai custar-lhe #b" + show + " mesos#k.");
+            cm.sendYesNo(
+                "Voce nao tem mais nada para fazer aqui, hein? Voce realmente quer ir para #b#m" +
+                    maps[selection] +
+                    "##k?  Vai custar-lhe #b" +
+                    show +
+                    " mesos#k."
+            );
             selectedMap = selection;
         } else if (status == 3) {
             if (cm.getMeso() < sCost) {
-                cm.sendNext("Voce nao tem mesos suficiente. Desculpe dizer isso, mas, sem eles, voce nao sera capaz de entrar no taxi.");
+                cm.sendNext(
+                    "Voce nao tem mesos suficiente. Desculpe dizer isso, mas, sem eles, voce nao sera capaz de entrar no taxi."
+                );
             } else {
                 cm.gainMeso(-sCost);
                 cm.warp(maps[selectedMap], 0);

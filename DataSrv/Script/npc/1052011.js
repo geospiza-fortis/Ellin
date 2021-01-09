@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -32,27 +32,27 @@
 var status = 0;
 
 function start() {
-	status = -1;
-	action(1, 0, 0);
+    status = -1;
+    action(1, 0, 0);
 }
 
 function action(mode, type, selection) {
-	if (mode == -1) {
-		cm.dispose();
-	} else {
-	if (status >= 0 && mode == 0) {
-		cm.dispose();
-		return;
-	}
-	if (mode == 1)
-		status++;
-	else
-		status--;
-	if (status == 0) {
-		cm.sendYesNo("This device is connected to the outside. Are you going to give up and leave this place? You'll have to start from\r\nscratch the next time you come in...");
-	} else if (status == 1) {
-		cm.warp(103000100, 0);
-		cm.dispose();
-		}
-	}
+    if (mode == -1) {
+        cm.dispose();
+    } else {
+        if (status >= 0 && mode == 0) {
+            cm.dispose();
+            return;
+        }
+        if (mode == 1) status++;
+        else status--;
+        if (status == 0) {
+            cm.sendYesNo(
+                "This device is connected to the outside. Are you going to give up and leave this place? You'll have to start from\r\nscratch the next time you come in..."
+            );
+        } else if (status == 1) {
+            cm.warp(103000100, 0);
+            cm.dispose();
+        }
+    }
 }

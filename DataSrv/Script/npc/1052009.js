@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
 					   Matthias Butz <matze@odinms.de>
 					   Jan Christian Meyer <vimes@odinms.de>
 
@@ -32,15 +32,11 @@
 **/
 
 function start() {
-    prizes = [4020005,4020006,4020007,4020008,4010000];
-    if (cm.isQuestStarted(2056))
-        cm.gainItem(4031040,1);
-    else
-        cm.gainItem(prizes[parseInt(Math.random() * prizes.length)],1);
+    prizes = [4020005, 4020006, 4020007, 4020008, 4010000];
+    if (cm.isQuestStarted(2056)) cm.gainItem(4031040, 1);
+    else cm.gainItem(prizes[parseInt(Math.random() * prizes.length)], 1);
     cm.warp(103000100);
     cm.dispose();
 }
 
-function action(mode, type, selection) {}	
-
-
+function action(mode, type, selection) {}

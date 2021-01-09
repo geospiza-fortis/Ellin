@@ -24,20 +24,18 @@
  * LeaderMS Revision
  * @autor GabrielSin
  * Rupi - 2002000
-*/
+ */
 
 function start() {
     cm.sendYesNo("Deseja sair da #bVila Feliz#k?");
 }
 
 function action(mode, type, selection) {
-    if (mode < 1)
-        cm.dispose();
+    if (mode < 1) cm.dispose();
     else {
         var map = cm.getPlayer().getSavedLocation("HAPPYVILLE");
-        if (map == -1)
-            map = 101000000;
-        
+        if (map == -1) map = 101000000;
+
         cm.warp(map, 0);
     }
     cm.dispose();

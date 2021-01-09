@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -22,14 +22,15 @@
 /* 	Ardin
 	Ariant
 	Created by Cody(shotdownsoul) -
-	
+
 */
 
-
 function start() {
-	cm.sendNext ("Hey hey, don't try to start trouble with anyone. I want nothing to do with you.");
+    cm.sendNext(
+        "Hey hey, don't try to start trouble with anyone. I want nothing to do with you."
+    );
 }
 
 function action() {
-	cm.dispose()
+    cm.dispose();
 }

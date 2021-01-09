@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -31,25 +31,24 @@
 **/
 
 function start() {
-	status = -1;
-	action(1, 0, 0);
+    status = -1;
+    action(1, 0, 0);
 }
 
 function action(mode, type, selection) {
-	if (mode == -1 || mode == 0) {
-		cm.dispose();
-		return;
-	} else {
-		if (mode == 1)
-			status++;
-		else
-			status--;
-		if (status == 0) {
-			cm.sendYesNo("Beep ... Beep ... voce pode fazer a sua fuga para um lugar mais seguro atraves de mim. Beep ... Beep ... voce gostaria de deixar este lugar?");
-		}
-		else if(status == 1) {
-			cm.warp(220080000, 0);
-			cm.dispose();
-		}
-	}
+    if (mode == -1 || mode == 0) {
+        cm.dispose();
+        return;
+    } else {
+        if (mode == 1) status++;
+        else status--;
+        if (status == 0) {
+            cm.sendYesNo(
+                "Beep ... Beep ... voce pode fazer a sua fuga para um lugar mais seguro atraves de mim. Beep ... Beep ... voce gostaria de deixar este lugar?"
+            );
+        } else if (status == 1) {
+            cm.warp(220080000, 0);
+            cm.dispose();
+        }
+    }
 }

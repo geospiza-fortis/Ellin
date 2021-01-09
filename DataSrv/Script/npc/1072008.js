@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -27,12 +27,10 @@
 
 importPackage(Packages.client);
 
-
 var status = 0;
 var job;
 
-function start() 
-{
+function start() {
     status = -1;
     action(1, 0, 0);
 }
@@ -40,4 +38,4 @@ function start()
 function action(mode, type, selection) {
     cm.sendOk("Este NPC esta desativado, desculpe!");
     cm.dispose();
-    }
+}

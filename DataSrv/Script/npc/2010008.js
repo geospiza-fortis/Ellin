@@ -1,8 +1,8 @@
 /*
-	This file was written by "StellarAshes" <stellar_dust@hotmail.com> 
+	This file was written by "StellarAshes" <stellar_dust@hotmail.com>
 			as a part of the Guild package for
 			the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -37,20 +37,24 @@ function action(mode, type, selection) {
             cm.dispose();
             return;
         }
-        if (mode == 1)
-            status++;
-        else
-            status--;
+        if (mode == 1) status++;
+        else status--;
 
         if (status == 0)
-            cm.sendSimple("What would you like to do?\r\n#b#L0#Create/Change your Guild Emblem#l#k");
+            cm.sendSimple(
+                "What would you like to do?\r\n#b#L0#Create/Change your Guild Emblem#l#k"
+            );
         else if (status == 1) {
             sel = selection;
             if (selection == 0) {
                 if (cm.getPlayer().getGuildRank() == 1) {
-                    cm.sendYesNo("Creating or changing Guild Emblem costs #b 5000000 mesos#k, are you sure you want to continue?");
+                    cm.sendYesNo(
+                        "Creating or changing Guild Emblem costs #b 5000000 mesos#k, are you sure you want to continue?"
+                    );
                 } else {
-                    cm.sendOk("You must be the Guild Leader to change the Emblem.  Please tell your leader to speak with me.");
+                    cm.sendOk(
+                        "You must be the Guild Leader to change the Emblem.  Please tell your leader to speak with me."
+                    );
                 }
             }
         } else if (status == 2) {

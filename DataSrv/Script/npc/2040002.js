@@ -35,25 +35,28 @@ function start() {
         em = cm.getEventManager("DollHouse");
 
         if (em.getProperty("noEntry") == "false") {
-            cm.sendNext("The pendulum is hidden inside a dollhouse that looks different than the others.");
-        }
-        else {
-            cm.sendOk("Someone else is already searching the area. Please wait until the area is cleared.");
+            cm.sendNext(
+                "The pendulum is hidden inside a dollhouse that looks different than the others."
+            );
+        } else {
+            cm.sendOk(
+                "Someone else is already searching the area. Please wait until the area is cleared."
+            );
             cm.dispose();
         }
-    }
-    else {
-        cm.sendOk("We are not allowed to let the general public wander past this point.");
+    } else {
+        cm.sendOk(
+            "We are not allowed to let the general public wander past this point."
+        );
         cm.dispose();
     }
 }
 
 function action(mode, type, selection) {
-    if (mode < 1)
-        cm.dispose();
+    if (mode < 1) cm.dispose();
     else {
         status++;
-        if (status == 1) 
+        if (status == 1)
             cm.sendYesNo("Are you ready to enter the dollhouse map?");
         else if (status == 2) {
             var eim = em.newInstance("DollHouse");

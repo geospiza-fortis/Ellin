@@ -1,23 +1,28 @@
-
 function start() {
-    if(cm.haveItem(4031074)){
+    if (cm.haveItem(4031074)) {
         if (cm.getEventNotScriptOpen("Trens")) {
-            cm.sendYesNo("Parece que está cheio de lugares vazios para esta viagem. Por favor, tenha seu bilhete em mãos para embarcar. O trajeto será longo, mas chegará bem a seu destino. O que você acha? Quer embarcar neste?");
+            cm.sendYesNo(
+                "It looks like it's full of empty seats for this trip. Please have your ticket in hand to board. The journey will be long, but it will reach your destination well. What do you think? Want to embark on this?"
+            );
         } else {
-            cm.sendOk("Sinto muito, mas o trem já está CHEIO. Não podemos aceitar mais nenhum passageiro. Por favor, embarque no próximo.");
+            cm.sendOk(
+                "I'm sorry, but the train is already FULL. We cannot accept any more passengers. Please get on board next."
+            );
             cm.dispose();
         }
     } else {
-        cm.sendOk("Ah, não... Não creio que tenha seu bilhete consigo. Não pode embarcar sem ele. Por favor, compre o bilhete no balcão de bilhetes.");
+        cm.sendOk(
+            "Oh no ... I don't think I have your ticket with you. You can't board without it. Please buy the ticket at the ticket counter."
+        );
         cm.dispose();
     }
 }
 function action(mode, type, selection) {
-   if (mode <= 0) {
-	cm.sendOk("Tudo bem, quando decidir falo comigo novamente!");
+    if (mode <= 0) {
+        cm.sendOk("Okay, when I decide to talk to me again!");
         cm.dispose();
-	return;
-    } 
+        return;
+    }
     cm.gainItem(4031074, -1);
     cm.warp(200000122, 0);
     cm.dispose();

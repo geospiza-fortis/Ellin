@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
 					   Matthias Butz <matze@odinms.de>
 					   Jan Christian Meyer <vimes@odinms.de>
 
@@ -38,27 +38,31 @@ var bm;
 var ride;
 
 function start() {
-	status = -1;
-	bm = cm.getEventManager("Boats");
-	action(1, 0, 0);
+    status = -1;
+    bm = cm.getEventManager("Boats");
+    action(1, 0, 0);
 }
 
 function action(mode, type, selection) {
-	if(mode == -1) {
-		cm.dispose();
-		return;
-	} else {
-		status++;
-		if(mode == 0) {
-			cm.sendOk("Voce vai chegar ao seu destino no momento certo. Va em frente e conversar com outras pessoas, e antes que voce perceba, voce ja vai estar la.");
-			cm.dispose();
-			return;
-		}
-		if(status == 0) {
-			cm.sendYesNo("Voce quer deixar a sala de espera? Voce pode, mas o bilhete nao e reembolsavel. Tem certeza de que ainda quer sair desta sala?");
-		} else if(status == 1) {
-			cm.warp(101000300, 0);
-			cm.dispose();
-		}
-	}
+    if (mode == -1) {
+        cm.dispose();
+        return;
+    } else {
+        status++;
+        if (mode == 0) {
+            cm.sendOk(
+                "You will arrive at your destination at the right time. Go ahead and talk to other people, and before you know it, you'll already be there."
+            );
+            cm.dispose();
+            return;
+        }
+        if (status == 0) {
+            cm.sendYesNo(
+                "Do you want to leave the waiting room? You can, but the ticket is not refundable. Are you sure you still want to leave this room?"
+            );
+        } else if (status == 1) {
+            cm.warp(101000300, 0);
+            cm.dispose();
+        }
+    }
 }

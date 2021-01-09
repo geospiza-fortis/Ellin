@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -42,23 +42,22 @@ function action(mode, type, selection) {
             cm.dispose();
             return;
         }
-        if (mode == 1)
-            status++;
-        else
-            status--;
+        if (mode == 1) status++;
+        else status--;
         if (status == 0) {
-            if(cm.haveItem(4001086)) {
-                cm.sendYesNo("Do you want to access #b#m240050400##k right now?");
+            if (cm.haveItem(4001086)) {
+                cm.sendYesNo(
+                    "Do you want to access #b#m240050400##k right now?"
+                );
             } else {
-                cm.sendOk("Those who don't have the #r#t4001086##k must prove their valor before challenging #bHorntail#k.");
+                cm.sendOk(
+                    "Those who don't have the #r#t4001086##k must prove their valor before challenging #bHorntail#k."
+                );
                 cm.dispose();
             }
-        }
-        else {
+        } else {
             cm.warp(240050400);
             cm.dispose();
         }
     }
 }
-					
-					

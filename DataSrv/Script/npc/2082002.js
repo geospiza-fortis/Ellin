@@ -27,17 +27,20 @@ function start() {
 
 function action(mode, type, selection) {
     if (status == 0) {
-        cm.sendYesNo("Você deseja deixar o vôo?");
+        cm.sendYesNo("You want to leave the flight?");
         status++;
     } else {
-        if ((status == 1 && type == 1 && selection == -1 && mode == 0) || mode == -1) {
+        if (
+            (status == 1 && type == 1 && selection == -1 && mode == 0) ||
+            mode == -1
+        ) {
             cm.dispose();
         } else {
             if (status == 1) {
-                cm.sendNext ("Tudo bem, fale comigo quando quiser novamente!");
+                cm.sendNext("Okay, talk to me when you want again!");
                 status++;
             } else if (status == 2) {
-                cm.warp(240000110, 0);// back to Leafre
+                cm.warp(240000110, 0); // back to Leafre
                 cm.dispose();
             }
         }

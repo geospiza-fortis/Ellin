@@ -1,11 +1,13 @@
 /**
  * @author: Ronan
  * @event: Henesys PQ
-*/
+ */
 
 var isPq = true;
-var minPlayers = 1, maxPlayers = 6;
-var minLevel = 10, maxLevel = 255;
+var minPlayers = 1,
+    maxPlayers = 6;
+var minLevel = 10,
+    maxLevel = 255;
 var entryMap = 910010000;
 var exitMap = 910010300;
 var recruitMap = 100000200;
@@ -14,7 +16,7 @@ var clearMap = 910010100;
 var minMapId = 910010000;
 var maxMapId = 910010400;
 
-var eventTime = 10;     
+var eventTime = 10;
 
 var lobbyRange = [0, 0];
 
@@ -30,11 +32,11 @@ function setEventRequirements() {
     var reqStr = "";
 
     reqStr += "\r\n    Number of players: ";
-    if(maxPlayers - minPlayers >= 1) reqStr += minPlayers + " ~ " + maxPlayers;
+    if (maxPlayers - minPlayers >= 1) reqStr += minPlayers + " ~ " + maxPlayers;
     else reqStr += minPlayers;
 
     reqStr += "\r\n    Level range: ";
-    if(maxLevel - minLevel >= 1) reqStr += minLevel + " ~ " + maxLevel;
+    if (maxLevel - minLevel >= 1) reqStr += minLevel + " ~ " + maxLevel;
     else reqStr += minLevel;
 
     reqStr += "\r\n    Time limit: ";
@@ -44,23 +46,31 @@ function setEventRequirements() {
 }
 
 function setEventExclusives(eim) {
-    var itemSet = [4001095, 4001096, 4001097, 4001098, 4001099, 4001100, 4001101];
+    var itemSet = [
+        4001095,
+        4001096,
+        4001097,
+        4001098,
+        4001099,
+        4001100,
+        4001101,
+    ];
     eim.setExclusiveItems(itemSet);
 }
 
 function setEventRewards(eim) {
     var itemSet, itemQty, evLevel, expStages;
 
-    evLevel = 1;    
+    evLevel = 1;
     itemSet = [4001158];
     itemQty = [1];
     eim.setEventRewards(evLevel, itemSet, itemQty);
 
-    expStages = [1600];    
+    expStages = [1600];
     eim.setEventClearStageExp(expStages);
 }
 
-function getEligibleParty(party) {     
+function getEligibleParty(party) {
     var eligible = [];
     var hasLeader = false;
 
@@ -70,14 +80,25 @@ function getEligibleParty(party) {
         for (var i = 0; i < party.size(); i++) {
             var ch = partyList[i];
 
-            if (ch.getMapId() == recruitMap && ch.getLevel() >= minLevel && ch.getLevel() <= maxLevel) {
+            if (
+                ch.getMapId() == recruitMap &&
+                ch.getLevel() >= minLevel &&
+                ch.getLevel() <= maxLevel
+            ) {
                 if (ch.isLeader()) hasLeader = true;
-                    eligible.push(ch);
+                eligible.push(ch);
             }
         }
     }
 
-    if (!(hasLeader && eligible.length >= minPlayers && eligible.length <= maxPlayers)) eligible = [];
+    if (
+        !(
+            hasLeader &&
+            eligible.length >= minPlayers &&
+            eligible.length <= maxPlayers
+        )
+    )
+        eligible = [];
     return eligible;
 }
 
@@ -114,7 +135,8 @@ function playerEntry(eim, player) {
 
 function scheduledTimeout(eim) {
     if (eim.getProperty("1stageclear") != null) {
-        var curStage = 910010200, toStage = 910010400;
+        var curStage = 910010200,
+            toStage = 910010400;
         eim.warpEventTeam(curStage, toStage);
     } else {
         end(eim);
@@ -124,8 +146,8 @@ function scheduledTimeout(eim) {
 function playerUnregistered(eim, player) {}
 
 function playerExit(eim, player) {
-        eim.unregisterPlayer(player);
-        player.changeMap(exitMap, 0);
+    eim.unregisterPlayer(player);
+    player.changeMap(exitMap, 0);
 }
 
 function playerLeft(eim, player) {
@@ -139,9 +161,7 @@ function changedMap(eim, player, mapid) {
         if (eim.isEventTeamLackingNow(true, minPlayers, player)) {
             eim.unregisterPlayer(player);
             end(eim);
-        }
-        else
-            eim.unregisterPlayer(player);
+        } else eim.unregisterPlayer(player);
     }
 }
 
@@ -154,30 +174,24 @@ function changedLeader(eim, leader) {
 
 function playerDead(eim, player) {}
 
-function playerRevive(eim, player) { 
+function playerRevive(eim, player) {
     if (eim.isEventTeamLackingNow(true, minPlayers, player)) {
         eim.unregisterPlayer(player);
         end(eim);
-    }
-    else
-        eim.unregisterPlayer(player);
+    } else eim.unregisterPlayer(player);
 }
 
 function playerDisconnected(eim, player) {
     if (eim.isEventTeamLackingNow(true, minPlayers, player)) {
         eim.unregisterPlayer(player);
         end(eim);
-        }
-    else
-        eim.unregisterPlayer(player);
+    } else eim.unregisterPlayer(player);
 }
 
 function leftParty(eim, player) {
     if (eim.isEventTeamLackingNow(false, minPlayers, player)) {
         end(eim);
-    }
-    else
-        playerLeft(eim, player);
+    } else playerLeft(eim, player);
 }
 
 function disbandParty(eim) {
@@ -205,7 +219,7 @@ function giveRandomEventReward(eim, player) {
 function clearPQ(eim) {
     eim.stopEventTimer();
     eim.setEventCleared();
-        
+
     eim.warpEventTeam(910010100);
 }
 
@@ -216,4 +230,3 @@ function allMonstersDead(eim) {}
 function cancelSchedule() {}
 
 function dispose(eim) {}
-
