@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
 					   Matthias Butz <matze@odinms.de>
 					   Jan Christian Meyer <vimes@odinms.de>
 
@@ -21,10 +21,10 @@
 */
 
 /* @Author Lerk
- * 
+ *
  * 2112016.js: Phoenix Egg in El Nath Lava - part of the Phoenix quest (4th job Bowmaster)
-*/
+ */
 
-function act(){
-	rm.dropItems();
+function act() {
+    rm.dropItems();
 }

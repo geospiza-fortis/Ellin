@@ -19,7 +19,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-/*	
+/*
 	Author : 		Blue
 	NPC Name: 	        Arwen
 	Map(s): 		Ellinia
@@ -28,6 +28,5 @@
 */
 
 function start(mode, type, selection) {
-
-	qm.forceCompleteQuest();
+    qm.forceCompleteQuest();
 }

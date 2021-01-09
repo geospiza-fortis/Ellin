@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
 					   Matthias Butz <matze@odinms.de>
 					   Jan Christian Meyer <vimes@odinms.de>
 
@@ -21,13 +21,16 @@
 */
 
 /* @Author Lerk
- * 
+ *
  * 2201004.js: Papulatus Reactor: Performs the Papulatus commands
-*/
+ */
 
-function act(){
-    rm.mapMessage(5, "The dimensional hole has been filled by the <Piece of Cracked Dimension>.");
+function act() {
+    rm.mapMessage(
+        5,
+        "The dimensional hole has been filled by the <Piece of Cracked Dimension>."
+    );
     rm.changeMusic("Bgm09/TimeAttack");
     rm.spawnMonster(8500000, -410, -400);
-    rm.createMapMonitor(220080001,"in00");
+    rm.createMapMonitor(220080001, "in00");
 }

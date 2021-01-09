@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -24,11 +24,10 @@
 	MADE BY Anke
 */
 
-
 function start() {
-	cm.sendOk ("Este Gachapon esta desativado permanente.");
+    cm.sendOk("Este Gachapon esta desativado permanente.");
 }
 
 function action() {
-	cm.dispose()
+    cm.dispose();
 }

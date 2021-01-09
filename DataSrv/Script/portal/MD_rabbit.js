@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -20,7 +20,7 @@
 */
 /*
 MiniDungeon - Rabbit
-*/ 
+*/
 var baseid = 221023400;
 var dungeonid = 221023401;
 var dungeons = 30;
@@ -47,11 +47,14 @@ function enter(pi) {
                 }
             }
         }
-        pi.playerMessage(5, "All of the Mini-Dungeons are in use right now, please try again later.");
+        pi.playerMessage(
+            5,
+            "All of the Mini-Dungeons are in use right now, please try again later."
+        );
         return false;
     } else {
-    	pi.playPortalSound();
-    	pi.warp(baseid, "MD00");
-    	return true;
+        pi.playPortalSound();
+        pi.warp(baseid, "MD00");
+        return true;
     }
 }

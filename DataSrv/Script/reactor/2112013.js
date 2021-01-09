@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
 					   Matthias Butz <matze@odinms.de>
 					   Jan Christian Meyer <vimes@odinms.de>
 
@@ -21,10 +21,10 @@
 */
 
 /* @Author Lerk
- * 
+ *
  * 2112013.js: Zakum Party Quest Rock - drops an item (~100 meso bundle in Global)
-*/
+ */
 
-function act(){
-	rm.dropItems(true, 1, 125, 175);
+function act() {
+    rm.dropItems(true, 1, 125, 175);
 }

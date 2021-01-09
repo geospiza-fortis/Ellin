@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
 					   Matthias Butz <matze@odinms.de>
 					   Jan Christian Meyer <vimes@odinms.de>
 
@@ -21,10 +21,10 @@
 */
 
 /* @Author Lerk
- * 
+ *
  * 1012000.js: Ellinia Plant - drops meso, tree branches, red pots, and Plant Samples (quest item)
-*/
+ */
 
 function act() {
-	rm.dropItems(true, 2, 20, 40);
+    rm.dropItems(true, 2, 20, 40);
 }

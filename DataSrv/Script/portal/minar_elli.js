@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
 					   Matthias Butz <matze@odinms.de>
 					   Jan Christian Meyer <vimes@odinms.de>
 
@@ -41,7 +41,9 @@ function enter(pi) {
             pi.warp(240010100, "elli00");
         }
         pi.gainItem(4031346, -1);
-        pi.playerMessage("The Magical Seed is spent and you are transferred to somewhere.");
+        pi.playerMessage(
+            "The Magical Seed is spent and you are transferred to somewhere."
+        );
         return true;
     } else {
         pi.playerMessage("Magic Seed is needed to go through the portal.");

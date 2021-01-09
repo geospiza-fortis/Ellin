@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -22,14 +22,15 @@
 /* 	Garnox - Pet Scientist
 	Singapore and NLC
 	MADE BY Cody and AAron
-	
+
 */
 
-
 function start() {
-	cm.sendOk ("Hi, I'm Garnox the Pet Scientist. Have you heard of the evolution of special pets?");
+    cm.sendOk(
+        "Hi, I'm Garnox the Pet Scientist. Have you heard of the evolution of special pets?"
+    );
 }
 
 function action() {
-	cm.dispose()
+    cm.dispose();
 }

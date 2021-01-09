@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -36,7 +36,14 @@
 
 function enter(pi) {
     pi.warp(200090010, 4);
-    if (pi.getPlayer().getClient().getChannelServer().getBarcosNotScript().PossuiBalrog()) {
+    if (
+        pi
+            .getPlayer()
+            .getClient()
+            .getChannelServer()
+            .getBarcosNotScript()
+            .PossuiBalrog()
+    ) {
         pi.changeMusic("Bgm04/ArabPirate");
     }
     return true;

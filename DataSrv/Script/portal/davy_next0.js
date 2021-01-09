@@ -4,9 +4,12 @@ function passedGrindMode(map, eim) {
 }
 
 function enter(pi) {
-    if (pi.getMap().getMonsters().size() == 0 && passedGrindMode(pi.getMap(), pi.getEventInstance())) {
+    if (
+        pi.getMap().getMonsters().size() == 0 &&
+        passedGrindMode(pi.getMap(), pi.getEventInstance())
+    ) {
         pi.playPortalSound();
-        pi.warp(925100100,0); //next
+        pi.warp(925100100, 0); //next
         return true;
     } else {
         pi.playerMessage(5, "The portal is not opened yet.");

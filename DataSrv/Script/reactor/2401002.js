@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
 					   Matthias Butz <matze@odinms.de>
 					   Jan Christian Meyer <vimes@odinms.de>
 
@@ -21,11 +21,11 @@
 */
 
 /* @Author Lerk
- * 
+ *
  * 2401002.js: Leafre Reactor - Egg for Frostprey Quest (4th job Marksman)
- * 
-*/
+ *
+ */
 
-function act(){
-	rm.spawnMonster(9300090);
+function act() {
+    rm.spawnMonster(9300090);
 }

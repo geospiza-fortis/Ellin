@@ -30,8 +30,7 @@ function enter(pi) {
         pi.playPortalSound();
         pi.warp(990000800, 0);
         return true;
-    }
-    else {
+    } else {
         pi.playerMessage(5, "Este caminho a seguir ainda não está aberto.");
         return false;
     }

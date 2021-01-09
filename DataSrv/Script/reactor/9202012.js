@@ -1,6 +1,6 @@
-/* 
+/*
  * This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -20,10 +20,10 @@
  */
 
 /* @Author Lerk
- * 
+ *
  * 9202012.js: Guild Quest - Bonus Box
- * 
-*/
+ *
+ */
 
 function act() {
     rm.sprayItems(true, 1, 30, 60, 10);

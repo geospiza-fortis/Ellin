@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
 					   Matthias Butz <matze@odinms.de>
 					   Jan Christian Meyer <vimes@odinms.de>
 
@@ -21,12 +21,12 @@
 */
 
 /* @Author Lerk
- * 
+ *
  * 2200001.js: Warps player into one of two Secret Factories
- * 
-*/
+ *
+ */
 
-function act(){
-    rm.playerMessage(5,"You have found a secret factory!");
-    rm.warp(Math.random() < .5 ? 922000020 : 922000021);
+function act() {
+    rm.playerMessage(5, "You have found a secret factory!");
+    rm.warp(Math.random() < 0.5 ? 922000020 : 922000021);
 }

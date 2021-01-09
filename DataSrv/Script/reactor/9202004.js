@@ -1,6 +1,6 @@
-/* 
+/*
  * This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -20,11 +20,11 @@
  */
 
 /* @Author Lerk
- * 
+ *
  * 9202004.js: Guild Quest - Pantry Box
  * Drops the Jr. Necki Wine (4001030)
- * 
-*/
+ *
+ */
 
 function act() {
     rm.dropItems();

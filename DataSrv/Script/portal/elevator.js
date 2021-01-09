@@ -4,7 +4,9 @@ function enter(pi) {
             pi.warp(222020110, "sp");
             return true;
         } else {
-            pi.playerMessage("The elevator is not available at the moment. Please try again later.");
+            pi.playerMessage(
+                "The elevator is not available at the moment. Please try again later."
+            );
             return false;
         }
     } else if (pi.getPlayer().getMapId() == 222020200) {
@@ -12,7 +14,9 @@ function enter(pi) {
             pi.warp(222020210, "sp");
             return true;
         } else {
-            pi.playerMessage("The elevator is not available at the moment. Please try again later.");
+            pi.playerMessage(
+                "The elevator is not available at the moment. Please try again later."
+            );
             return false;
         }
     } else {

@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
 					   Matthias Butz <matze@odinms.de>
 					   Jan Christian Meyer <vimes@odinms.de>
 
@@ -21,11 +21,14 @@
 */
 
 /* @Author Lerk
- * 
+ *
  * 2110000.js: Zakum Party Quest Chest - action go280010000
-*/
+ */
 
-function act(){
-    rm.playerMessage(5, "An unknown force has moved you to the starting point.");
+function act() {
+    rm.playerMessage(
+        5,
+        "An unknown force has moved you to the starting point."
+    );
     rm.warp(280010000, 0);
 }

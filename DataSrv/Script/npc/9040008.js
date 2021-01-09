@@ -1,8 +1,8 @@
 /*
-	This file was written by "StellarAshes" <stellar_dust@hotmail.com> 
+	This file was written by "StellarAshes" <stellar_dust@hotmail.com>
 			as a part of the Guild package for
 			the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -23,13 +23,12 @@
 
 /* Guild Rank Board */
 
-
 function start() {
-	status = -1;
-	action(1, 0, 0);
+    status = -1;
+    action(1, 0, 0);
 }
 
 function action() {
-	cm.displayGuildRanks();
-	cm.dispose();
+    cm.displayGuildRanks();
+    cm.dispose();
 }

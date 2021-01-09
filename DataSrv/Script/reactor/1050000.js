@@ -20,13 +20,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 /* @Author Crovy
- * 
+ *
  * 1050000.js: Berserk 4th job quest rock - drops a shield or punts you from map.
-*/
+ */
 
 function act() {
-    if (Math.random() > 0.7)
-        rm.dropItems();
-    else
-        rm.warp(105090200, 0);
+    if (Math.random() > 0.7) rm.dropItems();
+    else rm.warp(105090200, 0);
 }

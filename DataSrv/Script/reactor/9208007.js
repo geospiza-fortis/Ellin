@@ -1,6 +1,6 @@
-/* 
+/*
  * This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -26,17 +26,28 @@ Stage 2: Spear destinations - Guild Quest
 */
 
 function act() {
-        var react = rm.getPlayer().getEventInstance().getMapInstance(990000400).getReactorByName("speargate");
-        react.forceHitReactor(react.getState() + 1);
-        
-        if(react.getState() == 4) {
-                var eim = rm.getPlayer().getEventInstance();
+    var react = rm
+        .getPlayer()
+        .getEventInstance()
+        .getMapInstance(990000400)
+        .getReactorByName("speargate");
+    react.forceHitReactor(react.getState() + 1);
 
-                var maps = [990000400, 990000410, 990000420, 990000430, 990000431, 990000440];
-                for(var i = 0; i < maps.length; i++) {
-                        eim.showClearEffect(false, maps[i]);
-                }
-                
-                rm.getGuild().gainGP(20);
+    if (react.getState() == 4) {
+        var eim = rm.getPlayer().getEventInstance();
+
+        var maps = [
+            990000400,
+            990000410,
+            990000420,
+            990000430,
+            990000431,
+            990000440,
+        ];
+        for (var i = 0; i < maps.length; i++) {
+            eim.showClearEffect(false, maps[i]);
         }
+
+        rm.getGuild().gainGP(20);
+    }
 }

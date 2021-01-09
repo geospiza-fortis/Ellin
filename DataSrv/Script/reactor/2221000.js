@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
 					   Matthias Butz <matze@odinms.de>
 					   Jan Christian Meyer <vimes@odinms.de>
 
@@ -21,12 +21,12 @@
 */
 
 /* @Author Lerk
- * 
+ *
  * 2221000.js: KFT Reactor - Yellow King Goblin
- * 
-*/
+ *
+ */
 
-function act(){
+function act() {
     rm.spawnMonster(7130400);
     rm.mapMessage(5, "Here comes Yellow King Goblin!");
 }

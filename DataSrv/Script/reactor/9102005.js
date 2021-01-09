@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
 					   Matthias Butz <matze@odinms.de>
 					   Jan Christian Meyer <vimes@odinms.de>
 
@@ -21,11 +21,11 @@
 */
 
 /* @Author Jvlaple
- * 
+ *
  * Drops all primrose seed <3
-*9102002 - 9102007
-*/
+ *9102002 - 9102007
+ */
 
 function act() {
-	rm.dropItems();
+    rm.dropItems();
 }

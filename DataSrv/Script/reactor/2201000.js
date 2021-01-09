@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
 					   Matthias Butz <matze@odinms.de>
 					   Jan Christian Meyer <vimes@odinms.de>
 
@@ -21,11 +21,11 @@
 */
 
 /* @Author Lerk
- * 
+ *
  * 2201000.js: Summons alternate Toy Trojans (no drops except for the Maintenance Manual quest item)
- * 
-*/
+ *
+ */
 
-function act(){
-	rm.spawnMonster(9300011, 10);
+function act() {
+    rm.spawnMonster(9300011, 10);
 }

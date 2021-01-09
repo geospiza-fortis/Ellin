@@ -24,7 +24,9 @@
     @Author Lerk
 */
 function enter(pi) {
-    if (pi.getPlayer().getMap().getReactorByName("statuegate").getState() == 1) {
+    if (
+        pi.getPlayer().getMap().getReactorByName("statuegate").getState() == 1
+    ) {
         pi.playPortalSound();
         pi.warp(990000301, 0);
         return true;

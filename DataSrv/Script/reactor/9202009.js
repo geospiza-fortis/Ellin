@@ -1,6 +1,6 @@
 /*
 	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
 					   Matthias Butz <matze@odinms.de>
 					   Jan Christian Meyer <vimes@odinms.de>
 
@@ -21,11 +21,11 @@
 */
 
 /* @Author Lerk
- * 
- * 9202009.js: Guild Quest - Protector Rock 
+ *
+ * 9202009.js: Guild Quest - Protector Rock
  * Drops the Protector Rock earrings necessary (normally) to stay alive in the Guild Quest
- * 
-*/
+ *
+ */
 
 function act() {
     rm.dropItems();

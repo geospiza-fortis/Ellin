@@ -1,6 +1,6 @@
-/* 
+/*
  * This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -19,28 +19,40 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* 
+/*
  * @Author Lerk
- * 
+ *
  * Nuris, Sharenian: Returning Path (990001100)
- * 
+ *
  * Exit of Guild Quest
  */
 
 var status;
-var GQItems = new Array(1032033, 4001024, 4001025, 4001026, 4001027, 4001028, 4001031, 4001032, 4001033, 4001034, 4001035, 4001037);
+var GQItems = new Array(
+    1032033,
+    4001024,
+    4001025,
+    4001026,
+    4001027,
+    4001028,
+    4001031,
+    4001032,
+    4001033,
+    4001034,
+    4001035,
+    4001037
+);
 
 function start() {
-	if (cm.getPlayer().hasEquipped(1032033)) {
-		cm.sendOk("Por favor, remova o Brinco Protetor.");
-	} else {
-    		for (var i = 0; i < GQItems.length; i++) {
-			cm.removeAll(GQItems[i]);
-    		}
-    		cm.warp(103040000, 0);
-	}
+    if (cm.getPlayer().hasEquipped(1032033)) {
+        cm.sendOk("Por favor, remova o Brinco Protetor.");
+    } else {
+        for (var i = 0; i < GQItems.length; i++) {
+            cm.removeAll(GQItems[i]);
+        }
+        cm.warp(103040000, 0);
+    }
     cm.dispose();
 }
 
-function action(mode, type, selection) {
-}
+function action(mode, type, selection) {}

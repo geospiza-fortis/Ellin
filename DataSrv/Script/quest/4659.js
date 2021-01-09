@@ -30,37 +30,37 @@ importPackage(Packages.server);
 var status = -1;
 
 function start(mode, type, selection) {
-//nothing here?
+    //nothing here?
 }
 
 function end(mode, type, selection) {
     status++;
     if (mode != 1) {
-        if(type == 1 && mode == 0)
-            status -= 2;
-        else{
+        if (type == 1 && mode == 0) status -= 2;
+        else {
             qm.dispose();
             return;
         }
     }
     if (status == 0)
-        qm.sendNext("Great job on finding your evolution materials. I will now give you a dragon.");
+        qm.sendNext(
+            "Great job on finding your evolution materials. I will now give you a dragon."
+        );
     else if (status == 1) {
         if (qm.isQuestCompleted(4659))
             qm.dropMessage(1, "how did this get here?");
-        else if (qm.canHold(5000033)){
-//            var closeness = qm.getPlayer().getPet(0).getCloseness();
-//            var level = qm.getPlayer().getPet(0).getLevel();
-//            var fullness = qm.getPlayer().getPet(0).getFullness();
+        else if (qm.canHold(5000033)) {
+            //            var closeness = qm.getPlayer().getPet(0).getCloseness();
+            //            var level = qm.getPlayer().getPet(0).getLevel();
+            //            var fullness = qm.getPlayer().getPet(0).getFullness();
             qm.gainItem(5380000, -1);
             qm.gainItem(5000029, -1);
             var rand = (Math.random() * 4) | 0;
             qm.gainItem(5000029 + rand);
-//            var petId = MaplePet.createPet(rand + 5000030, level, closeness, fullness);
-//            if (petId == -1) return;
-//            MapleInventoryManipulator.addById(qm.getClient(), rand+5000030, 1, null, petId);
-        } else
-            qm.dropMessage(1,"Your inventory is full");
+            //            var petId = MaplePet.createPet(rand + 5000030, level, closeness, fullness);
+            //            if (petId == -1) return;
+            //            MapleInventoryManipulator.addById(qm.getClient(), rand+5000030, 1, null, petId);
+        } else qm.dropMessage(1, "Your inventory is full");
         qm.dispose();
     }
 }

@@ -25,34 +25,33 @@ oldSelection = -1;
 
 function start() {
     var text = "Ola, eu sou o leitor de ticket's.";
-    if(cm.haveItem(4031713))
+    if (cm.haveItem(4031713))
         text += " Voce sera levado imediatamente, que ticket quer usar?#b";
-    else
-        close = true;
-    if(cm.haveItem(4031713))
-        text += "\r\n#L0##t4031713#";
-    if(close){
+    else close = true;
+    if (cm.haveItem(4031713)) text += "\r\n#L0##t4031713#";
+    if (close) {
         cm.sendOk(text);
         cm.dispose();
-    }else
-        cm.sendSimple(text);
+    } else cm.sendSimple(text);
 }
 
 function action(mode, type, selection) {
     status++;
     if (mode != 1) {
-        if(mode == 0)
+        if (mode == 0)
             cm.sendNext("Voce deve ter algum negocio para cuidar aqui, certo?");
         cm.dispose();
         return;
     }
     if (status == 0) {
-        if(selection == 0){
-            cm.sendYesNo("Me parece que ha muito espaco para esse passeio. Por favor, tenha o seu bilhete pronto para que eu possa deixa-lo entrar. A viagem pode ser longa, mas voce vai chegar ao seu destino muito bem. O que voce acha? Voce quer entrar nesta viagem?");
+        if (selection == 0) {
+            cm.sendYesNo(
+                "Me parece que ha muito espaco para esse passeio. Por favor, tenha o seu bilhete pronto para que eu possa deixa-lo entrar. A viagem pode ser longa, mas voce vai chegar ao seu destino muito bem. O que voce acha? Voce quer entrar nesta viagem?"
+            );
         }
         oldSelection = selection;
-    } else if(status == 1){
-        if(oldSelection == 0){
+    } else if (status == 1) {
+        if (oldSelection == 0) {
             cm.gainItem(4031713, -1);
             cm.warp(103000100, 0);
         }

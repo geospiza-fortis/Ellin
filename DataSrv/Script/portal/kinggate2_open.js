@@ -1,6 +1,6 @@
-/* 
+/*
  * This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc> 
+    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
                        Matthias Butz <matze@odinms.de>
                        Jan Christian Meyer <vimes@odinms.de>
 
@@ -26,15 +26,20 @@ Stage 5: Door before Ergoth - Guild Quest
 
 function enter(pi) {
     if (pi.getPlayer().getMap().getReactorByName("kinggate").getState() == 1) {
-        pi.playPortalSound(); 
+        pi.playPortalSound();
         pi.warp(990000900, 2);
-        if (pi.getPlayer().getEventInstance().getProperty("boss") != null && pi.getPlayer().getEventInstance().getProperty("boss").equals("true")) {
+        if (
+            pi.getPlayer().getEventInstance().getProperty("boss") != null &&
+            pi.getPlayer().getEventInstance().getProperty("boss").equals("true")
+        ) {
             pi.changeMusic("Bgm10/Eregos");
         }
         return true;
-    }
-    else {
-        pi.playerMessage(5, "This crack appears to be blocked off by the door nearby.");
+    } else {
+        pi.playerMessage(
+            5,
+            "This crack appears to be blocked off by the door nearby."
+        );
         return false;
     }
 }
