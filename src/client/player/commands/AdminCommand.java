@@ -81,11 +81,11 @@ public class AdminCommand {
                         AdminCommand.ShutdownTime.ts.cancel(false);
                         return;
                     }
-                    BroadcastService.broadcastMessage(PacketCreator.ServerNotice(0, "O servidor será desligado em " + AdminCommand.ShutdownTime.this.minutesLeft + " minutos. Por favor, faça logoff com segurança."));
+                    BroadcastService.broadcastMessage(PacketCreator.ServerNotice(0, "The server will be shut down in " + AdminCommand.ShutdownTime.this.minutesLeft + " minutos. Por favor, faï¿½a logoff com seguranï¿½a."));
                     AdminCommand.ShutdownTime.this.minutesLeft--;
                 }, 60000L);
             } else {
-                c.getPlayer().dropMessage(6, "Já existe um desligamento em andamento ou o encerramento não foi concluído. Por favor, espere.");
+                c.getPlayer().dropMessage(6, "There is already a shutdown in progress or the shutdown has not been completed. Please wait.");
             }
             return true;
         }
@@ -216,7 +216,7 @@ public class AdminCommand {
                 ShutdownServer.getInstance().shutdown();
                 t.start();
             } else {
-                c.getPlayer().dropMessage(6, "Já existe um desligamento em andamento. Por favor, aguarde.");
+                c.getPlayer().dropMessage(6, "There is already a shutdown in progress. Please wait.");
             }
             return true;
         }
@@ -244,9 +244,9 @@ public class AdminCommand {
                         chr.saveDatabase();
                     }
                 }
-                System.out.println("[Noticia] Mundo salvo com sucesso!");
+                System.out.println("[Notice] World saved successfully!");
             } catch (Exception e) {
-                System.out.println("[Noticia] Ocorreu um erro!");
+                System.out.println("[Notice] An error has occurred!");
                 System.err.println(e);
             }
             return true;
@@ -684,7 +684,7 @@ public class AdminCommand {
                int ch = FindService.findChannel(splitted[1]);
                 if (ch < 0) {
                     PlayerNote.sendNote(c.getPlayer(), splitted[1], StringUtil.joinStringFrom(splitted, 2));
-                    c.getPlayer().dropMessage(5, "Não encontrado, nota enviada!");
+                    c.getPlayer().dropMessage(5, "Nï¿½o encontrado, nota enviada!");
                     return false;
                 }
             }

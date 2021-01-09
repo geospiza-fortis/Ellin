@@ -146,7 +146,7 @@ public class CashShopOperation {
         int cost;
         if (hasSerial) {
             int sn = packet.readInt();
-            System.out.printf("Item não disponivel: %s", sn);
+            System.out.printf("Item not available: %s", sn);
             return;
         }  else {
             invType = InventoryType.getByType(packet.readByte());

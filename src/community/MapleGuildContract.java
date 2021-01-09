@@ -118,32 +118,32 @@ public class MapleGuildContract {
     public static void sendContractMembers(Player p, String guildName, MapleParty party) {
         if (p != null) {
             if (containsParty(party)) {
-                sendNPCSay("Os memrbos do grupo ainda estão decidindo, espere!", p.getClient());
+                sendNPCSay("The members of the group are still deciding, wait!", p.getClient());
                 return;
             }
             if (isGuildNameAccept(guildName)) {
-                sendNPCSay("O nome da guilda que você escolheu não é valido!.", p.getClient());
+                sendNPCSay("The name of the guild you chose is not valid !", p.getClient());
                 return;
             }
             if (party == null) {
-                sendNPCSay("Ocorreu um erro, por favor, tente novamente!", p.getClient());
+                sendNPCSay("An error occurred. Please try again.", p.getClient());
                 return;
             }
             if (p.getName() == null ? party.getLeader().getName() != null : !p.getName().equals(party.getLeader().getName())) {
-                sendNPCSay("Peça ao seu líder para falar comigo!", p.getClient());
+                sendNPCSay("Ask your leader to speak to me!", p.getClient());
                 return;
             }
             if (p.getMeso() < GameConstants.GUILD_CRETECOST) {
-                sendNPCSay("Você não tem mesos suficientes!", p.getClient());
+                sendNPCSay("You don't have enough mesos!", p.getClient());
                 return;
             }
             if (p.getParty().getMembers().size() < 6) {
-                sendNPCSay("Ocorreu um erro, por favor, tente novamente!", p.getClient());
+                sendNPCSay("An error occurred. Please try again!", p.getClient());
                 return;
             }
             for (final Player mc : p.getPartyMembers()) {
                 if (mc.getGuild() != null || mc.getMapId() != MapConstants.GUILD_ROOM) {
-                    sendNPCSay("Alguém já está em uma guild ou não está no mapa!", p.getClient());
+                    sendNPCSay("Someone is already in a guild or not on the map!", p.getClient());
                     return;
                 }
             }
@@ -178,19 +178,19 @@ public class MapleGuildContract {
         if (leader == null) {
             for (MaplePartyCharacter mc : party.getMembers()) {
                 if (mc != null) {
-                    mc.getPlayer().dropMessage("Ocorreu um erro, por favor, tente novamente!");
+                    mc.getPlayer().dropMessage("An error occurred. Please try again!");
                 }
             }
             return;
         }
         if (p.getParty().getMembers().size() < 6) {
-            sendNPCSay("Houve um erro, parece que o seu grupo não tem todos os membros necessários.", leader.getClient());
+            sendNPCSay("There was an error, it seems that your group does not have all the necessary members.", leader.getClient());
             clear(party);
             return;
         }
         
         if (!containsParty(party)) {
-            sendNPCSay("Ocorreu um erro, por favor, tente novamente!", p.getClient());  
+            sendNPCSay("An error occurred. Please try again!", p.getClient());  
             return;
         }
         
@@ -210,10 +210,10 @@ public class MapleGuildContract {
                     createGuild(leader, getGuildName(party));
                     clear(party);
                 } else {
-                    sendNPCSay("Ocorreu um erro, por favor, tente novamente!", leader.getClient());  
+                    sendNPCSay("An error occurred. Please try again!", leader.getClient());  
                 }
             } else {
-                sendNPCSay("Infelizmente, alguém não concorda com sua proposta de guild!", leader.getClient());
+                sendNPCSay("Unfortunately, someone does not agree with your guild proposal!", leader.getClient());
                 clear(party);
             }
         }
@@ -257,7 +257,7 @@ public class MapleGuildContract {
             }
         }
         p.getClient().getSession().write(GuildPackets.ShowGuildInfo(p));
-        p.getClient().announce(PacketCreator.GetNPCTalk(2010007, (byte) 0, "Parabéns~ " + gName + " a guild foi registrada com sucesso.", "00 00"));  
+        p.getClient().announce(PacketCreator.GetNPCTalk(2010007, (byte) 0, "Congratulations~ " + gName + " the guild has been successfully registered.", "00 00"));  
         GuildHandler.respawnPlayer(p);	
     }
     

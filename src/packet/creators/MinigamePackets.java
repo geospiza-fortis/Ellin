@@ -1,6 +1,6 @@
 /**
- * Ellin é um servidor privado de MapleStory
- * Baseado em um servidor GMS-Like na v.62
+ * Ellin is a private MapleStory server
+ * Based on a GMS-Like server in v.62
  */
 
 package packet.creators;

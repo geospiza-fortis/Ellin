@@ -125,7 +125,7 @@ public class CommandProcessor {
                     if (line.charAt(0) == '!') { 
                         CommandObject commandOb = commands.get(splitted[0]);
                         if (commandOb == null || commandOb.getType() != type) {
-                            showMessage(c, "Esse comando não existe.", type);
+                            showMessage(c, "This command does not exist.", type);
                             return true;
                         }
                         if (p.getAdministrativeLevel() >= commandOb.getAdministrativeLevel()) {
@@ -134,7 +134,7 @@ public class CommandProcessor {
                                 saveCommandsDatabase(c.getPlayer(), line);
                             }
                         } else {
-                            showMessage(c, "Você não tem privilégios para usar esse comando.", type);
+                            showMessage(c, "You do not have privileges to use this command.", type);
                         }
                         return true;
                     }

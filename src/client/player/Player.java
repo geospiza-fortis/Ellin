@@ -5116,7 +5116,7 @@ public class Player extends AbstractAnimatedFieldObject implements Serializable 
                 }
             }
             if (!InventoryManipulator.checkSpace(getClient(), id, quantity, "")) {
-                this.getClient().getPlayer().dropMessage(1, "Seu inventário está cheio. Por favor, remova um item do seu inventário e tente novamente.");
+                this.getClient().getPlayer().dropMessage(1, "Your inventory is full. Please remove an item from your inventory and try again.");
                 return null;
             }
             if (ItemConstants.getInventoryType(id).equals(InventoryType.EQUIP) && !ItemConstants.isThrowingStar(id) && !ItemConstants.isBullet(id)) {

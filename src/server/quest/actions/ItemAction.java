@@ -175,7 +175,7 @@ public final class ItemAction extends MapleQuestAction {
                 if (freeSlotCount == -1) {
                     if (type.equals(InventoryType.EQUIP) && p.getInventory(InventoryType.EQUIPPED).countById(item.getId()) > quantity)
                         continue;
-                        p.dropMessage(1, "Por favor, verifique se você tem itens suficientes no seu inventário.");
+                        p.dropMessage(1, "Please make sure you have enough items in your inventory.");
                         return false;
                 } else {
                         int idx = type.getType() - 1;   // more slots available from the given items!
@@ -197,7 +197,7 @@ public final class ItemAction extends MapleQuestAction {
 
             result =  InventoryManipulator.checkSpaceProgressively(c, it.getLeft().getItemId(), it.getLeft().getQuantity(), "", rndUsed.get(idx));
             if (result % 2 == 0) {
-                p.dropMessage(1, "Por favor, verifique se você tem espaço suficiente no seu inventário.");
+                p.dropMessage(1, "Please make sure you have enough space in your inventory.");
                 return false;
             }
 
