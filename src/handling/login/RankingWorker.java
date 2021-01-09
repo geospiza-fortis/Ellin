@@ -74,7 +74,7 @@ public class RankingWorker implements Runnable {
                     int rankMove = 0;
                     rank++;
                     if (
-                        rs.getLong("lastlogin") < lastUpdate ||
+                        rs.getTimestamp("lastlogin").getTime() < lastUpdate ||
                         rs.getInt("loggedin") > 0
                     ) {
                         rankMove =
