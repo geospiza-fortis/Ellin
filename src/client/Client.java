@@ -822,7 +822,7 @@ public class Client {
                         );
                     }
                     birthday = Calendar.getInstance();
-                    long blubb = rs.getTimestamp("birthday").getTime();
+                    long blubb = rs.getLong("birthday");
                     if (blubb > 0) {
                         birthday.setTimeInMillis(blubb * 1000);
                     }
