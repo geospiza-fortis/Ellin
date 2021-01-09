@@ -27,14 +27,14 @@ CREATE TABLE IF NOT EXISTS `accounts` (
   `loggedin` tinyint(4) NOT NULL DEFAULT '0',
   `lastlogin` timestamp NULL DEFAULT NULL,
   `createdat` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `birthday` date NOT NULL DEFAULT '0000-00-00',
+  `birthday` date NOT NULL DEFAULT '2000-01-01',
   `banned` tinyint(1) NOT NULL DEFAULT '0',
   `banreason` text,
   `gm` tinyint(1) NOT NULL DEFAULT '0',
   `email` tinytext,
   `macs` tinytext,
   `lastpwemail` timestamp NOT NULL DEFAULT '2002-12-31 17:00:00',
-  `tempban` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `tempban` timestamp NOT NULL DEFAULT '2000-01-01 00:00:00',
   `greason` tinyint(4) DEFAULT NULL,
   `paypalNX` int(11) DEFAULT NULL,
   `mPoints` int(11) DEFAULT NULL,
@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS `accounts` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`),
   KEY `ranking1` (`id`,`banned`,`gm`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for alliances
@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS `alliances` (
   `capacity` int(11) NOT NULL DEFAULT '2',
   `notice` varchar(100) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS `bbs_replies` (
   `content` varchar(26) NOT NULL DEFAULT '',
   `guildid` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`replyid`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
 
 -- ----------------------------
@@ -110,7 +110,7 @@ CREATE TABLE IF NOT EXISTS `bbs_threads` (
   `guildid` int(10) unsigned NOT NULL,
   `localthreadid` int(10) unsigned NOT NULL,
   PRIMARY KEY (`threadid`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
 
 -- ----------------------------
@@ -122,7 +122,7 @@ CREATE TABLE IF NOT EXISTS `bosslog` (
   `bossid` varchar(20) NOT NULL,
   `lastattempt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`bosslogid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -135,7 +135,7 @@ CREATE TABLE IF NOT EXISTS `buddies` (
   `pending` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   FOREIGN KEY (`characterid`) REFERENCES `characters` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -147,7 +147,7 @@ CREATE TABLE IF NOT EXISTS `buddyentries` (
   `buddyid` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`owner`) REFERENCES `characters` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -160,7 +160,7 @@ CREATE TABLE IF NOT EXISTS `cashshopcouponitems` (
   `itemData` int(11) NOT NULL,
   `quantity` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -172,7 +172,7 @@ CREATE TABLE IF NOT EXISTS `cashshopcoupons` (
   `used` int(11) NOT NULL DEFAULT '0',
   `character` varchar(13) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -252,7 +252,7 @@ CREATE TABLE IF NOT EXISTS `characters` (
   KEY `party` (`party`),
   KEY `ranking1` (`level`,`exp`),
   KEY `ranking2` (`gm`,`job`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -266,7 +266,7 @@ CREATE TABLE IF NOT EXISTS `characterslots` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `Index_3` (`accountId`),
   FOREIGN KEY (`accountId`) REFERENCES `accounts` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -281,7 +281,7 @@ CREATE TABLE IF NOT EXISTS `cheatlog` (
   `param` tinytext NOT NULL,
   PRIMARY KEY (`id`),
   KEY `cid` (`characterid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -299,7 +299,7 @@ CREATE TABLE IF NOT EXISTS `completpqs` (
   `guildPQ` int(11) DEFAULT '0',
   `amoriaPQ` int(11) DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -312,7 +312,7 @@ CREATE TABLE IF NOT EXISTS `cooldowns` (
   `length` bigint(20) unsigned NOT NULL,
   `starttime` bigint(20) unsigned NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -330,7 +330,7 @@ CREATE TABLE IF NOT EXISTS `drop_data` (
   UNIQUE KEY `dropperid` (`dropperid`,`itemid`),
   KEY `mobid` (`dropperid`),
   KEY `dropperid_2` (`dropperid`,`itemid`)
-) ENGINE=MyISAM AUTO_INCREMENT=24966 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=24966 DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -348,7 +348,7 @@ CREATE TABLE IF NOT EXISTS `drop_data_global` (
   `comments` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `mobid` (`continent`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
 
 -- ----------------------------
@@ -380,7 +380,7 @@ CREATE TABLE IF NOT EXISTS `dueyitems` (
   `owner` tinytext,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`PackageId`) REFERENCES `dueypackages` (`PackageId`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -395,7 +395,7 @@ CREATE TABLE IF NOT EXISTS `dueypackages` (
   `Checked` tinyint(1) unsigned DEFAULT '1',
   `Type` tinyint(1) unsigned NOT NULL,
   PRIMARY KEY (`PackageId`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -408,7 +408,7 @@ CREATE TABLE IF NOT EXISTS `famelog` (
   `when` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`famelogid`),
   FOREIGN KEY (`characterid`) REFERENCES `characters` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -424,7 +424,7 @@ CREATE TABLE IF NOT EXISTS `gifts` (
   PRIMARY KEY (`id`),
   KEY `FK_gifts_1` (`to`),
   CONSTRAINT `FK_gifts_1` FOREIGN KEY (`to`) REFERENCES `characters` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -437,7 +437,7 @@ CREATE TABLE IF NOT EXISTS `gmlog` (
   `mapid` int(11) NOT NULL DEFAULT '0',
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`gmlogid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -462,7 +462,7 @@ CREATE TABLE IF NOT EXISTS `guilds` (
   `signature` int(11) NOT NULL DEFAULT '0',
   `alliance` int(10) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guildid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 ROW_FORMAT=FIXED;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -473,7 +473,7 @@ CREATE TABLE IF NOT EXISTS `hwidbans` (
   `hwid` varchar(30) NOT NULL,
   PRIMARY KEY (`hwidbanid`),
   UNIQUE KEY `hwid_2` (`hwid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -502,7 +502,7 @@ CREATE TABLE IF NOT EXISTS `inventoryequipment` (
   `locked` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`inventoryequipmentid`),
   FOREIGN KEY (`inventoryitemid`) REFERENCES `inventoryitems` (`inventoryitemid`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -527,7 +527,7 @@ CREATE TABLE IF NOT EXISTS `inventoryitems` (
   KEY `inventorytype` (`inventorytype`),
   KEY `characterid_2` (`characterid`,`inventorytype`),
   CONSTRAINT `inventoryitems_ibfk_1` FOREIGN KEY (`characterid`) REFERENCES `characters` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -537,7 +537,7 @@ CREATE TABLE IF NOT EXISTS `ipbans` (
   `ipbanid` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `ip` varchar(40) NOT NULL DEFAULT '',
   PRIMARY KEY (`ipbanid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -552,7 +552,7 @@ CREATE TABLE IF NOT EXISTS `iplog` (
   KEY `accountid` (`accountid`,`ip`),
   KEY `ip` (`ip`),
   CONSTRAINT `iplog_ibfk_1` FOREIGN KEY (`accountid`) REFERENCES `accounts` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -566,7 +566,7 @@ CREATE TABLE IF NOT EXISTS `keymap` (
   `action` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   FOREIGN KEY (`characterid`) REFERENCES `characters` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -577,7 +577,7 @@ CREATE TABLE IF NOT EXISTS `macbans` (
   `mac` varchar(30) NOT NULL,
   PRIMARY KEY (`macbanid`),
   UNIQUE KEY `mac_2` (`mac`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -587,7 +587,7 @@ CREATE TABLE IF NOT EXISTS `macfilters` (
   `macfilterid` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `filter` varchar(30) NOT NULL,
   PRIMARY KEY (`macfilterid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -600,7 +600,7 @@ CREATE TABLE IF NOT EXISTS `mountdata` (
   `Exp` int(10) unsigned NOT NULL DEFAULT '0',
   `Fatigue` int(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -614,7 +614,7 @@ CREATE TABLE IF NOT EXISTS `notes` (
   `timestamp` bigint(20) unsigned NOT NULL,
   `fame` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
 
 -- ----------------------------
@@ -629,7 +629,7 @@ CREATE TABLE IF NOT EXISTS `pets` (
   `seconds` int(11) NOT NULL DEFAULT '0',
   `excluded` varchar(200) NOT NULL DEFAULT '',
   PRIMARY KEY (`petid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
 
 -- ----------------------------
@@ -652,7 +652,7 @@ CREATE TABLE IF NOT EXISTS `playernpcs` (
   `rx0` int(11) NOT NULL DEFAULT '0',
   `rx1` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -665,7 +665,7 @@ CREATE TABLE IF NOT EXISTS `playernpcs_equip` (
   `equippos` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`npcid`) REFERENCES `playernpcs` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -677,7 +677,7 @@ CREATE TABLE IF NOT EXISTS `player_variables` (
   `name` varchar(45) NOT NULL,
   `value` varchar(10000) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -689,7 +689,7 @@ CREATE TABLE IF NOT EXISTS `questactions` (
   `status` int(11) NOT NULL DEFAULT '0',
   `data` blob NOT NULL,
   PRIMARY KEY (`questactionid`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -699,9 +699,9 @@ CREATE TABLE IF NOT EXISTS `questprogress` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `queststatusid` int(10) unsigned NOT NULL DEFAULT '0',
   `progressid` int(11) NOT NULL DEFAULT '0',
-  `progress` varchar(15) CHARACTER SET latin1 COLLATE latin1_german1_ci NOT NULL DEFAULT '',
+  `progress` varchar(15) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -713,7 +713,7 @@ CREATE TABLE IF NOT EXISTS `questrequirements` (
   `status` int(11) NOT NULL DEFAULT '0',
   `data` blob NOT NULL,
   PRIMARY KEY (`questrequirementid`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -729,7 +729,7 @@ CREATE TABLE IF NOT EXISTS `queststatus` (
   `completed` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`queststatusid`),
   FOREIGN KEY (`characterid`) REFERENCES `characters` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -742,7 +742,7 @@ CREATE TABLE IF NOT EXISTS `queststatusmobs` (
   `count` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`queststatusmobid`),
   FOREIGN KEY (`queststatusid`) REFERENCES `queststatus` (`queststatusid`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -756,7 +756,7 @@ CREATE TABLE IF NOT EXISTS `reactordrops` (
   `questid` int(5) NOT NULL DEFAULT '-1',
   PRIMARY KEY (`reactordropid`),
   KEY `reactorid` (`reactorid`)
-) ENGINE=InnoDB AUTO_INCREMENT=1487 DEFAULT CHARSET=latin1 PACK_KEYS=1;
+) ENGINE=InnoDB AUTO_INCREMENT=1487 DEFAULT CHARSET=utf8 PACK_KEYS=1;
 
 -- ----------------------------
 -- Table structure for regrocklocations
@@ -766,7 +766,7 @@ CREATE TABLE IF NOT EXISTS `regrocklocations` (
   `characterid` int(11) DEFAULT NULL,
   `mapid` int(11) DEFAULT NULL,
   PRIMARY KEY (`trockid`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -794,7 +794,7 @@ CREATE TABLE IF NOT EXISTS `rings` (
   `itemid` int(11) NOT NULL DEFAULT '0',
   `partnername` varchar(255) NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -809,7 +809,7 @@ CREATE TABLE IF NOT EXISTS `savedlocations` (
   UNIQUE KEY `characterid` (`characterid`,`map`,`locationtype`),
   KEY `savedlocations_ibfk_1` (`characterid`),
   CONSTRAINT `savedlocations_ibfk_1` FOREIGN KEY (`characterid`) REFERENCES `characters` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -827,7 +827,7 @@ CREATE TABLE IF NOT EXISTS `skillmacros` (
   PRIMARY KEY (`entryid`),
   KEY `characterid` (`characterid`),
   CONSTRAINT `skillmacros_ibfk_1` FOREIGN KEY (`characterid`) REFERENCES `characters` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -843,7 +843,7 @@ CREATE TABLE IF NOT EXISTS `skills` (
   UNIQUE KEY `characterid` (`characterid`,`skillid`),
   KEY `skills_ibfk_1` (`characterid`),
   CONSTRAINT `skills_ibfk_1` FOREIGN KEY (`characterid`) REFERENCES `characters` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -863,13 +863,13 @@ CREATE TABLE IF NOT EXISTS `spawns` (
   `mobtime` int(11) DEFAULT '1000',
   `mid` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
 -- Table structure for storages
 -- ----------------------------
-CREATE TABLE IF NOT EXISTS IF NOT EXISTS `storages` (
+CREATE TABLE IF NOT EXISTS `storages` (
   `storageid` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `accountid` int(11) NOT NULL DEFAULT '0',
   `slots` int(11) NOT NULL DEFAULT '0',
@@ -877,7 +877,7 @@ CREATE TABLE IF NOT EXISTS IF NOT EXISTS `storages` (
   PRIMARY KEY (`storageid`),
   KEY `accountid` (`accountid`),
   CONSTRAINT `storages_ibfk_1` FOREIGN KEY (`accountid`) REFERENCES `accounts` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -887,7 +887,7 @@ CREATE TABLE IF NOT EXISTS `topresults` (
   `itemid` int(11) DEFAULT NULL,
   `count` int(11) DEFAULT NULL,
   `world` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -898,7 +898,7 @@ CREATE TABLE IF NOT EXISTS `trocklocations` (
   `characterid` int(11) DEFAULT NULL,
   `mapid` int(11) DEFAULT NULL,
   PRIMARY KEY (`trockid`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -909,7 +909,7 @@ CREATE TABLE IF NOT EXISTS `wishlist` (
   `characterid` int(11) NOT NULL,
   `sn` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -922,7 +922,7 @@ CREATE TABLE IF NOT EXISTS `wz_speedquiz` (
   `answer` varchar(200) NOT NULL,
   `questionNo` int(11) NOT NULL,
   PRIMARY KEY (`quizDataId`)
-) ENGINE=MyISAM AUTO_INCREMENT=948 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=948 DEFAULT CHARSET=utf8;
 
 
 -- ----------------------------
@@ -932,5 +932,5 @@ CREATE TABLE IF NOT EXISTS `levelhistory` (
   `accountid` int(11) NOT NULL,
   `characterid` int(11) NOT NULL,
   `level` int(11) NOT NULL DEFAULT '1',
-  `date` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP
+  `date` timestamp NOT NULL DEFAULT '2000-01-01 00:00:00' ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

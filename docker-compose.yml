@@ -40,6 +40,9 @@ services:
             - MYSQL_PASSWORD
             - MYSQL_DATABASE
             - DEBUG=false
+        ports:
+            - "8484:8484"
+            - "7575:7575"
         depends_on:
             - db
         command: bash -c "bin/run_ellin_sql.sh && exec bin/launch.sh"
