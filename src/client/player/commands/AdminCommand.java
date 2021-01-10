@@ -1006,7 +1006,8 @@ public class AdminCommand {
                 .getCharacterByName(splitted[1]);
             if (victim != null) {
                 victim.dropMessage(
-                    "[GM - Responde] " + StringUtil.joinStringFrom(splitted, 2)
+                    "[GM - Answer back] " +
+                    StringUtil.joinStringFrom(splitted, 2)
                 );
                 return true;
             } else {
@@ -1017,9 +1018,7 @@ public class AdminCommand {
                         splitted[1],
                         StringUtil.joinStringFrom(splitted, 2)
                     );
-                    c
-                        .getPlayer()
-                        .dropMessage(5, "N�o encontrado, nota enviada!");
+                    c.getPlayer().dropMessage(5, "Not found, note sent!");
                     return false;
                 }
             }
