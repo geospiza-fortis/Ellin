@@ -2046,8 +2046,8 @@ public class InventoryHandler {
             BufferedReader br;
             try (
                 FileReader fl = new FileReader(
-                    ServerProperties.Misc.DATA_ROOT +
-                    "/Reward/Incubator/" +
+                    ServerProperties.Misc.INCUBATOR_ROOT +
+                    "/" +
                     ItemConstants.getNameCityIncubator(itemid) +
                     "/" +
                     types[(int) (chance * types.length)] +

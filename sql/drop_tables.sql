@@ -44,6 +44,8 @@ DROP TABLE IF EXISTS `regrocklocations`;
 DROP TABLE IF EXISTS `reports`;
 DROP TABLE IF EXISTS `rings`;
 DROP TABLE IF EXISTS `savedlocations`;
+DROP TABLE IF EXISTS `shopitems`;
+DROP TABLE IF EXISTS `shops`;
 DROP TABLE IF EXISTS `skillmacros`;
 DROP TABLE IF EXISTS `skills`;
 DROP TABLE IF EXISTS `spawns`;

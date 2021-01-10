@@ -27,7 +27,7 @@ public class ServerProperties {
         static {
             Properties p = new Properties();
             try {
-                p.load(new FileInputStream(Misc.DATA_ROOT + "/Login.ini"));
+                p.load(new FileInputStream(Misc.CONF_ROOT + "/Login.ini"));
 
                 PORT = Short.parseShort(p.getProperty("LoginPort"));
 
@@ -59,7 +59,7 @@ public class ServerProperties {
         static {
             Properties p = new Properties();
             try {
-                p.load(new FileInputStream(Misc.DATA_ROOT + "/Channel.ini"));
+                p.load(new FileInputStream(Misc.CONF_ROOT + "/Channel.ini"));
 
                 PORT = Integer.parseInt(p.getProperty("ChannelPort"));
                 COUNT = Integer.parseInt(p.getProperty("ChannelCount"));
@@ -95,7 +95,7 @@ public class ServerProperties {
             try {
                 p.load(
                     new FileInputStream(
-                        ServerProperties.Misc.DATA_ROOT + "/World.ini"
+                        ServerProperties.Misc.CONF_ROOT + "/World.ini"
                     )
                 );
 
@@ -129,7 +129,7 @@ public class ServerProperties {
         static {
             Properties p = new Properties();
             try {
-                p.load(new FileInputStream(Misc.DATA_ROOT + "/Database.ini"));
+                p.load(new FileInputStream(Misc.CONF_ROOT + "/Database.ini"));
 
                 DB_URL = p.getProperty("DatabaseUrl");
                 DB_USER = p.getProperty("DatabaseUser");
@@ -150,12 +150,14 @@ public class ServerProperties {
         public static boolean VOTE_MESSAGE;
         public static boolean WELCOME_MESSAGE;
         public static String WEB_SITE;
-        public static String DATA_ROOT = "DataSrv";
+        public static String CONF_ROOT = "conf";
+        public static String SCRIPT_ROOT = "scripts";
+        public static String INCUBATOR_ROOT = "incubator";
 
         static {
             Properties p = new Properties();
             try {
-                p.load(new FileInputStream(DATA_ROOT + "/Misc.ini"));
+                p.load(new FileInputStream(CONF_ROOT + "/Misc.ini"));
 
                 CASHSHOP_AVAILABLE =
                     p.getProperty("CashShopAvailable").equalsIgnoreCase("True");

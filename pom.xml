@@ -18,7 +18,7 @@
                         <format>
                             <includes>
                                 <include>src/**/*.java</include>
-                                <include>DataSrv/Script/**/*.js</include>
+                                <include>scripts/**/*.js</include>
                             </includes>
                             <trimTrailingWhitespace />
                             <endWithNewline />

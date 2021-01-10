@@ -1,44 +1,50 @@
 version: "3.4"
 
 volumes:
-  ellin-volume:
+    ellin-volume:
 
 services:
-  db:
-    image: mysql:5.7
-    restart: always
-    ports:
-      - "3306:3306"
-    volumes:
-      - ellin-volume:/var/lib/mysql
-    environment:
-      - MYSQL_RANDOM_ROOT_PASSWORD=true
-      - MYSQL_USER
-      - MYSQL_PASSWORD
-      - MYSQL_DATABASE
-  adminer:
-    image: adminer:latest
-    restart: always
-    depends_on:
-      - db
-    ports:
-      - "8080:8080"
-    environment:
-      - ADMINER_DEFAULT_SERVER=db
-      - ADMINER_DEFAULT_TYPE=mysql
-      - ADMINER_DEFAULT_PORT=3306
-      - ADMINER_DEFAULT_DB=${MYSQL_DATABASE}
-  world:
-    build:
-      context: .
-    restart: always
-    volumes:
-      - ./:/app
-      - /app/target
-    environment:
-      - MYSQL_USER
-      - MYSQL_PASSWORD
-      - MYSQL_DATABASE
-      - DEBUG=false
-    depends_on:
-      - db
+    db:
+        image: mysql:5.7
+        restart: always
+        ports:
+            - "3306:3306"
+        volumes:
+            - ellin-volume:/var/lib/mysql
+        environment:
+            - MYSQL_RANDOM_ROOT_PASSWORD=true
+            - MYSQL_USER
+            - MYSQL_PASSWORD
+            - MYSQL_DATABASE
+    adminer:
+        image: adminer:latest
+        restart: always
+        depends_on:
+            - db
+        ports:
+            - "8080:8080"
+        environment:
+            - ADMINER_DEFAULT_SERVER=db
+            - ADMINER_DEFAULT_TYPE=mysql
+            - ADMINER_DEFAULT_PORT=3306
+            - ADMINER_DEFAULT_DB=${MYSQL_DATABASE}
+    world:
+        build:
+            context: .
+        restart: always
+        volumes:
+            - ./:/app
+            - /app/target
+        environment:
+            - MYSQL_USER
+            - MYSQL_PASSWORD
+            - MYSQL_DATABASE
+            - DEBUG=false
+        ports:
+            - "8484:8484"
+            - "7575:7575"
+            - "7576:7576"
+            - "7577:7577"
+        depends_on:
+            - db
+        command: bash -c "bin/run_ellin_sql.sh && exec bin/launch.sh"

@@ -8,7 +8,8 @@ Find the external ip address of your docker host. If you are running on Windows,
 use `ipconfig` to find the WSL interface.
 
 Obtain a localhost v62 client and modify `127.0.0.1` to redirect to the external
-ip address with a hex editor.
+ip address with a hex editor. Set the IP address of the server by editing
+`conf/World.ini` and setting `GameServerIP`.
 
 Run the servers with the default testing settings.
 

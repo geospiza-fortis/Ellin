@@ -12,3 +12,4 @@ COPY pom.xml pom.xml
 RUN mvn exec:help spotless:apply
 RUN mvn dependency:go-offline package
 ADD . /app
+RUN mvn package

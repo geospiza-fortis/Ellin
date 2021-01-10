@@ -276,7 +276,7 @@ public class Client {
 
     private Calendar getTempBanCalendar(ResultSet rs) throws SQLException {
         Calendar lTempban = Calendar.getInstance();
-        long blubb = rs.getLong("tempban");
+        long blubb = rs.getTimestamp("tempban").getTime();
         if (blubb == 0) {
             lTempban.setTimeInMillis(0);
             return lTempban;
