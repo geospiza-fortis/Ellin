@@ -1557,4 +1557,145 @@ public class GMCommand {
             return true;
         }
     }
+
+    /** !help - show help for gm commands */
+    public static class Help extends CommandExecute {
+
+        @Override
+        public boolean execute(Client c, String[] splitted) {
+            final Player p = c.getPlayer();
+            p.dropMessage(5, "!hide - hides the current character");
+            p.dropMessage(5, "!drop <itemid> <quantity>");
+            p.dropMessage(5, "!spawn <mobid>");
+            p.dropMessage(5, "!level <level> - set the current level");
+            p.dropMessage(
+                5,
+                "!event [optional <mapid>] - begin an event on a channel"
+            );
+            p.dropMessage(5, "!zakum - spawn zakum");
+            p.dropMessage(5, "!horntail - spawn horntail (TODO)");
+            p.dropMessage(5, "!cake [optional <mobhp>] - spawn cake monster");
+            p.dropMessage(5, "!papu - spawn papulatus");
+            p.dropMessage(5, "!map <mapid> - warp player to map");
+            p.dropMessage(5, "!bomb [optional <count>] - spawn a bomb");
+            p.dropMessage(5, "!killall - kill all monsters on the map");
+            p.dropMessage(5, "!levelup - increase the current level by one");
+            p.dropMessage(
+                5,
+                "!clock [optional <seconds>] - set a timer at the top of the map"
+            );
+            p.dropMessage(5, "!buffme - apply all the buffs");
+            p.dropMessage(5, "!killmap - kill all the players on the map.");
+            p.dropMessage(5, "!mutemap - mute the current map");
+            p.dropMessage(5, "!unmute - unmute the current map");
+            p.dropMessage(
+                5,
+                "!unbuffmap - remove buffs from all players in the current map"
+            );
+            p.dropMessage(5, "!setall <value> - set all stats to the value");
+            p.dropMessage(5, "!whereami - show the id of the current map");
+            p.dropMessage(
+                5,
+                "!job <jobid> - set the job for the current character"
+            );
+            p.dropMessage(5, "!fullhp - increase hp and mp to max values");
+            p.dropMessage(5, "!gainmeso <value> - add mesos to your inventory");
+            p.dropMessage(5, "!healhere - heal all characters on the map");
+            p.dropMessage(5, "!dc [-f] <player> - disconnect a player");
+            p.dropMessage(5, "!online - show the players online");
+            p.dropMessage(5, "!giftnx <player> <amount> - gift a player nx");
+            p.dropMessage(
+                5,
+                "!say <message> - broadcast a message to the server"
+            );
+            p.dropMessage(
+                5,
+                "!warn <message> - send a warning message to all players"
+            );
+            p.dropMessage(5, "!openportal <portalid> - open a portal");
+            p.dropMessage(5, "!closeportal <portalid> - close a portal");
+            p.dropMessage(
+                5,
+                "!closeportals - close all portals in the current map"
+            );
+            p.dropMessage(
+                5,
+                "!openportals - open all portals in the current map"
+            );
+            p.dropMessage(
+                5,
+                "!itemcheck <player> <itemid> - check how many items a player has"
+            );
+            p.dropMessage(
+                5,
+                "!song <songid> - change the current bgm of the map"
+            );
+            p.dropMessage(
+                5,
+                "!removeitem <player> <itemid> - remove items from the inventory of a player"
+            );
+            p.dropMessage(
+                5,
+                "!speakmega <player> <message> - send a message as another player on megaphone"
+            );
+            p.dropMessage(
+                5,
+                "!speak <player> <message> - say a message as a player"
+            );
+            p.dropMessage(
+                5,
+                "!speakmap <message> - make all players speak a message"
+            );
+            p.dropMessage(
+                5,
+                "!mesoeveryone <amount> - Give everyone online mesos"
+            );
+            p.dropMessage(
+                5,
+                "!charinfo <player> - show information about a player"
+            );
+            p.dropMessage(5, "!cheaters - show information about cheaters");
+            p.dropMessage(
+                5,
+                "!maxskills - max the skills of the current player"
+            );
+            p.dropMessage(5, "!cleardrops - remove drops from the map");
+            p.dropMessage(
+                5,
+                "!exprate <value> [all] - change the experience rate for channel (or world)"
+            );
+            p.dropMessage(
+                5,
+                "!mesorate <value> [all] - change the meso rate for the channel (or world)"
+            );
+            p.dropMessage(
+                5,
+                "!droprate <value> [all] - change the drop rate for the channel (or world)"
+            );
+            p.dropMessage(
+                5,
+                "!questrate <value> [all] - change the quest rate for the channel (or world)"
+            );
+            p.dropMessage(
+                5,
+                "!fame <player> <value> - set the fame of a character"
+            );
+            p.dropMessage(5, "!eventrules - show the event rules in the map");
+            p.dropMessage(
+                5,
+                "!setname <old> <new> - sets the name of a character"
+            );
+            p.dropMessage(
+                5,
+                "!uptime - get how long the server has been online"
+            );
+            p.dropMessage(
+                5,
+                "!item <itemid> <quantity> - add an item to the inventory"
+            );
+            p.dropMessage(5, "!goto <location> - transport to a town center");
+            p.dropMessage(5, "!help - show help for gm commands");
+            return true;
+        }
+    }
 }

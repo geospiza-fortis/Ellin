@@ -108,7 +108,7 @@ public class PlayerCommand {
         }
     }
 
-    /** @gm <message>: Sends a message to all online GMs in the case of an emergency. */
+    /** @gm <message> - Sends a message to all online GMs in the case of an emergency. */
     public static class Gm extends CommandExecute {
 
         @Override
@@ -197,10 +197,8 @@ public class PlayerCommand {
         }
     }
 
-    /* @help - show a list of player commands */
-    public static class help extends Commands {}
-
-    public static class Commands extends CommandExecute {
+    /** @help - show a list of player commands */
+    public static class Help extends CommandExecute {
 
         @Override
         public boolean execute(Client c, String[] splitted) {
@@ -215,19 +213,22 @@ public class PlayerCommand {
             );
             p.dropMessage(
                 5,
-                "@gm <message>: Sends a message to all online GMs in the case of an emergency."
+                "@drops - bring up the search interface for item drops"
             );
-            p.dropMessage(5, "@dispose - Fixes your character if it is stuck.");
             p.dropMessage(
                 5,
                 "@playtime - Shows the playing time within our server."
             );
             p.dropMessage(
                 5,
-                "@uptime - Shows how long " +
-                ServerProperties.Login.SERVER_NAME +
-                " has been online."
+                "@gm <message> - Sends a message to all online GMs in the case of an emergency."
             );
+            p.dropMessage(
+                5,
+                "@uptime - Shows how long the server has been online."
+            );
+            p.dropMessage(5, "@dispose - Fixes your character if it is stuck.");
+            p.dropMessage(5, "@help - show a list of player commands");
             return true;
         }
     }

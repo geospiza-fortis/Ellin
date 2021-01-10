@@ -1221,4 +1221,86 @@ public class AdminCommand {
             return true;
         }
     }
+
+    /** !helpadmin - show admin help */
+    public static class HelpAdmin extends CommandExecute {
+
+        @Override
+        public boolean execute(Client c, String[] splitted) {
+            final Player p = c.getPlayer();
+            p.dropMessage(5, "!shutdowntime <time> - show notice for shutdown");
+            p.dropMessage(
+                5,
+                "!position - show the current player position and foothold"
+            );
+            p.dropMessage(5, "!expeds - show the status of expeditions");
+            p.dropMessage(5, "!seeds - spawn seeds in Henesys PQ");
+            p.dropMessage(5, "!reloadevents - reload events");
+            p.dropMessage(5, "!reloaddrops - reload drops");
+            p.dropMessage(5, "!reloadportals - reload portal");
+            p.dropMessage(5, "!reloadmaps - reload the current map");
+            p.dropMessage(5, "!shutdown - shutdown the server");
+            p.dropMessage(
+                5,
+                "!servermessage <message> - set the current server message in the scroll bar"
+            );
+            p.dropMessage(
+                5,
+                "!saveall - save the current state of the world to the database"
+            );
+            p.dropMessage(
+                5,
+                "!warpallhere - warp all players to the current map in the channel"
+            );
+            p.dropMessage(
+                5,
+                "!superequip <id> <stat> - create a weapon with custom stats"
+            );
+            p.dropMessage(
+                5,
+                "!npc <npcid> - spawn an npc at the current position"
+            );
+            p.dropMessage(
+                5,
+                "!notice <type> <message> - send various message types to players"
+            );
+            p.dropMessage(
+                5,
+                "!find <one of: npc, mob, item, map, skill> <term> - search for the id of an item"
+            );
+            p.dropMessage(5, "!warp [player] [mapid] - warp a player to a map");
+            p.dropMessage(
+                5,
+                "!warpchhere - warp all players in the channel to the current map"
+            );
+            p.dropMessage(5, "!warpmapto <mapid> - warp a player a map");
+            p.dropMessage(
+                5,
+                "!warphere <player> - warp a player to the current map"
+            );
+            p.dropMessage(
+                5,
+                "!rgm <player> <message> - send a gm notice to a player"
+            );
+            p.dropMessage(
+                5,
+                "!pnpc <npcid> - place an NPC at the current position"
+            );
+            p.dropMessage(
+                5,
+                "!sreactor <mobid> <mobTime> - spawn a reactor at the current location"
+            );
+            p.dropMessage(
+                5,
+                "!pmob <mobid> <mobTime> - place a mob spawn at the current position"
+            );
+            p.dropMessage(
+                5,
+                "!showtrace <threadid> - show the stack trace on a thread"
+            );
+            p.dropMessage(5, "!threads - show the currently running threads");
+            p.dropMessage(5, "!helpadmin - show admin help");
+            return true;
+        }
+    }
 }
