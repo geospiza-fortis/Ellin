@@ -48,6 +48,7 @@ public class GMCommand {
         return CoomandRank.GM;
     }
 
+    /** !hide - hides the current character */
     public static class Hide extends CommandExecute {
 
         @Override
@@ -60,6 +61,7 @@ public class GMCommand {
         }
     }
 
+    /** !drop <itemid> <quantity> */
     public static class Drop extends CommandExecute {
 
         @Override
@@ -107,6 +109,7 @@ public class GMCommand {
         }
     }
 
+    /** !spawn <mobid> */
     public static class Spawn extends CommandExecute {
 
         @Override
@@ -150,6 +153,7 @@ public class GMCommand {
         }
     }
 
+    /** !level <level> - set the current level */
     public static class Level extends CommandExecute {
 
         @Override
@@ -162,6 +166,7 @@ public class GMCommand {
         }
     }
 
+    /** !event [optional <mapid>] - begin an event on a channel */
     public static class Event extends CommandExecute {
 
         @Override
@@ -195,6 +200,7 @@ public class GMCommand {
         }
     }
 
+    /** !zakum - spawn zakum */
     public static class Zakum extends CommandExecute {
 
         @Override
@@ -219,6 +225,7 @@ public class GMCommand {
         }
     }
 
+    /** !horntail - spawn horntail (TODO) */
     public static class Horntail extends CommandExecute {
 
         @Override
@@ -232,6 +239,7 @@ public class GMCommand {
         }
     }
 
+    /** !cake [optional <mobhp>] - spawn cake monster */
     public static class Cake extends CommandExecute {
 
         @Override
@@ -262,6 +270,7 @@ public class GMCommand {
         }
     }
 
+    /** !papu - spawn papulatus */
     public static class Papu extends CommandExecute {
 
         @Override
@@ -277,6 +286,7 @@ public class GMCommand {
         }
     }
 
+    /** !map <mapid> - warp player to map */
     public static class Map extends CommandExecute {
 
         @Override
@@ -304,6 +314,7 @@ public class GMCommand {
         }
     }
 
+    /** !bomb [optional <count>] - spawn a bomb */
     public static class Bomb extends CommandExecute {
 
         @Override
@@ -322,6 +333,7 @@ public class GMCommand {
         }
     }
 
+    /** !killall - kill all monsters on the map */
     public static class KillAll extends CommandExecute {
 
         @Override
@@ -352,6 +364,7 @@ public class GMCommand {
         }
     }
 
+    /** !levelup - increase the current level by one */
     public static class Levelup extends CommandExecute {
 
         @Override
@@ -362,6 +375,7 @@ public class GMCommand {
         }
     }
 
+    /** !clock [optional <seconds>] - set a timer at the top of the map */
     public static class Clock extends CommandExecute {
 
         @Override
@@ -377,6 +391,7 @@ public class GMCommand {
         }
     }
 
+    /** !buffme - apply all the buffs */
     public static class Buffme extends CommandExecute {
 
         @Override
@@ -410,6 +425,7 @@ public class GMCommand {
         }
     }
 
+    /** !killmap - kill all the players on the map. */
     public static class Killmap extends CommandExecute {
 
         @Override
@@ -423,13 +439,12 @@ public class GMCommand {
             }
             c
                 .getPlayer()
-                .dropMessage(
-                    "O total de " + players + " jogadores estao com HP zerado."
-                );
+                .dropMessage("A total " + players + " players are at zero HP.");
             return true;
         }
     }
 
+    /** !mutemap - mute the current map */
     public static class Mutemap extends CommandExecute {
 
         @Override
@@ -461,6 +476,7 @@ public class GMCommand {
         }
     }
 
+    /** !unmute - unmute the current map */
     public static class Unmutemap extends CommandExecute {
 
         @Override
@@ -492,6 +508,7 @@ public class GMCommand {
         }
     }
 
+    /** !unbuffmap - remove buffs from all players in the current map */
     public static class Unbuffmap extends CommandExecute {
 
         @Override
@@ -505,6 +522,7 @@ public class GMCommand {
         }
     }
 
+    /** !setall <value> - set all stats to the value */
     public static class Setall extends CommandExecute {
 
         @Override
@@ -526,6 +544,7 @@ public class GMCommand {
         }
     }
 
+    /** !whereami - show the id of the current map */
     public static class Whereami extends CommandExecute {
 
         @Override
@@ -539,6 +558,7 @@ public class GMCommand {
         }
     }
 
+    /** !job <jobid> - set the job for the current character */
     public static class Job extends CommandExecute {
 
         @Override
@@ -554,6 +574,7 @@ public class GMCommand {
         }
     }
 
+    /** !fullhp - increase hp and mp to max values */
     public static class Fullhp extends CommandExecute {
 
         @Override
@@ -578,6 +599,7 @@ public class GMCommand {
         }
     }
 
+    /** !gainmeso <value> - add mesos to your inventory */
     public static class GainMeso extends CommandExecute {
 
         @Override
@@ -597,6 +619,7 @@ public class GMCommand {
         }
     }
 
+    /** !healhere - heal all characters on the map */
     public static class HealHere extends CommandExecute {
 
         @Override
@@ -632,6 +655,7 @@ public class GMCommand {
         }
     }
 
+    /** !dc [-f] <player> - disconnect a player */
     public static class DC extends CommandExecute {
 
         @Override
@@ -670,6 +694,7 @@ public class GMCommand {
         }
     }
 
+    /** !online - show the players online */
     public static class Online extends CommandExecute {
 
         @Override
@@ -698,6 +723,7 @@ public class GMCommand {
         }
     }
 
+    /** !giftnx <player> <amount> - gift a player nx */
     public static class GiftNX extends CommandExecute {
 
         @Override
@@ -729,6 +755,7 @@ public class GMCommand {
         }
     }
 
+    /** !say <message> - broadcast a message to the server */
     public static class Say extends CommandExecute {
 
         @Override
@@ -750,6 +777,7 @@ public class GMCommand {
         }
     }
 
+    /** !warn <message> - send a warning message to all players */
     public static class Warn extends CommandExecute {
 
         @Override
@@ -768,6 +796,7 @@ public class GMCommand {
         }
     }
 
+    /** !openportal <portalid> - open a portal */
     public static class OpenPortalId extends CommandExecute {
 
         @Override
@@ -787,12 +816,13 @@ public class GMCommand {
         }
     }
 
+    /** !closeportal <portalid> - close a portal */
     public static class ClosePortalId extends CommandExecute {
 
         @Override
         public boolean execute(Client c, String[] splitted) {
             if (splitted.length < 2) {
-                c.getPlayer().yellowMessage("Syntax: !openportal <portalid>");
+                c.getPlayer().yellowMessage("Syntax: !closeportal <portalid>");
                 return false;
             }
             BroadcastService.broadcastMessage(
@@ -803,6 +833,7 @@ public class GMCommand {
         }
     }
 
+    /** !closeportals - close all portals in the current map */
     public static class ClosePortals extends CommandExecute {
 
         @Override
@@ -817,6 +848,7 @@ public class GMCommand {
         }
     }
 
+    /** !openportals - open all portals in the current map */
     public static class OpenPortals extends CommandExecute {
 
         @Override
@@ -834,6 +866,7 @@ public class GMCommand {
         }
     }
 
+    /** !itemcheck <player> <itemid> - check how many items a player has */
     public static class ItemCheck extends CommandExecute {
 
         @Override
@@ -881,6 +914,7 @@ public class GMCommand {
         }
     }
 
+    /** !song <songid> - change the current bgm of the map */
     public static class Song extends CommandExecute {
 
         @Override
@@ -893,6 +927,7 @@ public class GMCommand {
         }
     }
 
+    /** !removeitem <player> <itemid> - remove items from the inventory of a player */
     public static class RemoveItem extends CommandExecute {
 
         @Override
@@ -924,6 +959,7 @@ public class GMCommand {
         }
     }
 
+    /** !speakmega <player> <message> - send a message as another player on megaphone */
     public static class SpeakMega extends CommandExecute {
 
         @Override
@@ -950,6 +986,7 @@ public class GMCommand {
         }
     }
 
+    /** !speak <player> <message> - say a message as a player */
     public static class Speak extends CommandExecute {
 
         @Override
@@ -977,6 +1014,7 @@ public class GMCommand {
         }
     }
 
+    /** !speakmap <message> - make all players speak a message */
     public static class SpeakMap extends CommandExecute {
 
         @Override
@@ -1002,6 +1040,7 @@ public class GMCommand {
         }
     }
 
+    /** !mesoeveryone <amount> - Give everyone online mesos */
     public static class MesoEveryone extends CommandExecute {
 
         @Override
@@ -1015,6 +1054,7 @@ public class GMCommand {
         }
     }
 
+    /** !charinfo <player> - show information about a player */
     public static class CharInfo extends CommandExecute {
 
         @Override
@@ -1086,6 +1126,7 @@ public class GMCommand {
         }
     }
 
+    /** !cheaters - show information about cheaters */
     public static class Cheaters extends CommandExecute {
 
         @Override
@@ -1105,6 +1146,7 @@ public class GMCommand {
         }
     }
 
+    /** !maxskills - max the skills of the current player */
     public static class Maxskills extends CommandExecute {
 
         @Override
@@ -1114,6 +1156,7 @@ public class GMCommand {
         }
     }
 
+    /** !cleardrops - remove drops from the map */
     public static class Cleardrops extends CommandExecute {
 
         @Override
@@ -1146,6 +1189,7 @@ public class GMCommand {
         }
     }
 
+    /** !exprate <value> [all] - change the experience rate for channel (or world) */
     public static class ExpRate extends CommandExecute {
 
         @Override
@@ -1175,6 +1219,7 @@ public class GMCommand {
         }
     }
 
+    /** !mesorate <value> [all] - change the meso rate for the channel (or world) */
     public static class MesoRate extends CommandExecute {
 
         @Override
@@ -1204,6 +1249,7 @@ public class GMCommand {
         }
     }
 
+    /** !droprate <value> [all] - change the drop rate for the channel (or world) */
     public static class DropRate extends CommandExecute {
 
         @Override
@@ -1235,6 +1281,7 @@ public class GMCommand {
         }
     }
 
+    /** !questrate <value> [all] - change the quest rate for the channel (or world) */
     public static class QuestRate extends CommandExecute {
 
         @Override
@@ -1266,6 +1313,7 @@ public class GMCommand {
         }
     }
 
+    /** !fame <player> <value> - set the fame of a character */
     public static class Fame extends CommandExecute {
 
         @Override
@@ -1287,6 +1335,7 @@ public class GMCommand {
         }
     }
 
+    /** !eventrules - show the event rules in the map */
     public static class EventRules extends CommandExecute {
 
         @Override
@@ -1298,6 +1347,7 @@ public class GMCommand {
         }
     }
 
+    /** !setname <old> <new> - sets the name of a character */
     public static class SetName extends CommandExecute {
 
         @Override
@@ -1315,6 +1365,7 @@ public class GMCommand {
                     if (victim != null) {
                         victim.getClient().disconnect(false, false);
                         victim.getClient().getSession().close();
+                        // TODO: only change the name if the name is valid
                         victim.setName(newname, true);
                         c
                             .getPlayer()
@@ -1343,6 +1394,7 @@ public class GMCommand {
         }
     }
 
+    /** !uptime - get how long the server has been online */
     public static class Uptime extends CommandExecute {
 
         @Override
@@ -1361,6 +1413,7 @@ public class GMCommand {
         }
     }
 
+    /** !item <itemid> <quantity> - add an item to the inventory */
     public static class item extends CommandExecute {
 
         @Override
@@ -1397,6 +1450,7 @@ public class GMCommand {
         }
     }
 
+    /** !goto <location> - transport to a town center */
     public static class GoTo extends CommandExecute {
 
         private static final HashMap<String, Integer> gotoMaps = new HashMap<>();
@@ -1500,6 +1554,147 @@ public class GMCommand {
                     }
                 }
             }
+            return true;
+        }
+    }
+
+    /** !help - show help for gm commands */
+    public static class Help extends CommandExecute {
+
+        @Override
+        public boolean execute(Client c, String[] splitted) {
+            final Player p = c.getPlayer();
+            p.dropMessage(5, "!hide - hides the current character");
+            p.dropMessage(5, "!drop <itemid> <quantity>");
+            p.dropMessage(5, "!spawn <mobid>");
+            p.dropMessage(5, "!level <level> - set the current level");
+            p.dropMessage(
+                5,
+                "!event [optional <mapid>] - begin an event on a channel"
+            );
+            p.dropMessage(5, "!zakum - spawn zakum");
+            p.dropMessage(5, "!horntail - spawn horntail (TODO)");
+            p.dropMessage(5, "!cake [optional <mobhp>] - spawn cake monster");
+            p.dropMessage(5, "!papu - spawn papulatus");
+            p.dropMessage(5, "!map <mapid> - warp player to map");
+            p.dropMessage(5, "!bomb [optional <count>] - spawn a bomb");
+            p.dropMessage(5, "!killall - kill all monsters on the map");
+            p.dropMessage(5, "!levelup - increase the current level by one");
+            p.dropMessage(
+                5,
+                "!clock [optional <seconds>] - set a timer at the top of the map"
+            );
+            p.dropMessage(5, "!buffme - apply all the buffs");
+            p.dropMessage(5, "!killmap - kill all the players on the map.");
+            p.dropMessage(5, "!mutemap - mute the current map");
+            p.dropMessage(5, "!unmute - unmute the current map");
+            p.dropMessage(
+                5,
+                "!unbuffmap - remove buffs from all players in the current map"
+            );
+            p.dropMessage(5, "!setall <value> - set all stats to the value");
+            p.dropMessage(5, "!whereami - show the id of the current map");
+            p.dropMessage(
+                5,
+                "!job <jobid> - set the job for the current character"
+            );
+            p.dropMessage(5, "!fullhp - increase hp and mp to max values");
+            p.dropMessage(5, "!gainmeso <value> - add mesos to your inventory");
+            p.dropMessage(5, "!healhere - heal all characters on the map");
+            p.dropMessage(5, "!dc [-f] <player> - disconnect a player");
+            p.dropMessage(5, "!online - show the players online");
+            p.dropMessage(5, "!giftnx <player> <amount> - gift a player nx");
+            p.dropMessage(
+                5,
+                "!say <message> - broadcast a message to the server"
+            );
+            p.dropMessage(
+                5,
+                "!warn <message> - send a warning message to all players"
+            );
+            p.dropMessage(5, "!openportal <portalid> - open a portal");
+            p.dropMessage(5, "!closeportal <portalid> - close a portal");
+            p.dropMessage(
+                5,
+                "!closeportals - close all portals in the current map"
+            );
+            p.dropMessage(
+                5,
+                "!openportals - open all portals in the current map"
+            );
+            p.dropMessage(
+                5,
+                "!itemcheck <player> <itemid> - check how many items a player has"
+            );
+            p.dropMessage(
+                5,
+                "!song <songid> - change the current bgm of the map"
+            );
+            p.dropMessage(
+                5,
+                "!removeitem <player> <itemid> - remove items from the inventory of a player"
+            );
+            p.dropMessage(
+                5,
+                "!speakmega <player> <message> - send a message as another player on megaphone"
+            );
+            p.dropMessage(
+                5,
+                "!speak <player> <message> - say a message as a player"
+            );
+            p.dropMessage(
+                5,
+                "!speakmap <message> - make all players speak a message"
+            );
+            p.dropMessage(
+                5,
+                "!mesoeveryone <amount> - Give everyone online mesos"
+            );
+            p.dropMessage(
+                5,
+                "!charinfo <player> - show information about a player"
+            );
+            p.dropMessage(5, "!cheaters - show information about cheaters");
+            p.dropMessage(
+                5,
+                "!maxskills - max the skills of the current player"
+            );
+            p.dropMessage(5, "!cleardrops - remove drops from the map");
+            p.dropMessage(
+                5,
+                "!exprate <value> [all] - change the experience rate for channel (or world)"
+            );
+            p.dropMessage(
+                5,
+                "!mesorate <value> [all] - change the meso rate for the channel (or world)"
+            );
+            p.dropMessage(
+                5,
+                "!droprate <value> [all] - change the drop rate for the channel (or world)"
+            );
+            p.dropMessage(
+                5,
+                "!questrate <value> [all] - change the quest rate for the channel (or world)"
+            );
+            p.dropMessage(
+                5,
+                "!fame <player> <value> - set the fame of a character"
+            );
+            p.dropMessage(5, "!eventrules - show the event rules in the map");
+            p.dropMessage(
+                5,
+                "!setname <old> <new> - sets the name of a character"
+            );
+            p.dropMessage(
+                5,
+                "!uptime - get how long the server has been online"
+            );
+            p.dropMessage(
+                5,
+                "!item <itemid> <quantity> - add an item to the inventory"
+            );
+            p.dropMessage(5, "!goto <location> - transport to a town center");
+            p.dropMessage(5, "!help - show help for gm commands");
             return true;
         }
     }
