@@ -27,6 +27,7 @@ public class PlayerCommand {
         return CoomandRank.NORMAL;
     }
 
+    /** @joinevent - If an event is in progress, use this to warp to the event map. */
     public static class JoinEvent extends CommandExecute {
 
         @Override
@@ -56,6 +57,7 @@ public class PlayerCommand {
         }
     }
 
+    /** @leaveevent - If an event has ended, use this to warp to your original map. */
     public static class LeaveEvent extends CommandExecute {
 
         @Override
@@ -80,6 +82,7 @@ public class PlayerCommand {
         }
     }
 
+    /** @drops - bring up the search interface for item drops */
     public static class Drops extends CommandExecute {
 
         @Override
@@ -89,6 +92,7 @@ public class PlayerCommand {
         }
     }
 
+    /** @playtime - Shows the playing time within our server. */
     public static class Playtime extends CommandExecute {
 
         @Override
@@ -104,6 +108,7 @@ public class PlayerCommand {
         }
     }
 
+    /** @gm <message>: Sends a message to all online GMs in the case of an emergency. */
     public static class Gm extends CommandExecute {
 
         @Override
@@ -150,6 +155,7 @@ public class PlayerCommand {
         }
     }
 
+    /** @uptime - Shows how long the server has been online. */
     public static class Uptime extends CommandExecute {
 
         @Override
@@ -179,6 +185,7 @@ public class PlayerCommand {
         }
     }
 
+    /** @dispose - Fixes your character if it is stuck. */
     public static class Dispose extends CommandExecute {
 
         @Override
@@ -190,6 +197,7 @@ public class PlayerCommand {
         }
     }
 
+    /* @help - show a list of player commands */
     public static class help extends Commands {}
 
     public static class Commands extends CommandExecute {

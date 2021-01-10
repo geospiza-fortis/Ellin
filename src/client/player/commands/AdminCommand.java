@@ -61,6 +61,7 @@ public class AdminCommand {
         return CoomandRank.ADMIN;
     }
 
+    /** !shutdowntime <time> - show notice for shutdown */
     public static class ShutdownTime extends AdminCommand.Shutdown {
 
         private static ScheduledFuture<?> ts = null;
@@ -74,9 +75,9 @@ public class AdminCommand {
                 .getPlayer()
                 .dropMessage(
                     6,
-                    "Desligando o servidor em... " +
+                    "Shutting down the server in " +
                     this.minutesLeft +
-                    " minutos"
+                    " minutes"
                 );
 
             if (ts == null && (t == null || !t.isAlive())) {
@@ -100,7 +101,7 @@ public class AdminCommand {
                                         0,
                                         "The server will be shut down in " +
                                         AdminCommand.ShutdownTime.this.minutesLeft +
-                                        " minutos. Por favor, fa�a logoff com seguran�a."
+                                        " minutes. Please log off safely."
                                     )
                                 );
                                 AdminCommand.ShutdownTime.this.minutesLeft--;
@@ -119,6 +120,7 @@ public class AdminCommand {
         }
     }
 
+    /** !position - show the current player position and foothold */
     public static class Position extends CommandExecute {
 
         @Override
@@ -139,6 +141,7 @@ public class AdminCommand {
         }
     }
 
+    /** !expeds - show the status of expeditions */
     public static class Expeds extends CommandExecute {
 
         @Override
@@ -198,6 +201,7 @@ public class AdminCommand {
         }
     }
 
+    /** !seeds - spawn seeds in Henesys PQ */
     public static class Seeds extends CommandExecute {
 
         @Override
@@ -247,6 +251,7 @@ public class AdminCommand {
         }
     }
 
+    /** !reloadevents - reload events */
     public static class ReloadEvents extends CommandExecute {
 
         @Override
@@ -259,6 +264,7 @@ public class AdminCommand {
         }
     }
 
+    /** !reloaddrops - reload drops  */
     public static class ReloadDrops extends CommandExecute {
 
         @Override
@@ -269,6 +275,7 @@ public class AdminCommand {
         }
     }
 
+    /** !reloadportals - reload portal */
     public static class ReloadPortals extends CommandExecute {
 
         @Override
@@ -279,6 +286,7 @@ public class AdminCommand {
         }
     }
 
+    /** !reloadmaps - reload the current map */
     public static class ReloadMaps extends CommandExecute {
 
         @Override
@@ -303,13 +311,14 @@ public class AdminCommand {
         }
     }
 
+    /** !shutdown - shutdown the server */
     public static class Shutdown extends CommandExecute {
 
         public static Thread t = null;
 
         @Override
         public boolean execute(Client c, String[] splitted) {
-            c.getPlayer().dropMessage(6, "Desligando...");
+            c.getPlayer().dropMessage(6, "Shutting down...");
             if (t == null || !t.isAlive()) {
                 t = new Thread(ShutdownServer.getInstance());
                 ShutdownServer.getInstance().shutdown();
@@ -326,6 +335,7 @@ public class AdminCommand {
         }
     }
 
+    /** !servermessage <message> - set the current server message in the scroll bar */
     public static class ServerMessage extends CommandExecute {
 
         @Override
@@ -339,6 +349,7 @@ public class AdminCommand {
         }
     }
 
+    /** !saveall - save the current state of the world to the database */
     public static class SaveAll extends CommandExecute {
 
         @Override
@@ -360,6 +371,7 @@ public class AdminCommand {
         }
     }
 
+    /** !warpallhere - warp all players to the current map in the channel */
     public static class WarpAllHere extends CommandExecute {
 
         @Override
@@ -416,6 +428,7 @@ public class AdminCommand {
         }
     }
 
+    /** !superequip <id> <stat> - create a weapon with custom stats */
     public static class SuperEquip extends CommandExecute {
 
         @Override
@@ -458,6 +471,7 @@ public class AdminCommand {
         }
     }
 
+    /** !npc <npcid> - spawn an npc at the current position */
     public static class NPC extends CommandExecute {
 
         @Override
@@ -493,28 +507,7 @@ public class AdminCommand {
         }
     }
 
-    public static class MyNPCPos extends CommandExecute {
-
-        @Override
-        public boolean execute(Client c, String[] splitted) {
-            Point pos = c.getPlayer().getPosition();
-            c
-                .getPlayer()
-                .dropMessage(
-                    6,
-                    "X: " +
-                    pos.x +
-                    " | Y: " +
-                    pos.y +
-                    " | RX0: " +
-                    (pos.x) +
-                    " | RX1: " +
-                    (pos.x)
-                );
-            return true;
-        }
-    }
-
+    /** !notice <type> <message> - send various message types to players */
     public static class Notice extends CommandExecute {
 
         private static int getNoticeType(String typestring) {
@@ -594,6 +587,7 @@ public class AdminCommand {
         }
     }
 
+    /** !find <one of: npc, mob, item, map, skill> <term> - search for the id of an item */
     public static class Find extends CommandExecute {
 
         @Override
@@ -820,12 +814,7 @@ public class AdminCommand {
         }
     }
 
-    public static class ID extends Find {}
-
-    public static class LookUp extends Find {}
-
-    public static class Search extends Find {}
-
+    /** !warp [player] [mapid] - warp a player to a map */
     public static class Warp extends CommandExecute {
 
         @Override
@@ -898,6 +887,7 @@ public class AdminCommand {
         }
     }
 
+    /** !warpchhere - warp all players in the channel to the current map */
     public static class warpChHere extends CommandExecute {
 
         @Override
@@ -927,6 +917,7 @@ public class AdminCommand {
         }
     }
 
+    /** !warpmapto <mapid> - warp a player a map  */
     public static class WarpMapTo extends CommandExecute {
 
         @Override
@@ -948,6 +939,7 @@ public class AdminCommand {
         }
     }
 
+    /** !warphere <player> - warp a player to the current map */
     public static class WarpHere extends CommandExecute {
 
         @Override
@@ -996,6 +988,7 @@ public class AdminCommand {
         }
     }
 
+    /** !rgm <player> <message> - send a gm notice to a player */
     public static class rgm extends CommandExecute {
 
         @Override
@@ -1026,6 +1019,7 @@ public class AdminCommand {
         }
     }
 
+    /** !pnpc <npcid> - place an NPC at the current position */
     public static class PNPC extends CommandExecute {
 
         @Override
@@ -1097,6 +1091,7 @@ public class AdminCommand {
         }
     }
 
+    /** !sreactor <mobid> <mobTime> - spawn a reactor at the current location */
     public static class SReactor extends CommandExecute {
 
         @Override
@@ -1115,6 +1110,7 @@ public class AdminCommand {
         }
     }
 
+    /** !pmob <mobid> <mobTime> - place a mob spawn at the current position */
     public static class PMOB extends CommandExecute {
 
         @Override
@@ -1173,16 +1169,20 @@ public class AdminCommand {
                 } catch (SQLException ex) {
                     c
                         .getPlayer()
-                        .dropMessage(6, "Failed to save NPC to the database");
+                        .dropMessage(
+                            6,
+                            "Failed to save spawns to the database"
+                        );
                 }
             } else {
-                c.getPlayer().dropMessage("You have entered an invalid Npc-Id");
+                c.getPlayer().dropMessage("You have entered an invalid mob id");
                 return false;
             }
             return true;
         }
     }
 
+    /** !showtrace <threadid> - show the stack trace on a thread */
     public static class ShowTrace extends CommandExecute {
 
         @Override
@@ -1201,6 +1201,7 @@ public class AdminCommand {
         }
     }
 
+    /** !threads - show the currently running threads */
     public static class Threads extends CommandExecute {
 
         @Override
